@@ -14,10 +14,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Fich - Take Control of Your Digital Assets</title>
+        <title>Crypto Trading Platform - Secure Digital Asset Trading | Fich</title>
         <meta
           name="description"
-          content="Fich offers a seamless, secure experience for managing your digital assets. Instant transactions, optimized fees, and premium design."
+          content="Fich Crypto Trading Platform - trade digital assets securely with instant transactions, optimized fees, and a premium interface built for all levels. Streamline your cryptocurrency trading while your funds stay safe."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
