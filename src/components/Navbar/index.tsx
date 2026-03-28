@@ -1,7 +1,14 @@
 import React from "react";
+import Link from "next/link";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { toggleMobileMenu, closeMobileMenu, toggleTheme } from "@/store/uiSlice";
+import {
+  toggleMobileMenu,
+  closeMobileMenu,
+  toggleTheme,
+} from "@/store/uiSlice";
+import { logout } from "@/store/authSlice";
+import UserMenu from "./UserMenu";
 import {
   Nav,
   NavContainer,
@@ -15,6 +22,12 @@ import {
   MobileMenu,
   MobileNavLink,
   RightGroup,
+  NavAuthGroup,
+  NavLoginButton,
+  NavSignupButton,
+  MobileAuthGroup,
+  MobileLoginButton,
+  MobileSignupButton,
 } from "./styles";
 
 const NAV_ITEMS = [
@@ -29,6 +42,7 @@ const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
   const mobileMenuOpen = useAppSelector((s) => s.ui.mobileMenuOpen);
   const themeName = useAppSelector((s) => s.ui.themeName);
+  const { isAuthenticated, user } = useAppSelector((s) => s.auth);
 
   return (
     <Nav>
@@ -54,6 +68,21 @@ const Navbar: React.FC = () => {
             {themeName === "dark" ? <FaSun size={16} /> : <FaMoon size={16} />}
           </ThemeToggle>
 
+          {isAuthenticated ? (
+            <NavAuthGroup>
+              <UserMenu />
+            </NavAuthGroup>
+          ) : (
+            <NavAuthGroup>
+              <Link href="/login" passHref legacyBehavior>
+                <NavLoginButton>Log in</NavLoginButton>
+              </Link>
+              <Link href="/signup" passHref legacyBehavior>
+                <NavSignupButton>Sign up</NavSignupButton>
+              </Link>
+            </NavAuthGroup>
+          )}
+
           <Hamburger
             onClick={() => dispatch(toggleMobileMenu())}
             $open={mobileMenuOpen}
@@ -75,6 +104,37 @@ const Navbar: React.FC = () => {
             {item.label}
           </MobileNavLink>
         ))}
+
+        {isAuthenticated ? (
+          <MobileAuthGroup>
+            <Link href="/profile" passHref legacyBehavior>
+              <MobileLoginButton onClick={() => dispatch(closeMobileMenu())}>
+                Profile
+              </MobileLoginButton>
+            </Link>
+            <MobileLoginButton
+              onClick={() => {
+                dispatch(logout());
+                dispatch(closeMobileMenu());
+              }}
+            >
+              Log out
+            </MobileLoginButton>
+          </MobileAuthGroup>
+        ) : (
+          <MobileAuthGroup>
+            <Link href="/login" passHref legacyBehavior>
+              <MobileLoginButton onClick={() => dispatch(closeMobileMenu())}>
+                Log in
+              </MobileLoginButton>
+            </Link>
+            <Link href="/signup" passHref legacyBehavior>
+              <MobileSignupButton onClick={() => dispatch(closeMobileMenu())}>
+                Sign up
+              </MobileSignupButton>
+            </Link>
+          </MobileAuthGroup>
+        )}
       </MobileMenu>
     </Nav>
   );
