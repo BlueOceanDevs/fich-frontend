@@ -31,11 +31,11 @@ import {
 } from "./styles";
 
 const NAV_ITEMS = [
-  { label: "Cryptos", href: "#cryptos" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Cryptos", href: "/#cryptos" },
+  { label: "How it works", href: "/#how-it-works" },
+  { label: "Testimonials", href: "/#testimonials" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "FAQ", href: "/#faq" },
 ];
 
 const Navbar: React.FC = () => {
@@ -47,7 +47,7 @@ const Navbar: React.FC = () => {
   return (
     <Nav>
       <NavContainer>
-        <Logo href="#">
+        <Logo href="/">
           <LogoDot />
           Fich
         </Logo>

@@ -8,7 +8,7 @@ import { setAuthenticated, fetchUser } from "@/store/authSlice";
 import { authApi } from "@/api/auth";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import AuthLayout from "@/components/Auth/AuthLayout";
-import GoogleIcon from "@/components/Auth/GoogleIcon";
+import GoogleAuthButton from "@/components/Auth/GoogleAuthButton";
 import {
   AuthForm,
   FieldGroup,
@@ -22,7 +22,6 @@ import {
   PrimaryButton,
   Spinner,
   Divider,
-  GoogleButton,
   AuthFooter,
   AuthLink,
   Alert,
@@ -70,8 +69,23 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    form.setGlobalError("Google login is not configured yet.");
+  const handleGoogleLogin = async (credential: string) => {
+    form.resetMessages();
+    form.setLoading(true);
+
+    try {
+      await authApi.googleLogin({ idToken: credential });
+      dispatch(setAuthenticated());
+      dispatch(fetchUser());
+      router.push("/");
+    } catch (err: any) {
+      form.setGlobalError(
+        err.response?.data?.errors?.[0] ||
+          "Google login failed. Please try again."
+      );
+    } finally {
+      form.setLoading(false);
+    }
   };
 
   return (
@@ -151,10 +165,13 @@ export default function LoginPage() {
             <span>or</span>
           </Divider>
 
-          <GoogleButton type="button" onClick={handleGoogleLogin}>
-            <GoogleIcon />
-            Continue with Google
-          </GoogleButton>
+          <GoogleAuthButton
+            text="signin_with"
+            context="signin"
+            onCredential={handleGoogleLogin}
+            onError={form.setGlobalError}
+            disabled={form.loading}
+          />
         </AuthForm>
 
         <AuthFooter>

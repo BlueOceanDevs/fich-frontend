@@ -1,40 +1,90 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { FaCamera } from "react-icons/fa";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchUser, updateUser } from "@/store/authSlice";
+import styled from "styled-components";
 import { userApi } from "@/api/user";
-import AuthLayout from "@/components/Auth/AuthLayout";
+import Layout from "@/components/Layout";
 import {
+  Alert,
   AuthForm,
+  FieldError,
   FieldGroup,
   FieldRow,
-  Label,
   Input,
-  FieldError,
+  Label,
   PrimaryButton,
   Spinner,
-  Alert,
 } from "@/components/Auth/styles";
-import styled from "styled-components";
+import { fetchUser, updateUser } from "@/store/authSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
-// ─────────────────────────────────────────────
-// Profile-specific styles
-// ─────────────────────────────────────────────
+const ProfileSection = styled.section`
+  padding: 128px 24px 88px;
+  background:
+    radial-gradient(
+      circle at top,
+      ${({ theme }) => `${theme.colors.primary}14`} 0%,
+      transparent 34%
+    ),
+    ${({ theme }) => theme.colors.background};
+`;
+
+const ProfileContainer = styled.div`
+  width: 100%;
+  max-width: ${({ theme }) => theme.maxWidth};
+  margin: 0 auto;
+`;
+
+const ProfileHeader = styled.div`
+  max-width: 640px;
+  margin-bottom: 28px;
+`;
+
+const ProfileTitle = styled.h1`
+  font-size: clamp(32px, 4vw, 44px);
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.text};
+  margin-bottom: 10px;
+`;
+
+const ProfileSubtitle = styled.p`
+  font-size: 16px;
+  line-height: 1.7;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+const ProfileCard = styled.div`
+  width: 100%;
+  max-width: 760px;
+  padding: 32px;
+  background: ${({ theme }) => theme.colors.card};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  box-shadow: 0 24px 80px ${({ theme }) => `${theme.colors.background}40`};
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    padding: 24px 18px;
+  }
+`;
 
 const AvatarSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  margin-bottom: 8px;
+  padding-bottom: 6px;
 `;
 
-const AvatarWrapper = styled.div`
+const AvatarWrapper = styled.button`
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 88px;
+  height: 88px;
+  padding: 0;
+  border: none;
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
@@ -66,26 +116,32 @@ const AvatarOverlay = styled.div`
   color: #fff;
 `;
 
+const AvatarHint = styled.span`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
 const HiddenInput = styled.input`
   display: none;
 `;
 
-const SectionLabel = styled.h3`
+const SectionLabel = styled.h2`
   font-size: 15px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text};
-  margin-bottom: -8px;
-  margin-top: 8px;
+  margin: 6px 0 -8px;
 `;
+
+function trimOrEmpty(value: string) {
+  return value.trim();
+}
 
 export default function ProfilePage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isAuthenticated, user } = useAppSelector((s) => s.auth);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Form state
   const [firstName, setFirstName] = useState(user?.firstName ?? "");
   const [lastName, setLastName] = useState(user?.lastName ?? "");
   const [displayName, setDisplayName] = useState(user?.displayName ?? "");
@@ -95,7 +151,6 @@ export default function ProfilePage() {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Sync form when user data loads
   useEffect(() => {
     if (user) {
       setFirstName(user.firstName ?? "");
@@ -104,7 +159,6 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace("/login");
@@ -112,6 +166,16 @@ export default function ProfilePage() {
   }, [isAuthenticated, router]);
 
   if (!isAuthenticated || !user) return null;
+
+  const clearFieldError = (field: "firstName" | "lastName") => {
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -127,17 +191,19 @@ export default function ProfilePage() {
 
     try {
       await userApi.setAvatarImage(file);
-      // Refetch user to get updated imageUrl
       dispatch(fetchUser());
       setSuccessMsg("Avatar updated successfully.");
     } catch (err: any) {
       setErrorMsg(
-        err.message || err.response?.data?.errors?.[0] || "Failed to upload avatar."
+        err.message ||
+          err.response?.data?.errors?.[0] ||
+          "Failed to upload avatar."
       );
     } finally {
       setUploadingAvatar(false);
-      // Reset file input so the same file can be selected again
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -147,33 +213,52 @@ export default function ProfilePage() {
     setErrorMsg("");
     setErrors({});
 
+    const trimmedFirstName = trimOrEmpty(firstName);
+    const trimmedLastName = trimOrEmpty(lastName);
+    const trimmedDisplayName = trimOrEmpty(displayName);
+
     const newErrors: Record<string, string> = {};
-    if (!firstName.trim()) newErrors.firstName = "First name is required";
-    if (!lastName.trim()) newErrors.lastName = "Last name is required";
+    if (trimmedFirstName && trimmedFirstName.length < 2) {
+      newErrors.firstName = "Must be at least 2 characters";
+    }
+    if (trimmedLastName && trimmedLastName.length < 2) {
+      newErrors.lastName = "Must be at least 2 characters";
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    setSaving(true);
-    try {
-      // Update name
-      await userApi.setName({
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-      });
+    const nameChanged =
+      trimmedFirstName !== (user.firstName ?? "") ||
+      trimmedLastName !== (user.lastName ?? "");
+    const displayNameChanged = trimmedDisplayName !== (user.displayName ?? "");
 
-      // Update display name if changed
-      if (displayName.trim() !== (user.displayName ?? "")) {
-        await userApi.setDisplayName(displayName.trim());
+    if (!nameChanged && !displayNameChanged) {
+      setSuccessMsg("No changes to save.");
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      if (nameChanged) {
+        await userApi.setName({
+          firstName: trimmedFirstName,
+          lastName: trimmedLastName,
+        });
       }
 
-      // Optimistically update Redux
+      if (displayNameChanged) {
+        await userApi.setDisplayName(trimmedDisplayName);
+      }
+
       dispatch(
         updateUser({
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          displayName: displayName.trim() || null,
+          firstName: trimmedFirstName || null,
+          lastName: trimmedLastName || null,
+          displayName: trimmedDisplayName || null,
         })
       );
 
@@ -192,89 +277,126 @@ export default function ProfilePage() {
       <Head>
         <title>Profile - Fich</title>
       </Head>
-      <AuthLayout title="Your Profile" subtitle="Manage your account information">
-        {successMsg && <Alert $variant="success">{successMsg}</Alert>}
-        {errorMsg && <Alert $variant="error">{errorMsg}</Alert>}
 
-        <AvatarSection>
-          <AvatarWrapper onClick={handleAvatarClick}>
-            <AvatarImg
-              src={user.imageUrl || "/default-avatar.svg"}
-              alt="Avatar"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "/default-avatar.svg";
-              }}
-            />
-            <AvatarOverlay>
-              <FaCamera size={20} />
-            </AvatarOverlay>
-          </AvatarWrapper>
-          {uploadingAvatar && (
-            <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-              Uploading...
-            </span>
-          )}
-          <HiddenInput
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            onChange={handleAvatarChange}
-          />
-        </AvatarSection>
+      <Layout>
+        <ProfileSection>
+          <ProfileContainer>
+            <ProfileHeader>
+              <ProfileTitle>Your profile</ProfileTitle>
+              <ProfileSubtitle>
+                Manage your account information, update your avatar, and keep
+                your public profile details current.
+              </ProfileSubtitle>
+            </ProfileHeader>
 
-        <AuthForm onSubmit={handleSubmit}>
-          <FieldGroup>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" value={user.email} disabled />
-          </FieldGroup>
+            <ProfileCard>
+              {successMsg && <Alert $variant="success">{successMsg}</Alert>}
+              {errorMsg && <Alert $variant="error">{errorMsg}</Alert>}
 
-          <SectionLabel>Name</SectionLabel>
+              <AvatarSection>
+                <AvatarWrapper type="button" onClick={handleAvatarClick}>
+                  <AvatarImg
+                    src={user.imageUrl || "/default-avatar.svg"}
+                    alt="Avatar"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        "/default-avatar.svg";
+                    }}
+                  />
+                  <AvatarOverlay>
+                    <FaCamera size={20} />
+                  </AvatarOverlay>
+                </AvatarWrapper>
 
-          <FieldRow>
-            <FieldGroup>
-              <Label htmlFor="firstName">First name</Label>
-              <Input
-                id="firstName"
-                type="text"
-                placeholder="First name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                $hasError={!!errors.firstName}
-              />
-              {errors.firstName && <FieldError>{errors.firstName}</FieldError>}
-            </FieldGroup>
+                <AvatarHint>
+                  {uploadingAvatar
+                    ? "Uploading avatar..."
+                    : "Click the image to upload a new avatar"}
+                </AvatarHint>
 
-            <FieldGroup>
-              <Label htmlFor="lastName">Last name</Label>
-              <Input
-                id="lastName"
-                type="text"
-                placeholder="Last name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                $hasError={!!errors.lastName}
-              />
-              {errors.lastName && <FieldError>{errors.lastName}</FieldError>}
-            </FieldGroup>
-          </FieldRow>
+                <HiddenInput
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleAvatarChange}
+                />
+              </AvatarSection>
 
-          <FieldGroup>
-            <Label htmlFor="displayName">Display name</Label>
-            <Input
-              id="displayName"
-              type="text"
-              placeholder="Display name (optional)"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-            />
-          </FieldGroup>
+              <AuthForm onSubmit={handleSubmit}>
+                <FieldGroup>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={user.email}
+                    disabled
+                    autoComplete="email"
+                  />
+                </FieldGroup>
 
-          <PrimaryButton type="submit" disabled={saving} $loading={saving}>
-            {saving && <Spinner />}
-            {saving ? "Saving..." : "Save changes"}
-          </PrimaryButton>
-        </AuthForm>
-      </AuthLayout>
+                <SectionLabel>Name</SectionLabel>
+
+                <FieldRow>
+                  <FieldGroup>
+                    <Label htmlFor="firstName">First name (optional)</Label>
+                    <Input
+                      id="firstName"
+                      type="text"
+                      placeholder="First name"
+                      value={firstName}
+                      onChange={(e) => {
+                        setFirstName(e.target.value);
+                        clearFieldError("firstName");
+                      }}
+                      $hasError={!!errors.firstName}
+                      autoComplete="given-name"
+                    />
+                    {errors.firstName && (
+                      <FieldError>{errors.firstName}</FieldError>
+                    )}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <Label htmlFor="lastName">Last name (optional)</Label>
+                    <Input
+                      id="lastName"
+                      type="text"
+                      placeholder="Last name"
+                      value={lastName}
+                      onChange={(e) => {
+                        setLastName(e.target.value);
+                        clearFieldError("lastName");
+                      }}
+                      $hasError={!!errors.lastName}
+                      autoComplete="family-name"
+                    />
+                    {errors.lastName && (
+                      <FieldError>{errors.lastName}</FieldError>
+                    )}
+                  </FieldGroup>
+                </FieldRow>
+
+                <FieldGroup>
+                  <Label htmlFor="displayName">Display name</Label>
+                  <Input
+                    id="displayName"
+                    type="text"
+                    placeholder="Display name (optional)"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    autoComplete="nickname"
+                  />
+                </FieldGroup>
+
+                <PrimaryButton type="submit" disabled={saving} $loading={saving}>
+                  {saving && <Spinner />}
+                  {saving ? "Saving..." : "Save changes"}
+                </PrimaryButton>
+              </AuthForm>
+            </ProfileCard>
+          </ProfileContainer>
+        </ProfileSection>
+      </Layout>
     </>
   );
 }

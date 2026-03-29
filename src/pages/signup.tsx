@@ -8,7 +8,7 @@ import { setAuthenticated, fetchUser } from "@/store/authSlice";
 import { authApi } from "@/api/auth";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import AuthLayout from "@/components/Auth/AuthLayout";
-import GoogleIcon from "@/components/Auth/GoogleIcon";
+import GoogleAuthButton from "@/components/Auth/GoogleAuthButton";
 import {
   AuthForm,
   FieldGroup,
@@ -21,7 +21,6 @@ import {
   PrimaryButton,
   Spinner,
   Divider,
-  GoogleButton,
   AuthFooter,
   AuthLink,
   Alert,
@@ -103,8 +102,23 @@ export default function SignupPage() {
     }
   };
 
-  const handleGoogleSignup = () => {
-    form.setGlobalError("Google signup is not configured yet.");
+  const handleGoogleSignup = async (credential: string) => {
+    form.resetMessages();
+    form.setLoading(true);
+
+    try {
+      await authApi.googleLogin({ idToken: credential });
+      dispatch(setAuthenticated());
+      dispatch(fetchUser());
+      router.push("/");
+    } catch (err: any) {
+      form.setGlobalError(
+        err.response?.data?.errors?.[0] ||
+          "Google signup failed. Please try again."
+      );
+    } finally {
+      form.setLoading(false);
+    }
   };
 
   return (
@@ -230,10 +244,13 @@ export default function SignupPage() {
             <span>or</span>
           </Divider>
 
-          <GoogleButton type="button" onClick={handleGoogleSignup}>
-            <GoogleIcon />
-            Continue with Google
-          </GoogleButton>
+          <GoogleAuthButton
+            text="signup_with"
+            context="signup"
+            onCredential={handleGoogleSignup}
+            onError={form.setGlobalError}
+            disabled={form.loading}
+          />
         </AuthForm>
 
         <AuthFooter>

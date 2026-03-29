@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import type { UserInfo } from "@/api/types";
 import { userApi } from "@/api/user";
 import { authApi } from "@/api/auth";
+import { disableGoogleAutoSelect } from "@/utils/google-identity";
 
 // ─────────────────────────────────────────────
 // State
@@ -45,6 +46,7 @@ export const logout = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       await authApi.logout();
+      disableGoogleAutoSelect();
     } catch {
       return rejectWithValue("Logout failed");
     }
