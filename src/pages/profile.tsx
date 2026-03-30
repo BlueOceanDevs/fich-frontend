@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { FaCamera } from "react-icons/fa";
+import Link from "next/link";
+import { FaCamera, FaCrown, FaExternalLinkAlt } from "react-icons/fa";
 import styled from "styled-components";
 import { userApi } from "@/api/user";
+import { ordersApi } from "@/api/orders";
 import Layout from "@/components/Layout";
 import {
   Alert,
@@ -17,7 +19,13 @@ import {
   Spinner,
 } from "@/components/Auth/styles";
 import { fetchUser, updateUser } from "@/store/authSlice";
+import { fetchSubscription } from "@/store/subscriptionSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import type { OrderDto } from "@/api/types";
+
+// ─────────────────────────────────────────────
+// Styled components
+// ─────────────────────────────────────────────
 
 const ProfileSection = styled.section`
   padding: 128px 24px 88px;
@@ -54,9 +62,17 @@ const ProfileSubtitle = styled.p`
   color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
-const ProfileCard = styled.div`
-  width: 100%;
-  max-width: 760px;
+const CardsGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const Card = styled.div`
   padding: 32px;
   background: ${({ theme }) => theme.colors.card};
   border: 1px solid ${({ theme }) => theme.colors.cardBorder};
@@ -69,6 +85,19 @@ const ProfileCard = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
     padding: 24px 18px;
   }
+`;
+
+const FullWidthCard = styled(Card)`
+  grid-column: 1 / -1;
+`;
+
+const CardTitle = styled.h2`
+  font-size: 18px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;
 
 const AvatarSection = styled.div`
@@ -132,14 +161,191 @@ const SectionLabel = styled.h2`
   margin: 6px 0 -8px;
 `;
 
+// ── Subscription card ──
+
+const SubInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const SubRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+`;
+
+const SubLabel = styled.span`
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+const SubValue = styled.span`
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+const PlanBadge = styled.span<{ $tier: string }>`
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  font-size: 13px;
+  font-weight: 600;
+  background: ${({ $tier }) =>
+    $tier === "Enterprise"
+      ? "rgba(139, 92, 246, 0.15)"
+      : $tier === "Pro"
+        ? "rgba(0, 216, 151, 0.15)"
+        : "rgba(100, 116, 139, 0.15)"};
+  color: ${({ $tier }) =>
+    $tier === "Enterprise"
+      ? "#8b5cf6"
+      : $tier === "Pro"
+        ? "#00d897"
+        : "#94a3b8"};
+`;
+
+const UpgradeLink = styled.a`
+  display: inline-block;
+  margin-top: 4px;
+  padding: 10px 24px;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.background};
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  transition: background 0.2s;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.primaryHover};
+  }
+`;
+
+// ── Orders table ──
+
+const OrdersTable = styled.div`
+  width: 100%;
+  overflow-x: auto;
+`;
+
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+`;
+
+const Th = styled.th`
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  white-space: nowrap;
+`;
+
+const Td = styled.td`
+  padding: 12px;
+  color: ${({ theme }) => theme.colors.text};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  white-space: nowrap;
+`;
+
+const StatusBadge = styled.span<{ $status: string }>`
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  font-size: 12px;
+  font-weight: 500;
+  background: ${({ $status }) => {
+    switch ($status) {
+      case "Finished":
+        return "rgba(0, 216, 151, 0.15)";
+      case "Waiting":
+      case "Confirming":
+      case "Confirmed":
+      case "Sending":
+        return "rgba(234, 179, 8, 0.15)";
+      case "Failed":
+      case "Expired":
+      case "Refunded":
+        return "rgba(239, 68, 68, 0.12)";
+      default:
+        return "rgba(100, 116, 139, 0.15)";
+    }
+  }};
+  color: ${({ $status }) => {
+    switch ($status) {
+      case "Finished":
+        return "#00d897";
+      case "Waiting":
+      case "Confirming":
+      case "Confirmed":
+      case "Sending":
+        return "#eab308";
+      case "Failed":
+      case "Expired":
+      case "Refunded":
+        return "#ef4444";
+      default:
+        return "#94a3b8";
+    }
+  }};
+`;
+
+const InvoiceLink = styled.a`
+  color: ${({ theme }) => theme.colors.primary};
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const EmptyState = styled.p`
+  text-align: center;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  font-size: 14px;
+  padding: 24px 0;
+`;
+
+// ─────────────────────────────────────────────
+// Page component
+// ─────────────────────────────────────────────
+
 function trimOrEmpty(value: string) {
   return value.trim();
+}
+
+function formatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function daysUntil(dateStr: string): string {
+  const end = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  if (diff < 0) return "Expired";
+  if (diff === 0) return "Today";
+  if (diff === 1) return "1 day";
+  return `${diff} days`;
 }
 
 export default function ProfilePage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isAuthenticated, user } = useAppSelector((s) => s.auth);
+  const { subscription } = useAppSelector((s) => s.subscription);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [firstName, setFirstName] = useState(user?.firstName ?? "");
@@ -150,6 +356,10 @@ export default function ProfilePage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+
+  // Orders
+  const [orders, setOrders] = useState<OrderDto[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
@@ -165,21 +375,35 @@ export default function ProfilePage() {
     }
   }, [isAuthenticated, router]);
 
+  // Fetch subscription and orders
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    dispatch(fetchSubscription());
+
+    ordersApi
+      .getMyOrders()
+      .then(({ data }) => {
+        if (data.isSuccess && data.data) {
+          setOrders(data.data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setOrdersLoading(false));
+  }, [isAuthenticated, dispatch]);
+
   if (!isAuthenticated || !user) return null;
 
   const clearFieldError = (field: "firstName" | "lastName") => {
     setErrors((prev) => {
       if (!prev[field]) return prev;
-
       const next = { ...prev };
       delete next[field];
       return next;
     });
   };
 
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleAvatarClick = () => fileInputRef.current?.click();
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -201,9 +425,7 @@ export default function ProfilePage() {
       );
     } finally {
       setUploadingAvatar(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -218,12 +440,10 @@ export default function ProfilePage() {
     const trimmedDisplayName = trimOrEmpty(displayName);
 
     const newErrors: Record<string, string> = {};
-    if (trimmedFirstName && trimmedFirstName.length < 2) {
+    if (trimmedFirstName && trimmedFirstName.length < 2)
       newErrors.firstName = "Must be at least 2 characters";
-    }
-    if (trimmedLastName && trimmedLastName.length < 2) {
+    if (trimmedLastName && trimmedLastName.length < 2)
       newErrors.lastName = "Must be at least 2 characters";
-    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -249,7 +469,6 @@ export default function ProfilePage() {
           lastName: trimmedLastName,
         });
       }
-
       if (displayNameChanged) {
         await userApi.setDisplayName(trimmedDisplayName);
       }
@@ -272,6 +491,11 @@ export default function ProfilePage() {
     }
   };
 
+  const isFreeForever =
+    subscription?.isActive &&
+    subscription.planTier === "Free" &&
+    new Date(subscription.endDate).getFullYear() > 9000;
+
   return (
     <>
       <Head>
@@ -284,116 +508,252 @@ export default function ProfilePage() {
             <ProfileHeader>
               <ProfileTitle>Your profile</ProfileTitle>
               <ProfileSubtitle>
-                Manage your account information, update your avatar, and keep
-                your public profile details current.
+                Manage your account, subscription, and order history.
               </ProfileSubtitle>
             </ProfileHeader>
 
-            <ProfileCard>
-              {successMsg && <Alert $variant="success">{successMsg}</Alert>}
-              {errorMsg && <Alert $variant="error">{errorMsg}</Alert>}
+            <CardsGrid>
+              {/* ── Profile card ── */}
+              <Card>
+                <CardTitle>Account</CardTitle>
 
-              <AvatarSection>
-                <AvatarWrapper type="button" onClick={handleAvatarClick}>
-                  <AvatarImg
-                    src={user.imageUrl || "/default-avatar.svg"}
-                    alt="Avatar"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "/default-avatar.svg";
-                    }}
-                  />
-                  <AvatarOverlay>
-                    <FaCamera size={20} />
-                  </AvatarOverlay>
-                </AvatarWrapper>
+                {successMsg && <Alert $variant="success">{successMsg}</Alert>}
+                {errorMsg && <Alert $variant="error">{errorMsg}</Alert>}
 
-                <AvatarHint>
-                  {uploadingAvatar
-                    ? "Uploading avatar..."
-                    : "Click the image to upload a new avatar"}
-                </AvatarHint>
-
-                <HiddenInput
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/gif"
-                  onChange={handleAvatarChange}
-                />
-              </AvatarSection>
-
-              <AuthForm onSubmit={handleSubmit}>
-                <FieldGroup>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={user.email}
-                    disabled
-                    autoComplete="email"
-                  />
-                </FieldGroup>
-
-                <SectionLabel>Name</SectionLabel>
-
-                <FieldRow>
-                  <FieldGroup>
-                    <Label htmlFor="firstName">First name (optional)</Label>
-                    <Input
-                      id="firstName"
-                      type="text"
-                      placeholder="First name"
-                      value={firstName}
-                      onChange={(e) => {
-                        setFirstName(e.target.value);
-                        clearFieldError("firstName");
+                <AvatarSection>
+                  <AvatarWrapper type="button" onClick={handleAvatarClick}>
+                    <AvatarImg
+                      src={user.imageUrl || "/default-avatar.svg"}
+                      alt="Avatar"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "/default-avatar.svg";
                       }}
-                      $hasError={!!errors.firstName}
-                      autoComplete="given-name"
                     />
-                    {errors.firstName && (
-                      <FieldError>{errors.firstName}</FieldError>
-                    )}
+                    <AvatarOverlay>
+                      <FaCamera size={20} />
+                    </AvatarOverlay>
+                  </AvatarWrapper>
+                  <AvatarHint>
+                    {uploadingAvatar
+                      ? "Uploading avatar..."
+                      : "Click to upload a new avatar"}
+                  </AvatarHint>
+                  <HiddenInput
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={handleAvatarChange}
+                  />
+                </AvatarSection>
+
+                <AuthForm onSubmit={handleSubmit}>
+                  <FieldGroup>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={user.email}
+                      disabled
+                      autoComplete="email"
+                    />
                   </FieldGroup>
 
+                  <SectionLabel>Name</SectionLabel>
+
+                  <FieldRow>
+                    <FieldGroup>
+                      <Label htmlFor="firstName">First name</Label>
+                      <Input
+                        id="firstName"
+                        type="text"
+                        placeholder="First name"
+                        value={firstName}
+                        onChange={(e) => {
+                          setFirstName(e.target.value);
+                          clearFieldError("firstName");
+                        }}
+                        $hasError={!!errors.firstName}
+                        autoComplete="given-name"
+                      />
+                      {errors.firstName && (
+                        <FieldError>{errors.firstName}</FieldError>
+                      )}
+                    </FieldGroup>
+
+                    <FieldGroup>
+                      <Label htmlFor="lastName">Last name</Label>
+                      <Input
+                        id="lastName"
+                        type="text"
+                        placeholder="Last name"
+                        value={lastName}
+                        onChange={(e) => {
+                          setLastName(e.target.value);
+                          clearFieldError("lastName");
+                        }}
+                        $hasError={!!errors.lastName}
+                        autoComplete="family-name"
+                      />
+                      {errors.lastName && (
+                        <FieldError>{errors.lastName}</FieldError>
+                      )}
+                    </FieldGroup>
+                  </FieldRow>
+
                   <FieldGroup>
-                    <Label htmlFor="lastName">Last name (optional)</Label>
+                    <Label htmlFor="displayName">Display name</Label>
                     <Input
-                      id="lastName"
+                      id="displayName"
                       type="text"
-                      placeholder="Last name"
-                      value={lastName}
-                      onChange={(e) => {
-                        setLastName(e.target.value);
-                        clearFieldError("lastName");
-                      }}
-                      $hasError={!!errors.lastName}
-                      autoComplete="family-name"
+                      placeholder="Display name (optional)"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      autoComplete="nickname"
                     />
-                    {errors.lastName && (
-                      <FieldError>{errors.lastName}</FieldError>
-                    )}
                   </FieldGroup>
-                </FieldRow>
 
-                <FieldGroup>
-                  <Label htmlFor="displayName">Display name</Label>
-                  <Input
-                    id="displayName"
-                    type="text"
-                    placeholder="Display name (optional)"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    autoComplete="nickname"
-                  />
-                </FieldGroup>
+                  <PrimaryButton type="submit" disabled={saving} $loading={saving}>
+                    {saving && <Spinner />}
+                    {saving ? "Saving..." : "Save changes"}
+                  </PrimaryButton>
+                </AuthForm>
+              </Card>
 
-                <PrimaryButton type="submit" disabled={saving} $loading={saving}>
-                  {saving && <Spinner />}
-                  {saving ? "Saving..." : "Save changes"}
-                </PrimaryButton>
-              </AuthForm>
-            </ProfileCard>
+              {/* ── Subscription card ── */}
+              <Card>
+                <CardTitle>
+                  <FaCrown size={16} />
+                  Subscription
+                </CardTitle>
+
+                {subscription?.isActive ? (
+                  <SubInfo>
+                    <SubRow>
+                      <SubLabel>Plan</SubLabel>
+                      <PlanBadge $tier={subscription.planTier}>
+                        {subscription.planName}
+                        {subscription.isTrial && " (Trial)"}
+                      </PlanBadge>
+                    </SubRow>
+                    <SubRow>
+                      <SubLabel>Tier</SubLabel>
+                      <SubValue>{subscription.planTier}</SubValue>
+                    </SubRow>
+                    <SubRow>
+                      <SubLabel>Billing</SubLabel>
+                      <SubValue>{subscription.billingPeriod}</SubValue>
+                    </SubRow>
+                    <SubRow>
+                      <SubLabel>Started</SubLabel>
+                      <SubValue>{formatDate(subscription.startDate)}</SubValue>
+                    </SubRow>
+                    {!isFreeForever && (
+                      <>
+                        <SubRow>
+                          <SubLabel>
+                            {subscription.isTrial ? "Trial ends" : "Renews / Expires"}
+                          </SubLabel>
+                          <SubValue>{formatDate(subscription.endDate)}</SubValue>
+                        </SubRow>
+                        <SubRow>
+                          <SubLabel>Time remaining</SubLabel>
+                          <SubValue>{daysUntil(subscription.endDate)}</SubValue>
+                        </SubRow>
+                      </>
+                    )}
+                    {isFreeForever && (
+                      <SubRow>
+                        <SubLabel>Expires</SubLabel>
+                        <SubValue>Never</SubValue>
+                      </SubRow>
+                    )}
+
+                    {subscription.planTier !== "Enterprise" && (
+                      <Link href="/plans" passHref legacyBehavior>
+                        <UpgradeLink>
+                          {subscription.planTier === "Free"
+                            ? "Upgrade Plan"
+                            : "Change Plan"}
+                        </UpgradeLink>
+                      </Link>
+                    )}
+                  </SubInfo>
+                ) : (
+                  <SubInfo>
+                    <EmptyState>
+                      You don&apos;t have an active subscription.
+                    </EmptyState>
+                    <Link href="/plans" passHref legacyBehavior>
+                      <UpgradeLink>View Plans</UpgradeLink>
+                    </Link>
+                  </SubInfo>
+                )}
+              </Card>
+
+              {/* ── Order history card ── */}
+              <FullWidthCard>
+                <CardTitle>Order History</CardTitle>
+
+                {ordersLoading ? (
+                  <EmptyState>Loading orders...</EmptyState>
+                ) : orders.length === 0 ? (
+                  <EmptyState>No orders yet.</EmptyState>
+                ) : (
+                  <OrdersTable>
+                    <Table>
+                      <thead>
+                        <tr>
+                          <Th>Order #</Th>
+                          <Th>Plan</Th>
+                          <Th>Price</Th>
+                          <Th>Paid</Th>
+                          <Th>Status</Th>
+                          <Th>Date</Th>
+                          <Th>Invoice</Th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {orders.map((order) => (
+                          <tr key={order.id}>
+                            <Td>#{order.id}</Td>
+                            <Td>
+                              {order.planName}
+                              {order.isTrial && " (Trial)"}
+                            </Td>
+                            <Td>${order.priceUsd.toFixed(2)}</Td>
+                            <Td>
+                              {order.currencyAmount != null && order.currencyPaid
+                                ? `${order.currencyAmount} ${order.currencyPaid.toUpperCase()}`
+                                : "—"}
+                            </Td>
+                            <Td>
+                              <StatusBadge $status={order.status}>
+                                {order.status}
+                              </StatusBadge>
+                            </Td>
+                            <Td>{formatDate(order.createdAt)}</Td>
+                            <Td>
+                              {order.invoiceUrl ? (
+                                <InvoiceLink
+                                  href={order.invoiceUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  View <FaExternalLinkAlt size={10} />
+                                </InvoiceLink>
+                              ) : (
+                                "—"
+                              )}
+                            </Td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </OrdersTable>
+                )}
+              </FullWidthCard>
+            </CardsGrid>
           </ProfileContainer>
         </ProfileSection>
       </Layout>

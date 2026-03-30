@@ -17,6 +17,7 @@ import pricingReducer from "./pricingSlice";
 import testimonialReducer from "./testimonialSlice";
 import faqReducer from "./faqSlice";
 import authReducer from "./authSlice";
+import subscriptionReducer from "./subscriptionSlice";
 
 // ─────────────────────────────────────────────
 // Root reducer
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
   pricing: pricingReducer,
   testimonials: testimonialReducer,
   faq: faqReducer,
+  subscription: subscriptionReducer,
 });
 
 // ─────────────────────────────────────────────

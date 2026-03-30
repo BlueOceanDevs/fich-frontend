@@ -64,3 +64,67 @@ export interface SetNameRequest {
   firstName: string;
   lastName: string;
 }
+
+// ─────────────────────────────────────────────
+// Plans
+// ─────────────────────────────────────────────
+
+export interface PlanDto {
+  id: number;
+  name: string;
+  description: string;
+  priceUsd: number;
+  effectivePriceUsd: number;
+  planBillingPeriod: string; // "Free" | "Monthly" | "Yearly"
+  tier: string; // "Free" | "Pro" | "Enterprise"
+  hasFreeTrial: boolean;
+  trialDays: number;
+  isOnSale: boolean;
+  salePercentage: number;
+  features: string | null;
+  sortOrder: number;
+}
+
+// ─────────────────────────────────────────────
+// Orders
+// ─────────────────────────────────────────────
+
+export interface CreateOrderRequest {
+  planId: number;
+  payCurrency?: string;
+}
+
+export interface OrderDto {
+  id: number;
+  planId: number;
+  planName: string;
+  priceUsd: number;
+  currencyPaid: string | null;
+  currencyAmount: number | null;
+  status: string;
+  invoiceUrl: string | null;
+  payAddress: string | null;
+  isTrial: boolean;
+  createdAt: string | null;
+}
+
+// ─────────────────────────────────────────────
+// Subscriptions
+// ─────────────────────────────────────────────
+
+export interface SubscriptionDto {
+  id: number;
+  planId: number;
+  planName: string;
+  planTier: string;
+  billingPeriod: string;
+  startDate: string;
+  endDate: string;
+  isTrial: boolean;
+  isActive: boolean;
+  isExpired: boolean;
+}
+
+export interface StartTrialRequest {
+  planId: number;
+}

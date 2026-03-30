@@ -29,6 +29,7 @@ import {
 
 export default function LoginPage() {
   const router = useRouter();
+  const redirect = (router.query.redirect as string) || "/";
   const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const form = useAuthForm({ email: "", password: "" });
@@ -59,7 +60,7 @@ export default function LoginPage() {
       });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
-      router.push("/");
+      router.push(redirect);
     } catch (err: any) {
       form.setGlobalError(
         err.response?.data?.errors?.[0] || "Login failed. Please try again."
@@ -77,7 +78,7 @@ export default function LoginPage() {
       await authApi.googleLogin({ idToken: credential });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
-      router.push("/");
+      router.push(redirect);
     } catch (err: any) {
       form.setGlobalError(
         err.response?.data?.errors?.[0] ||

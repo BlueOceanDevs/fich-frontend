@@ -151,13 +151,15 @@ export const PlanDescription = styled.p`
   line-height: 1.5;
 `;
 
-export const PlanCTA = styled.a<{ $popular: boolean }>`
+export const PlanCTA = styled.button<{ $popular: boolean }>`
   display: block;
+  width: 100%;
   text-align: center;
   padding: 12px 24px;
   border-radius: ${({ theme }) => theme.borderRadius.full};
   font-size: 14px;
   font-weight: 600;
+  cursor: pointer;
   transition: all 0.2s;
   background: ${({ $popular, theme }) =>
     $popular ? theme.colors.primary : "transparent"};
@@ -167,9 +169,14 @@ export const PlanCTA = styled.a<{ $popular: boolean }>`
     ${({ $popular, theme }) =>
       $popular ? theme.colors.primary : theme.colors.cardBorder};
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: ${({ $popular, theme }) =>
       $popular ? theme.colors.primaryHover : theme.colors.backgroundLight};
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `;
 
@@ -179,10 +186,42 @@ export const PlanDivider = styled.div`
   margin: 24px 0;
 `;
 
+export const FeatureSectionHeader = styled.p`
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  text-align: center;
+  margin-bottom: 16px;
+`;
+
 export const FeaturesList = styled.ul`
   display: flex;
   flex-direction: column;
   gap: 12px;
+`;
+
+export const TrialLink = styled.button`
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: ${({ theme }) => theme.colors.primary};
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 export const FeatureItem = styled.li`

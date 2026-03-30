@@ -14,6 +14,37 @@ const api = axios.create({
 });
 
 // ─────────────────────────────────────────────
+// Auth-clear callback — set by _app.tsx so we
+// can clear Redux state without importing the
+// store directly (avoids circular deps).
+// ─────────────────────────────────────────────
+
+let onAuthExpired: (() => void) | null = null;
+
+export function setOnAuthExpired(cb: () => void) {
+  onAuthExpired = cb;
+}
+
+// ─────────────────────────────────────────────
+// Public pages that should NOT redirect on 401
+// ─────────────────────────────────────────────
+
+const PUBLIC_PATHS = [
+  "/",
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/confirm-email",
+];
+
+function isPublicPage(): boolean {
+  if (typeof window === "undefined") return true;
+  const path = window.location.pathname;
+  return PUBLIC_PATHS.some((p) => path === p || path.startsWith("/#"));
+}
+
+// ─────────────────────────────────────────────
 // Response interceptor – auto refresh on 401
 // ─────────────────────────────────────────────
 
@@ -67,10 +98,15 @@ api.interceptors.response.use(
       return api(original);
     } catch (refreshError) {
       drainQueue(refreshError);
-      // Redirect to login – the refresh token is also dead
-      if (typeof window !== "undefined") {
+
+      // Clear auth state so the UI reflects logged-out
+      onAuthExpired?.();
+
+      // Only redirect to login if the user is on a protected page
+      if (typeof window !== "undefined" && !isPublicPage()) {
         window.location.href = "/login";
       }
+
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

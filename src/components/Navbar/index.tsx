@@ -34,7 +34,7 @@ const NAV_ITEMS = [
   { label: "Cryptos", href: "/#cryptos" },
   { label: "How it works", href: "/#how-it-works" },
   { label: "Testimonials", href: "/#testimonials" },
-  { label: "Pricing", href: "/#pricing" },
+  { label: "Pricing", href: "/plans" },
   { label: "FAQ", href: "/#faq" },
 ];
 
