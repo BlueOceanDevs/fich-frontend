@@ -1,47 +1,13 @@
 import styled from "styled-components";
 
-export const Section = styled.section`
-  padding: 100px 24px;
-  border-top: 1px solid ${({ theme }) => theme.colors.divider};
-`;
-
-export const Container = styled.div`
-  max-width: ${({ theme }) => theme.maxWidth};
-  margin: 0 auto;
-`;
-
-export const Header = styled.div`
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 48px;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    flex-direction: column;
-    gap: 20px;
-  }
-`;
-
-export const HeaderLeft = styled.div`
-  max-width: 550px;
-`;
-
-export const Title = styled.h2`
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  letter-spacing: -0.5px;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 28px;
-  }
-`;
-
-export const Subtitle = styled.p`
-  font-size: 15px;
-  color: ${({ theme }) => theme.colors.textSecondary};
-  line-height: 1.6;
-`;
+export { Section } from "@/components/ui/Section";
+export { Container } from "@/components/ui/Section";
+export { SectionHeader as Header } from "@/components/ui/Section";
+export { SectionHeaderLeft as HeaderLeft } from "@/components/ui/Section";
+export { SectionTitle as Title } from "@/components/ui/Typography";
+export { SectionSubtitle as Subtitle } from "@/components/ui/Typography";
+export { SubtleLink as BuyLink } from "@/components/ui/Link";
+export { IconCircle as CryptoIcon } from "@/components/ui/IconWrapper";
 
 export const AvatarGroup = styled.div`
   display: flex;
@@ -98,19 +64,6 @@ export const CryptoCard = styled.div`
   }
 `;
 
-export const CryptoIcon = styled.div<{ $color: string }>`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: ${({ $color }) => $color}22;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  color: ${({ $color }) => $color};
-  flex-shrink: 0;
-`;
-
 export const CryptoInfo = styled.div``;
 
 export const CryptoName = styled.div`
@@ -147,17 +100,4 @@ export const CryptoChange = styled.div<{ $positive: boolean }>`
   text-align: right;
   color: ${({ $positive, theme }) =>
     $positive ? theme.colors.primary : theme.colors.danger};
-`;
-
-export const BuyLink = styled.a`
-  display: inline-block;
-  margin-top: 32px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.primary};
-  font-weight: 500;
-  transition: opacity 0.2s;
-
-  &:hover {
-    opacity: 0.8;
-  }
 `;

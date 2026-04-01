@@ -1,46 +1,14 @@
 import styled from "styled-components";
+import { SectionSubtitle } from "@/components/ui/Typography";
 
-export const Section = styled.section`
-  padding: 100px 24px;
-  border-top: 1px solid ${({ theme }) => theme.colors.divider};
-`;
+export { Section } from "@/components/ui/Section";
+export { Container } from "@/components/ui/Section";
+export { SectionHeader as Header } from "@/components/ui/Section";
+export { SectionHeaderLeft as HeaderLeft } from "@/components/ui/Section";
+export { SectionTitle as Title } from "@/components/ui/Typography";
 
-export const Container = styled.div`
-  max-width: ${({ theme }) => theme.maxWidth};
-  margin: 0 auto;
-`;
-
-export const Header = styled.div`
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 40px;
-  gap: 40px;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    flex-direction: column;
-    gap: 16px;
-  }
-`;
-
-export const HeaderLeft = styled.div``;
-
-export const Title = styled.h2`
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 28px;
-  }
-`;
-
-export const Subtitle = styled.p`
-  font-size: 15px;
-  color: ${({ theme }) => theme.colors.textSecondary};
+export const Subtitle = styled(SectionSubtitle)`
   max-width: 380px;
-  line-height: 1.6;
   padding-top: 8px;
 `;
 
@@ -64,6 +32,7 @@ export const ToggleButton = styled.button<{ $active: boolean }>`
   border: 1px solid
     ${({ $active, theme }) =>
       $active ? theme.colors.text : theme.colors.cardBorder};
+  cursor: pointer;
   transition: all 0.2s;
 
   &:hover {

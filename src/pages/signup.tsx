@@ -91,7 +91,7 @@ export default function SignupPage() {
       });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
-      router.push("/");
+      router.push("/setup");
     } catch (err: any) {
       form.setGlobalError(
         err.response?.data?.errors?.[0] ||
@@ -110,7 +110,7 @@ export default function SignupPage() {
       await authApi.googleLogin({ idToken: credential });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
-      router.push("/");
+      router.push("/setup");
     } catch (err: any) {
       form.setGlobalError(
         err.response?.data?.errors?.[0] ||

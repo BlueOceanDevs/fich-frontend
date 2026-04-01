@@ -128,3 +128,39 @@ export interface SubscriptionDto {
 export interface StartTrialRequest {
   planId: number;
 }
+
+// ─────────────────────────────────────────────
+// Exchange Connection
+// ─────────────────────────────────────────────
+
+export interface ConnectExchangeRequest {
+  apiKey: string;
+  apiSecret: string;
+}
+
+export interface UpdateExchangeKeysRequest {
+  apiKey: string;
+  apiSecret: string;
+}
+
+// ─────────────────────────────────────────────
+// Onboarding
+// ─────────────────────────────────────────────
+
+export interface OnboardingStatusDto {
+  hasActiveSubscription: boolean;
+  hasActiveExchange: boolean;
+  exchangeStatus: string | null;
+  subscriptionTier: string | null;
+  setupComplete: boolean;
+}
+
+export interface ExchangeConnectionDto {
+  id: number;
+  exchangeType: string; // "Binance"
+  status: string; // "Pending" | "Active" | "Invalid" | "Disconnected"
+  binanceUid: string | null;
+  lastValidatedAt: string | null;
+  lastValidationError: string | null;
+  createdAt: string | null;
+}

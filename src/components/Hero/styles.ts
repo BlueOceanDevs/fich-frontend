@@ -1,9 +1,7 @@
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
+import { fadeInUp } from "@/components/ui/animations";
 
-const fadeInUp = keyframes`
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-`;
+export { CTAButton as HeroButton } from "@/components/ui/Button";
 
 export const HeroSection = styled.section`
   min-height: 100vh;
@@ -58,23 +56,6 @@ export const HeroSubtitle = styled.p`
   line-height: 1.7;
 `;
 
-export const HeroButton = styled.a`
-  display: inline-block;
-  padding: 14px 32px;
-  background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.background};
-  border-radius: ${({ theme }) => theme.borderRadius.full};
-  font-size: 15px;
-  font-weight: 600;
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.primaryHover};
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 216, 151, 0.3);
-  }
-`;
-
 export const TrustRow = styled.div`
   display: flex;
   align-items: center;
@@ -93,4 +74,3 @@ export const Stars = styled.div`
   gap: 3px;
   color: ${({ theme }) => theme.colors.primary};
 `;
-

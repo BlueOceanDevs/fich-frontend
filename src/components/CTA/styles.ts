@@ -1,10 +1,7 @@
 import styled from "styled-components";
 
-export const Section = styled.section`
-  padding: 100px 24px;
-  text-align: center;
-  border-top: 1px solid ${({ theme }) => theme.colors.divider};
-`;
+export { Section } from "@/components/ui/Section";
+export { CTAButton } from "@/components/ui/Button";
 
 export const Container = styled.div`
   max-width: 600px;
@@ -31,21 +28,4 @@ export const Subtitle = styled.p`
   max-width: 460px;
   margin-left: auto;
   margin-right: auto;
-`;
-
-export const CTAButton = styled.a`
-  display: inline-block;
-  padding: 14px 32px;
-  background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.background};
-  border-radius: ${({ theme }) => theme.borderRadius.full};
-  font-size: 15px;
-  font-weight: 600;
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.primaryHover};
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 216, 151, 0.3);
-  }
 `;

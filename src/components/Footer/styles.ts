@@ -1,5 +1,7 @@
 import styled from "styled-components";
 
+export { MutedLink as FooterLink } from "@/components/ui/Link";
+
 export const FooterSection = styled.footer`
   padding: 60px 24px 32px;
   border-top: 1px solid ${({ theme }) => theme.colors.divider};
@@ -59,16 +61,6 @@ export const FooterColumnTitle = styled.h4`
   font-weight: 600;
   margin-bottom: 4px;
   color: ${({ theme }) => theme.colors.text};
-`;
-
-export const FooterLink = styled.a`
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.textMuted};
-  transition: color 0.2s;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.text};
-  }
 `;
 
 export const FooterBottom = styled.div`

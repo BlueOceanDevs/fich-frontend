@@ -121,7 +121,7 @@ const UserMenu: React.FC = () => {
               </DropdownItem>
             </Link>
 
-            <Link href="/#pricing" passHref legacyBehavior>
+            <Link href="/plans" passHref legacyBehavior>
               <DropdownItem
                 as="a"
                 onClick={() => setOpen(false)}

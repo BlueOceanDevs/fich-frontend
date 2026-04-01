@@ -7,6 +7,8 @@ import { clearAuth } from "@/store/authSlice";
 import { clearSubscription } from "@/store/subscriptionSlice";
 import { setOnAuthExpired } from "@/api/client";
 import ThemeWrapper from "@/components/ThemeWrapper";
+import PageLoader from "@/components/PageLoader";
+import OnboardingGuard from "@/components/OnboardingGuard";
 
 function AppInner({ Component, pageProps }: AppProps) {
   // Wire up the auth-expired callback once on mount
@@ -19,7 +21,10 @@ function AppInner({ Component, pageProps }: AppProps) {
 
   return (
     <ThemeWrapper>
-      <Component {...pageProps} />
+      <PageLoader />
+      <OnboardingGuard>
+        <Component {...pageProps} />
+      </OnboardingGuard>
     </ThemeWrapper>
   );
 }

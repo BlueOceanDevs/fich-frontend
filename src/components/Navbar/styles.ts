@@ -1,5 +1,9 @@
 import styled from "styled-components";
 
+export { NavLink } from "@/components/ui/Link";
+export { PillButton as NavSignupButton } from "@/components/ui/Button";
+export { GhostButton as NavLoginButton } from "@/components/ui/Button";
+
 export const Nav = styled.nav`
   position: fixed;
   top: 0;
@@ -48,17 +52,6 @@ export const NavLinks = styled.div`
   }
 `;
 
-export const NavLink = styled.a`
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.textSecondary};
-  transition: color 0.2s;
-  font-weight: 400;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.text};
-  }
-`;
-
 export const RightGroup = styled.div`
   display: flex;
   align-items: center;
@@ -75,6 +68,7 @@ export const ThemeToggle = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
@@ -89,6 +83,8 @@ export const Hamburger = styled.button<{ $open: boolean }>`
   gap: 5px;
   background: none;
   padding: 4px;
+  border: none;
+  cursor: pointer;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     display: flex;
@@ -136,6 +132,7 @@ export const MobileMenu = styled.div<{ $open: boolean }>`
 export const MobileNavLink = styled.a`
   font-size: 16px;
   color: ${({ theme }) => theme.colors.textSecondary};
+  text-decoration: none;
   transition: color 0.2s;
 
   &:hover {
@@ -153,36 +150,6 @@ export const NavAuthGroup = styled.div`
   }
 `;
 
-export const NavLoginButton = styled.a`
-  padding: 8px 18px;
-  font-size: 14px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.textSecondary};
-  border-radius: ${({ theme }) => theme.borderRadius.full};
-  transition: color 0.2s;
-  cursor: pointer;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.text};
-  }
-`;
-
-export const NavSignupButton = styled.a`
-  padding: 8px 20px;
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.background};
-  background: ${({ theme }) => theme.colors.primary};
-  border-radius: ${({ theme }) => theme.borderRadius.full};
-  transition: background 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.primaryHover};
-    box-shadow: 0 4px 16px ${({ theme }) => theme.colors.primary}40;
-  }
-`;
-
 export const MobileAuthGroup = styled.div`
   display: flex;
   flex-direction: column;
@@ -197,6 +164,7 @@ export const MobileLoginButton = styled.a`
   font-size: 15px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.textSecondary};
+  text-decoration: none;
   cursor: pointer;
 
   &:hover {
@@ -211,6 +179,7 @@ export const MobileSignupButton = styled.a`
   color: ${({ theme }) => theme.colors.background};
   background: ${({ theme }) => theme.colors.primary};
   border-radius: ${({ theme }) => theme.borderRadius.full};
+  text-decoration: none;
   cursor: pointer;
 
   &:hover {

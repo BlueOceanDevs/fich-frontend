@@ -1,53 +1,19 @@
 import styled from "styled-components";
+import { SectionSubtitle } from "@/components/ui/Typography";
+import { StaticCard } from "@/components/ui/Card";
 
-export const Section = styled.section`
-  padding: 100px 24px;
-  border-top: 1px solid ${({ theme }) => theme.colors.divider};
-`;
+export { Section } from "@/components/ui/Section";
+export { Container } from "@/components/ui/Section";
+export { SectionHeader as Header } from "@/components/ui/Section";
+export { SectionHeaderLeft as HeaderLeft } from "@/components/ui/Section";
+export { SectionTitle as Title } from "@/components/ui/Typography";
 
-export const Container = styled.div`
-  max-width: ${({ theme }) => theme.maxWidth};
-  margin: 0 auto;
-`;
-
-export const Header = styled.div`
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 48px;
-  gap: 40px;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    flex-direction: column;
-    gap: 16px;
-  }
-`;
-
-export const HeaderLeft = styled.div``;
-
-export const Title = styled.h2`
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 28px;
-  }
-`;
-
-export const Subtitle = styled.p`
-  font-size: 15px;
-  color: ${({ theme }) => theme.colors.textSecondary};
+export const Subtitle = styled(SectionSubtitle)`
   max-width: 400px;
-  line-height: 1.6;
   padding-top: 8px;
 `;
 
-export const TestimonialCard = styled.div`
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
+export const TestimonialCard = styled(StaticCard)`
   padding: 40px;
   max-width: 480px;
   position: relative;
@@ -116,6 +82,8 @@ export const NavButton = styled.button`
   background: none;
   color: ${({ theme }) => theme.colors.textSecondary};
   font-size: 14px;
+  cursor: pointer;
+  border: none;
   transition: color 0.2s;
 
   &:hover {

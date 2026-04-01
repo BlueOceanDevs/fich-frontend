@@ -29,7 +29,7 @@ import {
 
 export default function LoginPage() {
   const router = useRouter();
-  const redirect = (router.query.redirect as string) || "/";
+  const redirect = (router.query.redirect as string) || "/setup";
   const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const form = useAuthForm({ email: "", password: "" });

@@ -1,58 +1,21 @@
 import styled from "styled-components";
+import { SectionSubtitle as BaseSectionSubtitle } from "@/components/ui/Typography";
+import { Card as BaseCard } from "@/components/ui/Card";
 
-export const Section = styled.section`
-  padding: 100px 24px;
-`;
+export { Section } from "@/components/ui/Section";
+export { Container } from "@/components/ui/Section";
+export { SectionTitle } from "@/components/ui/Typography";
 
-export const Container = styled.div`
-  max-width: ${({ theme }) => theme.maxWidth};
-  margin: 0 auto;
-  text-align: center;
-`;
-
-export const SectionTitle = styled.h2`
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  letter-spacing: -0.5px;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 28px;
-  }
-`;
-
-export const SectionSubtitle = styled.p`
-  font-size: 15px;
-  color: ${({ theme }) => theme.colors.textSecondary};
+export const SectionSubtitle = styled(BaseSectionSubtitle)`
   max-width: 420px;
   margin: 0 auto 60px;
-  line-height: 1.6;
 `;
 
-export const CardsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-export const Card = styled.div`
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+export const Card = styled(BaseCard)`
   padding: 36px 24px;
   text-align: center;
-  transition: border-color 0.3s, transform 0.3s;
 
   &:hover {
-    border-color: ${({ theme }) => theme.colors.primary};
     transform: translateY(-4px);
   }
 `;
@@ -68,6 +31,20 @@ export const CardIcon = styled.div`
   justify-content: center;
   margin: 0 auto 20px;
   color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+export const CardsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const CardTitle = styled.h3`

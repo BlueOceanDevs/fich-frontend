@@ -1,5 +1,5 @@
 import api from "./client";
-import type { ApiResponse, ApiResponseOf, UserInfo, SetNameRequest } from "./types";
+import type { ApiResponse, ApiResponseOf, UserInfo, SetNameRequest, OnboardingStatusDto } from "./types";
 import { validateImageFile } from "../utils/validate-image";
 
 // ─────────────────────────────────────────────
@@ -19,6 +19,10 @@ export const userApi = {
 
   setName(data: SetNameRequest) {
     return api.put<ApiResponse>("/user/SetName", data);
+  },
+
+  getOnboardingStatus() {
+    return api.get<ApiResponseOf<OnboardingStatusDto>>("/user/OnboardingStatus");
   },
 
   /**
