@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import styled from "styled-components";
-import { FaUser, FaSignOutAlt, FaCrown } from "react-icons/fa";
+import { FaUser, FaSignOutAlt, FaCrown, FaCheckCircle, FaExclamationCircle, FaPlug } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/authSlice";
 import { fetchSubscription, clearSubscription } from "@/store/subscriptionSlice";
+import { exchangeApi } from "@/api/exchange";
+import type { ExchangeConnectionDto } from "@/api/types";
 import {
   UserAvatarButton,
   AvatarImage,
@@ -28,11 +30,33 @@ const PlanBadge = styled.span`
   font-weight: 600;
 `;
 
+const StatusRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+const StatusDot = styled.span<{ $ok: boolean }>`
+  display: flex;
+  align-items: center;
+  color: ${({ $ok }) => ($ok ? "#00d897" : "#eab308")};
+  font-size: 12px;
+  flex-shrink: 0;
+`;
+
+const StatusLabel = styled.span`
+  white-space: nowrap;
+`;
+
 const UserMenu: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const { subscription } = useAppSelector((s) => s.subscription);
   const [open, setOpen] = useState(false);
+  const [exchange, setExchange] = useState<ExchangeConnectionDto | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const hasFetchedSub = useRef(false);
 
@@ -41,11 +65,17 @@ const UserMenu: React.FC = () => {
       ? `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim()
       : null;
 
-  // Fetch subscription once when menu component mounts (user is logged in)
+  // Fetch subscription and exchange status once when menu component mounts
   useEffect(() => {
     if (user && !hasFetchedSub.current) {
       hasFetchedSub.current = true;
       dispatch(fetchSubscription());
+      exchangeApi
+        .getStatus()
+        .then(({ data }) => {
+          if (data.isSuccess && data.data) setExchange(data.data);
+        })
+        .catch(() => {});
     }
   }, [user, dispatch]);
 
@@ -106,6 +136,38 @@ const UserMenu: React.FC = () => {
                 </PlanBadge>
               )}
             </DropdownHeader>
+
+            {/* Status indicators */}
+            {user && !user.isEmailConfirmed && (
+              <StatusRow>
+                <StatusDot $ok={false}>
+                  <FaExclamationCircle size={12} />
+                </StatusDot>
+                <StatusLabel>Email not confirmed</StatusLabel>
+              </StatusRow>
+            )}
+            {user?.isEmailConfirmed && (
+              <StatusRow>
+                <StatusDot $ok>
+                  <FaCheckCircle size={12} />
+                </StatusDot>
+                <StatusLabel>Email confirmed</StatusLabel>
+              </StatusRow>
+            )}
+            <StatusRow>
+              <StatusDot $ok={exchange?.status === "Active"}>
+                {exchange?.status === "Active" ? (
+                  <FaCheckCircle size={12} />
+                ) : (
+                  <FaPlug size={12} />
+                )}
+              </StatusDot>
+              <StatusLabel>
+                {exchange?.status === "Active"
+                  ? "Exchange connected"
+                  : "Exchange not connected"}
+              </StatusLabel>
+            </StatusRow>
 
             <DropdownDivider />
 

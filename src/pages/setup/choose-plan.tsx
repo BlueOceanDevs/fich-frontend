@@ -21,6 +21,7 @@ import {
 import { ordersApi } from "@/api/orders";
 import { subscriptionsApi } from "@/api/subscriptions";
 import { Spinner } from "@/components/ui/Button";
+import EmailConfirmationBanner from "@/components/EmailConfirmationBanner";
 import {
   SetupSection,
   SetupContainer,
@@ -77,7 +78,7 @@ export default function ChoosePlanPage() {
   const strategyParam = typeof strategy === "string" ? strategy : "";
   const nextStep = `/setup/start-trading${strategyParam ? `?strategy=${strategyParam}` : ""}`;
 
-  const { isAuthenticated } = useAppSelector((s) => s.auth);
+  const { isAuthenticated, user } = useAppSelector((s) => s.auth);
   const { billingCycle, tierGroups, usedFallback } = useAppSelector(
     (s) => s.pricing
   );
@@ -181,6 +182,14 @@ export default function ChoosePlanPage() {
 
   // ── Handlers ──
 
+  const requireEmailConfirmed = (): boolean => {
+    if (user && !user.isEmailConfirmed) {
+      setError("Please confirm your email address before choosing a plan. Check your inbox or resend from your profile.");
+      return false;
+    }
+    return true;
+  };
+
   const handleContinueToPayment = async () => {
     if (!selectedGroup) return;
 
@@ -193,6 +202,7 @@ export default function ChoosePlanPage() {
       return;
     }
 
+    if (!requireEmailConfirmed()) return;
     setError(null);
 
     if (isFree) {
@@ -233,6 +243,7 @@ export default function ChoosePlanPage() {
     if (!selectedGroup) return;
     const plan = getActivePlan(selectedGroup);
     if (!plan) return;
+    if (!requireEmailConfirmed()) return;
 
     setActionLoading("trial");
     setError(null);
@@ -255,6 +266,7 @@ export default function ChoosePlanPage() {
   };
 
   const handleFreeFallback = async () => {
+    if (!requireEmailConfirmed()) return;
     setActionLoading("later");
     setError(null);
     try {
@@ -358,6 +370,9 @@ export default function ChoosePlanPage() {
                 {maxSavings > 0 && <SaveBadge>Save {maxSavings}%</SaveBadge>}
               </PlanToggleButton>
             </PlanToggleRow>
+
+            {/* ── Email confirmation banner ── */}
+            <EmailConfirmationBanner />
 
             {/* ── Error ── */}
             {error && (

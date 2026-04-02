@@ -1,6 +1,7 @@
 import api from "./client";
 import type {
   ApiResponse,
+  ApiResponseOf,
   LoginRequest,
   RegisterRequest,
   ConfirmEmailRequest,
@@ -36,6 +37,10 @@ export const authApi = {
 
   resendConfirmationEmail() {
     return api.post<ApiResponse>("/auth/ResendConfirmationEmail");
+  },
+
+  getConfirmationCooldown() {
+    return api.get<ApiResponseOf<number>>("/auth/ConfirmationCooldown");
   },
 
   forgotPassword(data: ForgotPasswordRequest) {

@@ -86,6 +86,8 @@ export default function SignupPage() {
     form.setLoading(true);
     try {
       await authApi.register({
+        firstName: form.values.firstName.trim() || undefined,
+        lastName: form.values.lastName.trim() || undefined,
         email: form.values.email.trim(),
         password: form.values.password,
       });

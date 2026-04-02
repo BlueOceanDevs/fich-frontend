@@ -2,11 +2,24 @@ import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { FaCamera, FaCrown, FaExternalLinkAlt } from "react-icons/fa";
+import {
+  FaCamera,
+  FaCrown,
+  FaExternalLinkAlt,
+  FaExchangeAlt,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaTimesCircle,
+  FaClock,
+  FaArrowRight,
+} from "react-icons/fa";
 import styled from "styled-components";
 import { userApi } from "@/api/user";
+import { exchangeApi } from "@/api/exchange";
 import { ordersApi } from "@/api/orders";
 import Layout from "@/components/Layout";
+import EmailConfirmationBanner from "@/components/EmailConfirmationBanner";
+import ConnectExchangeModal from "@/components/Setup/ConnectExchangeModal";
 import {
   Alert,
   AuthForm,
@@ -21,7 +34,7 @@ import {
 import { fetchUser, updateUser } from "@/store/authSlice";
 import { fetchSubscription } from "@/store/subscriptionSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import type { OrderDto } from "@/api/types";
+import type { OrderDto, ExchangeConnectionDto, OnboardingStatusDto } from "@/api/types";
 
 // ─────────────────────────────────────────────
 // Styled components
@@ -312,6 +325,190 @@ const EmptyState = styled.p`
   padding: 24px 0;
 `;
 
+// ── Setup banner ──
+
+const SetupBanner = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  background: linear-gradient(
+    135deg,
+    ${({ theme }) => `${theme.colors.primary}18`} 0%,
+    ${({ theme }) => `${theme.colors.primary}08`} 100%
+  );
+  border: 1px solid ${({ theme }) => `${theme.colors.primary}30`};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    flex-direction: column;
+    text-align: center;
+  }
+`;
+
+const SetupBannerText = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const SetupBannerTitle = styled.span`
+  font-size: 15px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+const SetupBannerHint = styled.span`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+const SetupBannerButton = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.background};
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.2s;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.primaryHover};
+  }
+`;
+
+// ── Exchange card ──
+
+const ExchangeStatusRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const ExchangeIcon = styled.div<{ $status: string }>`
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: ${({ $status }) =>
+    $status === "Active"
+      ? "rgba(0, 216, 151, 0.12)"
+      : $status === "Pending"
+        ? "rgba(234, 179, 8, 0.12)"
+        : $status === "Invalid"
+          ? "rgba(239, 68, 68, 0.10)"
+          : "rgba(100, 116, 139, 0.10)"};
+  color: ${({ $status }) =>
+    $status === "Active"
+      ? "#00d897"
+      : $status === "Pending"
+        ? "#eab308"
+        : $status === "Invalid"
+          ? "#ef4444"
+          : "#94a3b8"};
+`;
+
+const ExchangeInfo = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+
+const ExchangeName = styled.span`
+  font-size: 15px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+const ExchangeStatusText = styled.span<{ $status: string }>`
+  font-size: 13px;
+  color: ${({ $status }) =>
+    $status === "Active"
+      ? "#00d897"
+      : $status === "Pending"
+        ? "#eab308"
+        : $status === "Invalid"
+          ? "#ef4444"
+          : "#94a3b8"};
+`;
+
+const ExchangeDetail = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  background: ${({ theme }) => `${theme.colors.background}80`};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-size: 13px;
+`;
+
+const ExchangeDetailRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ExchangeDetailLabel = styled.span`
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+const ExchangeDetailValue = styled.span`
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+const ExchangeError = styled.div`
+  padding: 10px 14px;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  font-size: 13px;
+  color: #ef4444;
+  line-height: 1.5;
+`;
+
+const ExchangeActions = styled.div`
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+`;
+
+const ExchangeActionBtn = styled.button<{ $variant?: "danger" }>`
+  padding: 8px 18px;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid
+    ${({ $variant, theme }) =>
+      $variant === "danger" ? "rgba(239, 68, 68, 0.3)" : theme.colors.primary};
+  background: ${({ $variant, theme }) =>
+    $variant === "danger" ? "transparent" : theme.colors.primary};
+  color: ${({ $variant, theme }) =>
+    $variant === "danger" ? "#ef4444" : theme.colors.background};
+
+  &:hover {
+    background: ${({ $variant, theme }) =>
+      $variant === "danger" ? "rgba(239, 68, 68, 0.1)" : theme.colors.primaryHover};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
 // ─────────────────────────────────────────────
 // Page component
 // ─────────────────────────────────────────────
@@ -361,6 +558,15 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState<OrderDto[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
 
+  // Exchange connection
+  const [exchange, setExchange] = useState<ExchangeConnectionDto | null>(null);
+  const [exchangeLoading, setExchangeLoading] = useState(true);
+  const [disconnecting, setDisconnecting] = useState(false);
+  const [showExchangeModal, setShowExchangeModal] = useState(false);
+
+  // Onboarding status
+  const [onboarding, setOnboarding] = useState<OnboardingStatusDto | null>(null);
+
   useEffect(() => {
     if (user) {
       setFirstName(user.firstName ?? "");
@@ -375,7 +581,20 @@ export default function ProfilePage() {
     }
   }, [isAuthenticated, router]);
 
-  // Fetch subscription and orders
+  // Fetch subscription, orders, exchange status, and onboarding
+  const fetchExchangeStatus = async () => {
+    try {
+      const { data } = await exchangeApi.getStatus();
+      if (data.isSuccess) {
+        setExchange(data.data ?? null);
+      }
+    } catch {
+      // no connection
+    } finally {
+      setExchangeLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!isAuthenticated) return;
 
@@ -390,7 +609,81 @@ export default function ProfilePage() {
       })
       .catch(() => {})
       .finally(() => setOrdersLoading(false));
+
+    fetchExchangeStatus();
+
+    userApi
+      .getOnboardingStatus()
+      .then(({ data }) => {
+        if (data.isSuccess && data.data) {
+          setOnboarding(data.data);
+        }
+      })
+      .catch(() => {});
   }, [isAuthenticated, dispatch]);
+
+  const handleDisconnect = async () => {
+    if (!confirm("Are you sure you want to disconnect your exchange? This will stop all trading.")) return;
+    setDisconnecting(true);
+    try {
+      await exchangeApi.disconnect();
+      setExchange(null);
+      // Refresh onboarding status
+      const { data } = await userApi.getOnboardingStatus();
+      if (data.isSuccess && data.data) setOnboarding(data.data);
+    } catch {
+      setErrorMsg("Failed to disconnect exchange.");
+    } finally {
+      setDisconnecting(false);
+    }
+  };
+
+  const handleExchangeModalClose = () => {
+    setShowExchangeModal(false);
+    // Refresh exchange status after modal closes
+    setExchangeLoading(true);
+    fetchExchangeStatus();
+    // Refresh onboarding
+    userApi.getOnboardingStatus().then(({ data }) => {
+      if (data.isSuccess && data.data) setOnboarding(data.data);
+    }).catch(() => {});
+  };
+
+  const exchangeStatusIcon = (status: string) => {
+    switch (status) {
+      case "Active": return <FaCheckCircle />;
+      case "Pending": return <FaClock />;
+      case "Invalid": return <FaTimesCircle />;
+      default: return <FaExchangeAlt />;
+    }
+  };
+
+  const exchangeStatusLabel = (status: string) => {
+    switch (status) {
+      case "Active": return "Connected";
+      case "Pending": return "Validating...";
+      case "Invalid": return "Connection Failed";
+      default: return "Not Connected";
+    }
+  };
+
+  const setupIncomplete = onboarding && !onboarding.setupComplete;
+
+  const getSetupContinueUrl = () => {
+    if (!onboarding) return "/setup";
+    if (!onboarding.hasActiveExchange) return "/setup";
+    if (!onboarding.hasActiveSubscription) return "/setup/choose-plan";
+    return "/setup/start-trading";
+  };
+
+  const getSetupHint = () => {
+    if (!onboarding) return "Complete your setup to start trading.";
+    const missing: string[] = [];
+    if (!onboarding.hasActiveExchange) missing.push("connect your exchange");
+    if (!onboarding.hasActiveSubscription) missing.push("choose a plan");
+    if (missing.length === 0) return "Finalize your setup to start trading.";
+    return `You still need to ${missing.join(" and ")} to start trading.`;
+  };
 
   if (!isAuthenticated || !user) return null;
 
@@ -511,6 +804,24 @@ export default function ProfilePage() {
                 Manage your account, subscription, and order history.
               </ProfileSubtitle>
             </ProfileHeader>
+
+            {/* ── Email confirmation banner ── */}
+            <EmailConfirmationBanner />
+
+            {/* ── Setup incomplete banner ── */}
+            {setupIncomplete && (
+              <SetupBanner>
+                <SetupBannerText>
+                  <SetupBannerTitle>Complete your setup</SetupBannerTitle>
+                  <SetupBannerHint>{getSetupHint()}</SetupBannerHint>
+                </SetupBannerText>
+                <Link href={getSetupContinueUrl()} passHref legacyBehavior>
+                  <SetupBannerButton>
+                    Continue Setup <FaArrowRight size={12} />
+                  </SetupBannerButton>
+                </Link>
+              </SetupBanner>
+            )}
 
             <CardsGrid>
               {/* ── Profile card ── */}
@@ -691,6 +1002,91 @@ export default function ProfilePage() {
                 )}
               </Card>
 
+              {/* ── Exchange connection card ── */}
+              <FullWidthCard>
+                <CardTitle>
+                  <FaExchangeAlt size={16} />
+                  Exchange Connection
+                </CardTitle>
+
+                {exchangeLoading ? (
+                  <EmptyState>Loading exchange status...</EmptyState>
+                ) : exchange ? (
+                  <>
+                    <ExchangeStatusRow>
+                      <ExchangeIcon $status={exchange.status}>
+                        {exchangeStatusIcon(exchange.status)}
+                      </ExchangeIcon>
+                      <ExchangeInfo>
+                        <ExchangeName>{exchange.exchangeType || "Binance"}</ExchangeName>
+                        <ExchangeStatusText $status={exchange.status}>
+                          {exchangeStatusLabel(exchange.status)}
+                        </ExchangeStatusText>
+                      </ExchangeInfo>
+                    </ExchangeStatusRow>
+
+                    <ExchangeDetail>
+                      {exchange.binanceUid && (
+                        <ExchangeDetailRow>
+                          <ExchangeDetailLabel>Binance UID</ExchangeDetailLabel>
+                          <ExchangeDetailValue>{exchange.binanceUid}</ExchangeDetailValue>
+                        </ExchangeDetailRow>
+                      )}
+                      <ExchangeDetailRow>
+                        <ExchangeDetailLabel>Connected</ExchangeDetailLabel>
+                        <ExchangeDetailValue>
+                          {exchange.createdAt ? formatDate(exchange.createdAt) : "—"}
+                        </ExchangeDetailValue>
+                      </ExchangeDetailRow>
+                      {exchange.lastValidatedAt && (
+                        <ExchangeDetailRow>
+                          <ExchangeDetailLabel>Last Validated</ExchangeDetailLabel>
+                          <ExchangeDetailValue>{formatDate(exchange.lastValidatedAt)}</ExchangeDetailValue>
+                        </ExchangeDetailRow>
+                      )}
+                    </ExchangeDetail>
+
+                    {exchange.status === "Invalid" && exchange.lastValidationError && (
+                      <ExchangeError>
+                        <FaExclamationTriangle style={{ marginRight: 6 }} />
+                        {exchange.lastValidationError}
+                      </ExchangeError>
+                    )}
+
+                    <ExchangeActions>
+                      {exchange.status === "Invalid" && (
+                        <ExchangeActionBtn onClick={() => setShowExchangeModal(true)}>
+                          Reconnect
+                        </ExchangeActionBtn>
+                      )}
+                      {exchange.status === "Pending" && (
+                        <ExchangeActionBtn onClick={() => setShowExchangeModal(true)}>
+                          Check Status
+                        </ExchangeActionBtn>
+                      )}
+                      <ExchangeActionBtn
+                        $variant="danger"
+                        onClick={handleDisconnect}
+                        disabled={disconnecting}
+                      >
+                        {disconnecting ? "Disconnecting..." : "Disconnect"}
+                      </ExchangeActionBtn>
+                    </ExchangeActions>
+                  </>
+                ) : (
+                  <>
+                    <EmptyState>
+                      No exchange connected. Connect your Binance account to start trading.
+                    </EmptyState>
+                    <ExchangeActions>
+                      <ExchangeActionBtn onClick={() => setShowExchangeModal(true)}>
+                        Connect Exchange
+                      </ExchangeActionBtn>
+                    </ExchangeActions>
+                  </>
+                )}
+              </FullWidthCard>
+
               {/* ── Order history card ── */}
               <FullWidthCard>
                 <CardTitle>Order History</CardTitle>
@@ -756,6 +1152,14 @@ export default function ProfilePage() {
             </CardsGrid>
           </ProfileContainer>
         </ProfileSection>
+
+        {showExchangeModal && (
+          <ConnectExchangeModal
+            onClose={handleExchangeModalClose}
+            strategy=""
+            onSuccess={handleExchangeModalClose}
+          />
+        )}
       </Layout>
     </>
   );

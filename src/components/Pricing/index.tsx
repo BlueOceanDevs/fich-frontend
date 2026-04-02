@@ -5,7 +5,7 @@ import { fetchPlans, setBillingCycle, FALLBACK_PRICES } from "@/store/pricingSli
 import { activateFreePlan, startTrial, fetchSubscription } from "@/store/subscriptionSlice";
 import { ordersApi } from "@/api/orders";
 import { subscriptionsApi } from "@/api/subscriptions";
-import { FaCheck } from "react-icons/fa";
+import { FaCheck, FaExclamationTriangle } from "react-icons/fa";
 import ScrollReveal, { StaggerChildren } from "@/components/ScrollReveal";
 import {
   Section,
@@ -39,7 +39,7 @@ const Pricing: React.FC = () => {
   const { billingCycle, tierGroups, usedFallback } = useAppSelector(
     (s) => s.pricing
   );
-  const { isAuthenticated } = useAppSelector((s) => s.auth);
+  const { isAuthenticated, user } = useAppSelector((s) => s.auth);
   const { subscription } = useAppSelector((s) => s.subscription);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -67,11 +67,20 @@ const Pricing: React.FC = () => {
 
   // ── Handlers ──
 
+  const requireEmailConfirmed = (): boolean => {
+    if (user && !user.isEmailConfirmed) {
+      setError("Please confirm your email address before choosing a plan. Check your inbox or resend from your profile.");
+      return false;
+    }
+    return true;
+  };
+
   const handleFreePlan = async () => {
     if (!isAuthenticated) {
       router.push("/login?redirect=/plans");
       return;
     }
+    if (!requireEmailConfirmed()) return;
     setActionLoading("Free");
     setError(null);
     try {
@@ -90,6 +99,7 @@ const Pricing: React.FC = () => {
       router.push("/login?redirect=/plans");
       return;
     }
+    if (!requireEmailConfirmed()) return;
     setActionLoading(`trial-${tier}`);
     setError(null);
     try {
@@ -109,6 +119,7 @@ const Pricing: React.FC = () => {
       router.push("/login?redirect=/plans");
       return;
     }
+    if (!requireEmailConfirmed()) return;
     setActionLoading(`subscribe-${tier}`);
     setError(null);
     try {
