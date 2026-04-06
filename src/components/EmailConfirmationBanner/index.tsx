@@ -118,11 +118,21 @@ const EmailConfirmationBanner: React.FC = () => {
     setSending(true);
     setSent(false);
     try {
-      await authApi.resendConfirmationEmail();
+      const { data } = await authApi.resendConfirmationEmail();
       setSent(true);
-      setCooldown(60);
-    } catch {
-      // error already shown via global error handler
+      if (data.isSuccess && data.data && data.data > 0) {
+        setCooldown(data.data);
+      }
+    } catch (err: any) {
+      // If server returns cooldown remaining in the error, parse and start countdown
+      const errorMsg: string = err.response?.data?.errors?.[0] ?? "";
+      const pipeIdx = errorMsg.lastIndexOf("|");
+      if (pipeIdx !== -1) {
+        const seconds = parseInt(errorMsg.substring(pipeIdx + 1), 10);
+        if (!isNaN(seconds) && seconds > 0) {
+          setCooldown(seconds);
+        }
+      }
     } finally {
       setSending(false);
     }

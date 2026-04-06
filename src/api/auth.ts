@@ -36,7 +36,7 @@ export const authApi = {
   },
 
   resendConfirmationEmail() {
-    return api.post<ApiResponse>("/auth/ResendConfirmationEmail");
+    return api.post<ApiResponseOf<number>>("/auth/ResendConfirmationEmail");
   },
 
   getConfirmationCooldown() {
