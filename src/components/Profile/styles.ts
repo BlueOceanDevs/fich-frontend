@@ -477,6 +477,43 @@ export const ExchangeActions = styled.div`
   flex-wrap: wrap;
 `;
 
+// ── Pagination ──
+
+export const PaginationRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 8px;
+`;
+
+export const PagBtn = styled.button`
+  padding: 6px 16px;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary};
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
+
+export const PagText = styled.span`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
 export const ExchangeActionBtn = styled.button<{ $variant?: "danger" }>`
   padding: 8px 18px;
   border-radius: ${({ theme }) => theme.borderRadius.full};

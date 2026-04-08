@@ -10,6 +10,7 @@ import AccountCard from "@/components/Profile/AccountCard";
 import SubscriptionCard from "@/components/Profile/SubscriptionCard";
 import ExchangeCard from "@/components/Profile/ExchangeCard";
 import OrdersTab from "@/components/Profile/OrdersTab";
+import TradesTab from "@/components/Profile/TradesTab";
 import { fetchSubscription } from "@/store/subscriptionSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import type { OnboardingStatusDto } from "@/api/types";
@@ -29,7 +30,7 @@ import {
   SetupBannerButton,
 } from "@/components/Profile/styles";
 
-type ProfileTab = "overview" | "orders";
+type ProfileTab = "overview" | "orders" | "trades";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -130,6 +131,12 @@ export default function ProfilePage() {
               >
                 Orders
               </Tab>
+              <Tab
+                $active={activeTab === "trades"}
+                onClick={() => setActiveTab("trades")}
+              >
+                Trades
+              </Tab>
             </TabRow>
 
             {activeTab === "overview" && (
@@ -141,6 +148,8 @@ export default function ProfilePage() {
             )}
 
             {activeTab === "orders" && <OrdersTab />}
+
+            {activeTab === "trades" && <TradesTab />}
           </ProfileContainer>
         </ProfileSection>
       </Layout>

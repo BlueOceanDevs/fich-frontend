@@ -157,6 +157,36 @@ export interface OnboardingStatusDto {
   setupComplete: boolean;
 }
 
+// ─────────────────────────────────────────────
+// Trade Orders
+// ─────────────────────────────────────────────
+
+export interface TradeOrderDto {
+  id: number;
+  signalId: number;
+  symbol: string;
+  side: string;
+  status: string;
+  requestedQuantity: number;
+  filledQuantity: number;
+  requestedPrice: number;
+  avgFillPrice: number | null;
+  binanceOrderId: number | null;
+  errorMessage: string | null;
+  retryCount: number;
+  filledAt: string | null;
+  lastCheckedAt: string | null;
+  createdAt: string;
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 export interface ExchangeConnectionDto {
   id: number;
   exchangeType: string; // "Binance"
