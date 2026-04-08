@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import type { AppProps } from "next/app";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import { store, persistor } from "@/store";
-import { clearAuth } from "@/store/authSlice";
+import { store, persistor, type RootState } from "@/store";
+import { clearAuth, fetchUser } from "@/store/authSlice";
 import { clearSubscription } from "@/store/subscriptionSlice";
 import { setOnAuthExpired } from "@/api/client";
 import ThemeWrapper from "@/components/ThemeWrapper";
@@ -11,6 +11,8 @@ import PageLoader from "@/components/PageLoader";
 import OnboardingGuard from "@/components/OnboardingGuard";
 
 function AppInner({ Component, pageProps }: AppProps) {
+  const isAuthenticated = useSelector((s: RootState) => s.auth.isAuthenticated);
+
   // Wire up the auth-expired callback once on mount
   useEffect(() => {
     setOnAuthExpired(() => {
@@ -18,6 +20,13 @@ function AppInner({ Component, pageProps }: AppProps) {
       store.dispatch(clearSubscription());
     });
   }, []);
+
+  // Re-fetch user profile on page reload when already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      store.dispatch(fetchUser());
+    }
+  }, [isAuthenticated]);
 
   return (
     <ThemeWrapper>
