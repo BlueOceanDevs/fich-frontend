@@ -190,7 +190,8 @@ const ExchangeCard: React.FC<ExchangeCardProps> = ({ onStatusChange }) => {
       {showModal && (
         <ConnectExchangeModal
           onClose={handleModalClose}
-          strategy=""
+          strategy={exchange?.strategySlug ?? ""}
+          strategyId={exchange?.strategyId ?? 0}
           onSuccess={handleModalClose}
         />
       )}

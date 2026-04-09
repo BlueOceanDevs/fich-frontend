@@ -138,6 +138,7 @@ export interface StartTrialRequest {
 export interface ConnectExchangeRequest {
   apiKey: string;
   apiSecret: string;
+  strategyId: number;
 }
 
 export interface UpdateExchangeKeysRequest {
@@ -155,6 +156,25 @@ export interface OnboardingStatusDto {
   exchangeStatus: string | null;
   subscriptionTier: string | null;
   setupComplete: boolean;
+}
+
+// ─────────────────────────────────────────────
+// Strategies
+// ─────────────────────────────────────────────
+
+export interface StrategyDto {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  minPortfolioUsd: number;
+  exchange: string;
+  badge: string | null;
+  features: string[];
+  iconName: string;
+  chartColor: string;
+  chartPath: string | null;
+  sortOrder: number;
 }
 
 // ─────────────────────────────────────────────
@@ -195,4 +215,7 @@ export interface ExchangeConnectionDto {
   lastValidatedAt: string | null;
   lastValidationError: string | null;
   createdAt: string | null;
+  strategyId: number;
+  strategyName: string;
+  strategySlug: string;
 }

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { FaCheck, FaChartLine, FaShieldAlt, FaBolt } from "react-icons/fa";
+import { FaCheck, FaChartLine, FaShieldAlt, FaBolt, FaRocket, FaCog, FaStar, FaBalanceScale, FaArrowUp, FaChartArea } from "react-icons/fa";
 import Layout from "@/components/Layout";
 import { useAppSelector } from "@/store/hooks";
 import { userApi } from "@/api/user";
+import { strategiesApi } from "@/api/strategies";
+import type { StrategyDto } from "@/api/types";
 import ConnectExchangeModal from "@/components/Setup/ConnectExchangeModal";
 import {
   SetupSection,
@@ -38,70 +40,22 @@ import {
 } from "@/components/Setup/styles";
 
 // ─────────────────────────────────────────────
-// Types
+// Icon map — maps backend iconName to React icon
 // ─────────────────────────────────────────────
 
-interface Strategy {
-  id: string;
-  name: string;
-  description: string;
-  minPortfolio: string;
-  exchange: string;
-  badge?: string;
-  features: string[];
-  icon: React.ReactNode;
-  chartColor: string;
-}
+const ICON_MAP: Record<string, React.ReactNode> = {
+  "chart-line": <FaChartLine size={20} />,
+  "shield": <FaShieldAlt size={20} />,
+  "bolt": <FaBolt size={20} />,
+  "rocket": <FaRocket size={20} />,
+  "cog": <FaCog size={20} />,
+  "star": <FaStar size={20} />,
+  "balance": <FaBalanceScale size={20} />,
+  "trending-up": <FaArrowUp size={20} />,
+  "auto-graph": <FaChartArea size={20} />,
+};
 
-// ─────────────────────────────────────────────
-// Strategy data
-// ─────────────────────────────────────────────
-
-const STRATEGIES: Strategy[] = [
-  {
-    id: "crypto-index",
-    name: "Crypto Index",
-    description: "Diversified crypto exposure in one simple step",
-    minPortfolio: "$500",
-    exchange: "Binance Futures",
-    badge: "Most Popular",
-    features: [
-      "Built for long-term growth",
-      "Follows overall crypto market performance",
-      "Auto-rebalances weekly",
-    ],
-    icon: <FaChartLine size={20} />,
-    chartColor: "#00D897",
-  },
-  {
-    id: "balanced",
-    name: "Balanced",
-    description: "Balanced growth & protection across market cycles",
-    minPortfolio: "$1,000",
-    exchange: "Binance Futures",
-    features: [
-      "Trades both rising and falling markets",
-      "Focuses on lower risk and steady returns",
-      "Optimized for risk-adjusted performance",
-    ],
-    icon: <FaShieldAlt size={20} />,
-    chartColor: "#627EEA",
-  },
-  {
-    id: "aggressive",
-    name: "Aggressive",
-    description: "Maximum returns for high-risk tolerance",
-    minPortfolio: "$2,000",
-    exchange: "Binance Futures",
-    features: [
-      "Higher allocation to volatile altcoins",
-      "Leveraged positions for amplified gains",
-      "Best suited for experienced traders",
-    ],
-    icon: <FaBolt size={20} />,
-    chartColor: "#F7931A",
-  },
-];
+const DEFAULT_ICON = <FaChartLine size={20} />;
 
 // ─────────────────────────────────────────────
 // Steps config
@@ -114,16 +68,9 @@ const STEPS = [
   { label: "Start Trading", number: 4 },
 ];
 
-// ── Mini chart paths (simple uptrend curves) ──
-
-const CHART_PATHS: Record<string, string> = {
-  "crypto-index":
-    "M0,70 C20,65 30,60 50,50 C70,40 80,55 100,35 C120,15 140,25 160,10 C175,5 190,8 200,5",
-  balanced:
-    "M0,70 C25,68 40,55 60,50 C80,45 90,48 110,40 C130,32 150,28 170,18 C185,12 195,8 200,5",
-  aggressive:
-    "M0,70 C15,72 25,65 40,55 C55,40 65,55 80,35 C95,15 110,30 130,10 C150,5 170,15 185,3 L200,2",
-};
+// Fallback chart path if none provided by backend
+const DEFAULT_CHART_PATH =
+  "M0,70 C20,65 30,60 50,50 C70,40 80,55 100,35 C120,15 140,25 160,10 C175,5 190,8 200,5";
 
 // ─────────────────────────────────────────────
 // Page component
@@ -132,9 +79,11 @@ const CHART_PATHS: Record<string, string> = {
 export default function SetupPage() {
   const router = useRouter();
   const { isAuthenticated } = useAppSelector((s) => s.auth);
-  const [selectedStrategy, setSelectedStrategy] = useState<string | null>(null);
+  const [selectedStrategyId, setSelectedStrategyId] = useState<number | null>(null);
   const [checkingSetup, setCheckingSetup] = useState(true);
   const [showExchangeModal, setShowExchangeModal] = useState(false);
+  const [strategies, setStrategies] = useState<StrategyDto[]>([]);
+  const [strategiesLoading, setStrategiesLoading] = useState(true);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -143,31 +92,44 @@ export default function SetupPage() {
     }
   }, [isAuthenticated, router]);
 
-  // Single API call to check if the user already completed onboarding
+  // Check onboarding status + fetch strategies in parallel
   useEffect(() => {
     if (!isAuthenticated) return;
 
     let cancelled = false;
 
-    async function checkOnboardingStatus() {
-      try {
-        const { data } = await userApi.getOnboardingStatus();
-        if (cancelled) return;
-
-        if (data.isSuccess && data.data?.setupComplete) {
-          router.replace("/profile");
-          return;
-        }
-      } catch {
-        // If check fails, just show the setup page
-      }
+    async function init() {
+      const [, strategiesRes] = await Promise.allSettled([
+        (async () => {
+          try {
+            const { data } = await userApi.getOnboardingStatus();
+            if (cancelled) return;
+            if (data.isSuccess && data.data?.setupComplete) {
+              router.replace("/profile");
+            }
+          } catch {
+            // If check fails, just show the setup page
+          }
+        })(),
+        (async () => {
+          try {
+            const { data } = await strategiesApi.getActiveStrategies();
+            if (!cancelled && data.isSuccess && data.data) {
+              setStrategies(data.data);
+            }
+          } catch {
+            // Strategies will be empty — page still renders
+          }
+        })(),
+      ]);
 
       if (!cancelled) {
         setCheckingSetup(false);
+        setStrategiesLoading(false);
       }
     }
 
-    checkOnboardingStatus();
+    init();
 
     return () => { cancelled = true; };
   }, [isAuthenticated, router]);
@@ -177,7 +139,7 @@ export default function SetupPage() {
   const currentStep = 1;
 
   const handleContinue = () => {
-    if (!selectedStrategy) return;
+    if (!selectedStrategyId) return;
     setShowExchangeModal(true);
   };
 
@@ -224,85 +186,97 @@ export default function SetupPage() {
 
             {/* ── Strategy cards ── */}
             <StrategyList>
-              {STRATEGIES.map((strategy) => {
-                const isSelected = selectedStrategy === strategy.id;
-                return (
-                  <StrategyCard
-                    key={strategy.id}
-                    $selected={isSelected}
-                    $accentColor={strategy.chartColor}
-                    onClick={() => setSelectedStrategy(strategy.id)}
-                  >
-                    <Checkmark
-                      $visible={isSelected}
-                      $color={strategy.chartColor}
+              {strategiesLoading ? (
+                <div style={{ textAlign: "center", padding: "2rem 0", color: "rgba(255,255,255,0.5)" }}>
+                  Loading strategies...
+                </div>
+              ) : strategies.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "2rem 0", color: "rgba(255,255,255,0.5)" }}>
+                  No strategies available at the moment.
+                </div>
+              ) : (
+                strategies.map((strategy) => {
+                  const isSelected = selectedStrategyId === strategy.id;
+                  const icon = ICON_MAP[strategy.iconName] || DEFAULT_ICON;
+                  const chartPath = strategy.chartPath || DEFAULT_CHART_PATH;
+                  const minPortfolio = strategy.minPortfolioUsd >= 1000
+                    ? `$${(strategy.minPortfolioUsd / 1000).toFixed(strategy.minPortfolioUsd % 1000 === 0 ? 0 : 1)}k`
+                    : `$${strategy.minPortfolioUsd.toLocaleString()}`;
+
+                  return (
+                    <StrategyCard
+                      key={strategy.slug}
+                      $selected={isSelected}
+                      $accentColor={strategy.chartColor}
+                      onClick={() => setSelectedStrategyId(strategy.id)}
                     >
-                      <FaCheck size={12} />
-                    </Checkmark>
-
-                    <CardLeft>
-                      <CardHeader>
-                        <IconWrapper $color={strategy.chartColor}>
-                          {strategy.icon}
-                        </IconWrapper>
-                        <StrategyName>{strategy.name}</StrategyName>
-                        {strategy.badge && <Badge>{strategy.badge}</Badge>}
-                      </CardHeader>
-
-                      <StrategyDesc>{strategy.description}</StrategyDesc>
-
-                      <StrategyMeta>
-                        <span>{strategy.minPortfolio} min portfolio</span>
-                        <MetaDot>•</MetaDot>
-                        <span>{strategy.exchange}</span>
-                      </StrategyMeta>
-
-                      <FeatureList>
-                        {strategy.features.map((f) => (
-                          <FeatureItem key={f}>{f}</FeatureItem>
-                        ))}
-                      </FeatureList>
-                    </CardLeft>
-
-                    <ChartArea $color={strategy.chartColor}>
-                      <ChartLabel $color={strategy.chartColor}>
-                        {strategy.id === "crypto-index"
-                          ? "outperforms major indexes"
-                          : strategy.id === "balanced"
-                            ? "steady risk-adjusted returns"
-                            : "high volatility, high reward"}
-                      </ChartLabel>
-                      <ChartSvg
-                        viewBox="0 0 200 80"
-                        preserveAspectRatio="none"
+                      <Checkmark
+                        $visible={isSelected}
+                        $color={strategy.chartColor}
                       >
-                        <path
-                          d={CHART_PATHS[strategy.id]}
-                          fill="none"
-                          stroke={strategy.chartColor}
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                        />
-                        <path
-                          d={`${CHART_PATHS[strategy.id]} L200,80 L0,80 Z`}
-                          fill={`${strategy.chartColor}10`}
-                        />
-                      </ChartSvg>
-                    </ChartArea>
-                  </StrategyCard>
-                );
-              })}
+                        <FaCheck size={12} />
+                      </Checkmark>
+
+                      <CardLeft>
+                        <CardHeader>
+                          <IconWrapper $color={strategy.chartColor}>
+                            {icon}
+                          </IconWrapper>
+                          <StrategyName>{strategy.name}</StrategyName>
+                          {strategy.badge && <Badge>{strategy.badge}</Badge>}
+                        </CardHeader>
+
+                        <StrategyDesc>{strategy.description}</StrategyDesc>
+
+                        <StrategyMeta>
+                          <span>{minPortfolio} min portfolio</span>
+                          <MetaDot>•</MetaDot>
+                          <span>{strategy.exchange}</span>
+                        </StrategyMeta>
+
+                        <FeatureList>
+                          {strategy.features.map((f) => (
+                            <FeatureItem key={f}>{f}</FeatureItem>
+                          ))}
+                        </FeatureList>
+                      </CardLeft>
+
+                      <ChartArea $color={strategy.chartColor}>
+                        <ChartLabel $color={strategy.chartColor}>
+                          {strategy.description}
+                        </ChartLabel>
+                        <ChartSvg
+                          viewBox="0 0 200 80"
+                          preserveAspectRatio="none"
+                        >
+                          <path
+                            d={chartPath}
+                            fill="none"
+                            stroke={strategy.chartColor}
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d={`${chartPath} L200,80 L0,80 Z`}
+                            fill={`${strategy.chartColor}10`}
+                          />
+                        </ChartSvg>
+                      </ChartArea>
+                    </StrategyCard>
+                  );
+                })
+              )}
             </StrategyList>
 
             {/* ── Continue button ── */}
             <BottomActions>
               <NextHint>
-                {selectedStrategy
+                {selectedStrategyId
                   ? "Next: connect your exchange API keys"
                   : "Select a strategy to continue"}
               </NextHint>
               <ContinueButton
-                $disabled={!selectedStrategy}
+                $disabled={!selectedStrategyId}
                 onClick={handleContinue}
               >
                 Continue
@@ -313,9 +287,10 @@ export default function SetupPage() {
       </Layout>
 
       {/* ── Connect Exchange Modal ── */}
-      {showExchangeModal && selectedStrategy && (
+      {showExchangeModal && selectedStrategyId && (
         <ConnectExchangeModal
-          strategy={selectedStrategy}
+          strategy={strategies.find((s) => s.id === selectedStrategyId)?.slug ?? ""}
+          strategyId={selectedStrategyId}
           onClose={() => setShowExchangeModal(false)}
         />
       )}

@@ -65,13 +65,14 @@ const SERVER_IP = "94.130.110.37";
 interface Props {
   onClose: () => void;
   strategy: string;
+  strategyId: number;
   /** If provided, called on success instead of navigating to choose-plan */
   onSuccess?: () => void;
 }
 
 type Step = "select" | "keys" | "success";
 
-export default function ConnectExchangeModal({ onClose, strategy, onSuccess }: Props) {
+export default function ConnectExchangeModal({ onClose, strategy, strategyId, onSuccess }: Props) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("select");
   const [selectedExchange, setSelectedExchange] = useState<string>("binance");
@@ -159,6 +160,7 @@ export default function ConnectExchangeModal({ onClose, strategy, onSuccess }: P
       const { data } = await exchangeApi.connect({
         apiKey: trimmedKey,
         apiSecret: trimmedSecret,
+        strategyId,
       });
 
       if (data.isSuccess && data.data) {
