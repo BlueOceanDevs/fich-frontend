@@ -107,6 +107,11 @@ const Navbar: React.FC = () => {
 
         {isAuthenticated ? (
           <MobileAuthGroup>
+            <Link href="/dashboard" passHref legacyBehavior>
+              <MobileLoginButton onClick={() => dispatch(closeMobileMenu())}>
+                Dashboard
+              </MobileLoginButton>
+            </Link>
             <Link href="/profile" passHref legacyBehavior>
               <MobileLoginButton onClick={() => dispatch(closeMobileMenu())}>
                 Profile

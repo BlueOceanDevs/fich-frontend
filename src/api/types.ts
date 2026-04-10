@@ -207,6 +207,44 @@ export interface PagedResult<T> {
   totalPages: number;
 }
 
+// ─────────────────────────────────────────────
+// Portfolio
+// ─────────────────────────────────────────────
+
+export interface PortfolioDto {
+  totalValueUsd: number;
+  totalInvestedUsd: number;
+  pnlUsd: number;
+  pnlPercent: number;
+  usdtBalance: number;
+  totalTrades: number;
+  activeHoldings: number;
+  strategyName: string;
+  holdings: HoldingDto[];
+  history: PortfolioSnapshotDto[];
+}
+
+export interface HoldingDto {
+  symbol: string;
+  asset: string;
+  quantity: number;
+  avgBuyPrice: number;
+  currentPrice: number;
+  valueUsd: number;
+  pnlUsd: number;
+  pnlPercent: number;
+  allocationPercent: number;
+}
+
+export interface PortfolioSnapshotDto {
+  date: string;
+  valueUsd: number;
+}
+
+// ─────────────────────────────────────────────
+// Exchange Connection
+// ─────────────────────────────────────────────
+
 export interface ExchangeConnectionDto {
   id: number;
   exchangeType: string; // "Binance"

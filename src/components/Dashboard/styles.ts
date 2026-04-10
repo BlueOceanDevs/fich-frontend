@@ -1,279 +1,401 @@
 import styled, { keyframes } from "styled-components";
 
-const fadeInUp = keyframes`
-  from { opacity: 0; transform: translateY(30px); }
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 `;
 
-export const DashWrapper = styled.div`
-  margin-top: 60px;
-  width: 100%;
-  max-width: 1000px;
-  animation: ${fadeInUp} 1s ease-out 0.3s both;
+// ── Layout ──
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    display: none;
-  }
+export const DashboardSection = styled.section`
+  padding: 128px 24px 88px;
+  background:
+    radial-gradient(
+      circle at top,
+      ${({ theme }) => `${theme.colors.primary}14`} 0%,
+      transparent 34%
+    ),
+    ${({ theme }) => theme.colors.background};
 `;
 
-export const DashWindow = styled.div`
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
+export const DashboardContainer = styled.div`
+  width: 100%;
+  max-width: ${({ theme }) => theme.maxWidth};
+  margin: 0 auto;
+`;
+
+export const DashboardHeader = styled.div`
+  margin-bottom: 28px;
+`;
+
+export const DashboardTitle = styled.h1`
+  font-size: clamp(32px, 4vw, 44px);
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.text};
+  margin-bottom: 6px;
+`;
+
+export const DashboardSubtitle = styled.p`
+  font-size: 16px;
+  line-height: 1.7;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+// ── Cards ──
+
+export const Card = styled.div`
+  padding: 28px;
   background: ${({ theme }) => theme.colors.card};
   border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  overflow: hidden;
-  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5);
-`;
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  animation: ${fadeIn} 0.4s ease-out both;
 
-export const DashTopBar = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  background: ${({ theme }) => theme.colors.backgroundLight};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
-`;
-
-export const DashDot = styled.span<{ color: string }>`
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: ${({ color }) => color};
-  margin-right: 6px;
-`;
-
-export const DashBody = styled.div`
-  display: flex;
-  min-height: 380px;
-`;
-
-export const Sidebar = styled.div`
-  width: 160px;
-  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  padding: 16px 0;
-  flex-shrink: 0;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    width: 120px;
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    padding: 20px 16px;
   }
 `;
 
-export const SidebarItem = styled.div<{ $active?: boolean }>`
+export const CardTitle = styled.h2`
+  font-size: 16px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
-  font-size: 12px;
-  color: ${({ $active, theme }) =>
-    $active ? theme.colors.text : theme.colors.textMuted};
-  background: ${({ $active, theme }) =>
-    $active ? theme.colors.backgroundLight : "transparent"};
-  border-left: 2px solid
-    ${({ $active, theme }) =>
-      $active ? theme.colors.primary : "transparent"};
-  cursor: pointer;
-  transition: all 0.2s;
+`;
 
-  &:hover {
-    color: ${({ theme }) => theme.colors.text};
-    background: ${({ theme }) => theme.colors.backgroundLight};
+// ── Summary ──
+
+export const SummaryCard = styled(Card)`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  animation-delay: 0.05s;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;
 
-export const SidebarIcon = styled.span`
-  font-size: 14px;
-`;
-
-export const MainPanel = styled.div`
-  flex: 1;
-  padding: 20px;
+export const SummaryLeft = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 6px;
 `;
 
-export const BalanceLabel = styled.div`
-  font-size: 11px;
-  color: ${({ theme }) => theme.colors.textMuted};
+export const SummaryLabel = styled.span`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.textSecondary};
   text-transform: uppercase;
   letter-spacing: 0.5px;
 `;
 
-export const BalanceAmount = styled.div`
-  font-size: 28px;
+export const SummaryValue = styled.span`
+  font-size: clamp(28px, 4vw, 38px);
   font-weight: 700;
   color: ${({ theme }) => theme.colors.text};
-  margin-top: 4px;
+`;
+
+export const SummaryPnl = styled.span<{ $positive: boolean }>`
+  font-size: 15px;
+  font-weight: 600;
+  color: ${({ $positive, theme }) =>
+    $positive ? theme.colors.success : theme.colors.danger};
+`;
+
+export const SummaryRight = styled.div`
   display: flex;
-  align-items: baseline;
-  gap: 12px;
-`;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
 
-export const BalanceChange = styled.span`
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.primary};
-  font-weight: 500;
-`;
-
-export const ChartArea = styled.div`
-  flex: 1;
-  min-height: 120px;
-  margin: 16px 0;
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-`;
-
-const drawLine = keyframes`
-  from { stroke-dashoffset: 800; }
-  to { stroke-dashoffset: 0; }
-`;
-
-export const ChartLine = styled.div`
-  width: 100%;
-  height: 100%;
-  position: relative;
-
-  &::before {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    background: linear-gradient(
-      to top,
-      rgba(0, 216, 151, 0.08) 0%,
-      transparent 100%
-    );
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: 40%;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      ${({ theme }) => theme.colors.primary} 0%,
-      ${({ theme }) => theme.colors.primary} 20%,
-      ${({ theme }) => theme.colors.primary} 40%,
-      rgba(0, 216, 151, 0.5) 60%,
-      ${({ theme }) => theme.colors.primary} 80%,
-      ${({ theme }) => theme.colors.primary} 100%
-    );
-    clip-path: polygon(
-      0% 60%, 10% 45%, 20% 55%, 30% 30%, 40% 50%, 50% 25%,
-      60% 40%, 70% 20%, 80% 35%, 90% 15%, 100% 30%,
-      100% 100%, 0% 100%
-    );
-    opacity: 0.9;
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    align-items: flex-start;
   }
 `;
 
-export const AssetsRow = styled.div`
-  margin-top: auto;
-`;
-
-export const AssetPill = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: ${({ theme }) => theme.colors.backgroundLight};
+export const StrategyBadge = styled.span`
+  display: inline-block;
+  padding: 6px 16px;
   border-radius: ${({ theme }) => theme.borderRadius.full};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  flex-shrink: 0;
-`;
-
-export const AssetName = styled.span`
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.text};
+  background: ${({ theme }) => `${theme.colors.primary}18`};
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
-export const AssetPrice = styled.span`
-  font-size: 10px;
-  color: ${({ theme }) => theme.colors.textMuted};
-`;
+// ── Quick Stats ──
 
-export const BottomTabs = styled.div`
-  display: flex;
+export const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  margin-top: 16px;
-  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  padding-top: 12px;
+  margin-top: 20px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    grid-template-columns: 1fr;
+  }
 `;
 
-export const TabItem = styled.span<{ $active?: boolean }>`
-  font-size: 11px;
-  color: ${({ $active, theme }) =>
-    $active ? theme.colors.text : theme.colors.textMuted};
-  cursor: pointer;
-  padding-bottom: 4px;
-  border-bottom: 1px solid
-    ${({ $active, theme }) =>
-      $active ? theme.colors.primary : "transparent"};
-  transition: all 0.2s;
-`;
-
-export const QuickSwapPanel = styled.div`
-  background: ${({ theme }) => theme.colors.backgroundLight};
-  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  padding: 16px;
-`;
-
-export const QuickSwapTitle = styled.div`
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 12px;
-`;
-
-export const SwapRow = styled.div`
+export const StatCard = styled(Card)`
+  padding: 20px 24px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  flex-direction: column;
+  gap: 8px;
 `;
 
-export const SwapLabel = styled.span`
-  font-size: 11px;
-  color: ${({ theme }) => theme.colors.textMuted};
+export const StatLabel = styled.span`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 `;
 
-export const SwapValue = styled.span`
-  font-size: 11px;
-  font-weight: 600;
+export const StatValue = styled.span`
+  font-size: 22px;
+  font-weight: 700;
   color: ${({ theme }) => theme.colors.text};
 `;
 
-export const RepartitionPanel = styled.div`
+// ── Charts grid ──
+
+export const ChartsGrid = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const ChartCard = styled(Card)`
+  animation-delay: 0.15s;
+  min-height: 320px;
+`;
+
+// ── Holdings Table ──
+
+export const TableWrapper = styled.div`
+  margin-top: 20px;
+`;
+
+export const TableCard = styled(Card)`
+  animation-delay: 0.2s;
+`;
+
+export const TableScroll = styled.div`
+  width: 100%;
+  overflow-x: auto;
+`;
+
+export const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+`;
+
+export const Th = styled.th`
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  white-space: nowrap;
+`;
+
+export const ThRight = styled(Th)`
+  text-align: right;
+`;
+
+export const Td = styled.td`
+  padding: 12px;
+  color: ${({ theme }) => theme.colors.text};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  white-space: nowrap;
+`;
+
+export const TdRight = styled(Td)`
+  text-align: right;
+`;
+
+export const PnlText = styled.span<{ $positive: boolean }>`
+  font-weight: 500;
+  color: ${({ $positive, theme }) =>
+    $positive ? theme.colors.success : theme.colors.danger};
+`;
+
+export const AssetCell = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const AssetIcon = styled.div`
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   background: ${({ theme }) => theme.colors.backgroundLight};
-  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  padding: 16px;
-  flex: 1;
-`;
-
-export const RepartitionTitle = styled.div`
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 12px;
-`;
-
-export const DonutPlaceholder = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
 
-  .donut-ring {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    border: 12px solid ${({ theme }) => theme.colors.cardBorder};
-    border-top-color: #f7931a;
-    border-right-color: #627eea;
-    border-bottom-color: #9945ff;
-    border-left-color: #00aae4;
+export const AssetName = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+`;
+
+export const AssetSymbol = styled.span`
+  font-weight: 600;
+  font-size: 13px;
+`;
+
+export const AssetPair = styled.span`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.textMuted};
+`;
+
+// ── Allocation bar ──
+
+export const AllocationBar = styled.div`
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: ${({ theme }) => theme.colors.backgroundLight};
+  overflow: hidden;
+`;
+
+export const AllocationFill = styled.div<{ $pct: number; $color: string }>`
+  height: 100%;
+  width: ${({ $pct }) => `${Math.min($pct, 100)}%`};
+  border-radius: 3px;
+  background: ${({ $color }) => $color};
+  transition: width 0.6s ease;
+`;
+
+// ── Recent Trades ──
+
+export const RecentTradesCard = styled(Card)`
+  margin-top: 20px;
+  animation-delay: 0.25s;
+`;
+
+export const StatusBadge = styled.span<{ $status: string }>`
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  font-size: 12px;
+  font-weight: 500;
+  background: ${({ $status }) => {
+    switch ($status) {
+      case "Filled": return "rgba(0, 216, 151, 0.15)";
+      case "Pending": case "PartiallyFilled": return "rgba(234, 179, 8, 0.15)";
+      case "Failed": case "Cancelled": return "rgba(239, 68, 68, 0.12)";
+      default: return "rgba(100, 116, 139, 0.15)";
+    }
+  }};
+  color: ${({ $status }) => {
+    switch ($status) {
+      case "Filled": return "#00d897";
+      case "Pending": case "PartiallyFilled": return "#eab308";
+      case "Failed": case "Cancelled": return "#ef4444";
+      default: return "#94a3b8";
+    }
+  }};
+`;
+
+export const SideBadge = styled.span<{ $side: string }>`
+  font-weight: 600;
+  font-size: 12px;
+  color: ${({ $side }) => ($side === "Buy" ? "#00d897" : "#ef4444")};
+`;
+
+export const ViewAllLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.primary};
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
   }
+`;
+
+export const CardTitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+`;
+
+// ── Empty / Loading ──
+
+export const EmptyState = styled.p`
+  text-align: center;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  font-size: 14px;
+  padding: 32px 0;
+`;
+
+export const LoadingState = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  font-size: 14px;
+`;
+
+// ── Pagination ──
+
+export const PaginationRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 12px;
+`;
+
+export const PagBtn = styled.button`
+  padding: 6px 16px;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary};
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
+
+export const PagText = styled.span`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.textSecondary};
 `;

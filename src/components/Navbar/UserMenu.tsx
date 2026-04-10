@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import styled from "styled-components";
-import { FaUser, FaSignOutAlt, FaCrown, FaCheckCircle, FaExclamationCircle, FaPlug } from "react-icons/fa";
+import { FaUser, FaSignOutAlt, FaCrown, FaCheckCircle, FaExclamationCircle, FaPlug, FaChartLine } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/authSlice";
 import { fetchSubscription, clearSubscription } from "@/store/subscriptionSlice";
@@ -170,6 +170,18 @@ const UserMenu: React.FC = () => {
             </StatusRow>
 
             <DropdownDivider />
+
+            <Link href="/dashboard" passHref legacyBehavior>
+              <DropdownItem
+                as="a"
+                onClick={() => setOpen(false)}
+              >
+                <DropdownItemIcon>
+                  <FaChartLine size={14} />
+                </DropdownItemIcon>
+                Dashboard
+              </DropdownItem>
+            </Link>
 
             <Link href="/profile" passHref legacyBehavior>
               <DropdownItem
