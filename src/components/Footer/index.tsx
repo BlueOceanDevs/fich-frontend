@@ -41,13 +41,14 @@ const Footer: React.FC = () => {
             <FooterLink href="#testimonials">Testimonials</FooterLink>
             <FooterLink href="#pricing">Pricing</FooterLink>
             <FooterLink href="#faq">FAQ</FooterLink>
+            <FooterLink href="/contact">Contact</FooterLink>
           </FooterColumn>
 
           <FooterColumn>
-            <FooterColumnTitle>Socials</FooterColumnTitle>
-            <FooterLink href="#">Twitter</FooterLink>
-            <FooterLink href="#">Instagram</FooterLink>
-            <FooterLink href="#">LinkedIn</FooterLink>
+            <FooterColumnTitle>Legal</FooterColumnTitle>
+            <FooterLink href="/privacy-policy">Privacy Policy</FooterLink>
+            <FooterLink href="/terms">Terms of Service</FooterLink>
+            <FooterLink href="/risk-disclosure">Risk Disclosure</FooterLink>
           </FooterColumn>
         </FooterGrid>
 

@@ -17,6 +17,10 @@ const EXEMPT_PATHS = [
   "/plans",
   "/setup",
   "/profile",
+  "/privacy-policy",
+  "/terms",
+  "/risk-disclosure",
+  "/contact",
   "/payment/success",
   "/payment/cancel",
 ];
