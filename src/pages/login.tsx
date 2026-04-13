@@ -7,6 +7,7 @@ import { useAppDispatch } from "@/store/hooks";
 import { setAuthenticated, fetchUser } from "@/store/authSlice";
 import { authApi } from "@/api/auth";
 import { useAuthForm } from "@/hooks/useAuthForm";
+import { getPostLoginRoute } from "@/utils/post-login-redirect";
 import AuthLayout from "@/components/Auth/AuthLayout";
 import GoogleAuthButton from "@/components/Auth/GoogleAuthButton";
 import {
@@ -29,7 +30,7 @@ import {
 
 export default function LoginPage() {
   const router = useRouter();
-  const redirect = (router.query.redirect as string) || "/setup";
+  const explicitRedirect = router.query.redirect as string | undefined;
   const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const form = useAuthForm({ email: "", password: "" });
@@ -60,7 +61,8 @@ export default function LoginPage() {
       });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
-      router.push(redirect);
+      const dest = explicitRedirect || (await getPostLoginRoute());
+      router.push(dest);
     } catch (err: any) {
       form.setGlobalError(
         err.response?.data?.errors?.[0] || "Login failed. Please try again."
@@ -78,7 +80,8 @@ export default function LoginPage() {
       await authApi.googleLogin({ idToken: credential });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
-      router.push(redirect);
+      const dest = explicitRedirect || (await getPostLoginRoute());
+      router.push(dest);
     } catch (err: any) {
       form.setGlobalError(
         err.response?.data?.errors?.[0] ||

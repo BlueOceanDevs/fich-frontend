@@ -1,6 +1,6 @@
 import React from "react";
 import { FaStar } from "react-icons/fa";
-import Dashboard from "@/components/Dashboard";
+import HeroPreview from "./HeroPreview";
 import {
   HeroSection,
   HeroContent,
@@ -37,7 +37,7 @@ const Hero: React.FC = () => {
           </Stars>
         </TrustRow>
       </HeroContent>
-      <Dashboard />
+      <HeroPreview />
     </HeroSection>
   );
 };

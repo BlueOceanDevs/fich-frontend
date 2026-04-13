@@ -112,11 +112,6 @@ const Navbar: React.FC = () => {
                 Dashboard
               </MobileLoginButton>
             </Link>
-            <Link href="/profile" passHref legacyBehavior>
-              <MobileLoginButton onClick={() => dispatch(closeMobileMenu())}>
-                Profile
-              </MobileLoginButton>
-            </Link>
             <MobileLoginButton
               onClick={() => {
                 dispatch(logout());

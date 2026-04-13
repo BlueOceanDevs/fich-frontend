@@ -7,6 +7,7 @@ import { useAppDispatch } from "@/store/hooks";
 import { setAuthenticated, fetchUser } from "@/store/authSlice";
 import { authApi } from "@/api/auth";
 import { useAuthForm } from "@/hooks/useAuthForm";
+import { getPostLoginRoute } from "@/utils/post-login-redirect";
 import AuthLayout from "@/components/Auth/AuthLayout";
 import GoogleAuthButton from "@/components/Auth/GoogleAuthButton";
 import {
@@ -93,7 +94,8 @@ export default function SignupPage() {
       });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
-      router.push("/setup");
+      const dest = await getPostLoginRoute();
+      router.push(dest);
     } catch (err: any) {
       form.setGlobalError(
         err.response?.data?.errors?.[0] ||
@@ -112,7 +114,8 @@ export default function SignupPage() {
       await authApi.googleLogin({ idToken: credential });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
-      router.push("/setup");
+      const dest = await getPostLoginRoute();
+      router.push(dest);
     } catch (err: any) {
       form.setGlobalError(
         err.response?.data?.errors?.[0] ||

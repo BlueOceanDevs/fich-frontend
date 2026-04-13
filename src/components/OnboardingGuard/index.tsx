@@ -65,7 +65,14 @@ export default function OnboardingGuard({
         if (cancelled) return;
 
         if (data.isSuccess && data.data && !data.data.setupComplete) {
-          router.replace("/setup");
+          const status = data.data;
+          if (!status.hasActiveExchange) {
+            router.replace("/setup");
+          } else if (!status.hasActiveSubscription) {
+            router.replace("/setup/choose-plan");
+          } else {
+            router.replace("/setup");
+          }
           return;
         }
       } catch {
