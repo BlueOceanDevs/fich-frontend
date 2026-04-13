@@ -1,5 +1,5 @@
 import api from "./client";
-import type { ApiResponseOf, PagedResult, PortfolioDto, TradeOrderDto } from "./types";
+import type { ApiResponseOf, PagedResult, PortfolioDto, TradeOrderDto, LastRebalanceDto } from "./types";
 
 export const tradesApi = {
   getMyOrders(page = 1, pageSize = 25) {
@@ -10,5 +10,9 @@ export const tradesApi = {
 
   getPortfolio() {
     return api.get<ApiResponseOf<PortfolioDto>>("/Trade/Portfolio");
+  },
+
+  getLastRebalance() {
+    return api.get<ApiResponseOf<LastRebalanceDto | null>>("/Trade/LastRebalance");
   },
 };

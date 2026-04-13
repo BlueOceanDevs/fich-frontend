@@ -33,12 +33,25 @@ const Card = styled.div`
   text-align: center;
 `;
 
-const Icon = styled.div`
+const SuccessIcon = styled.div`
   width: 64px;
   height: 64px;
   border-radius: 50%;
   background: rgba(0, 216, 151, 0.15);
   color: ${({ theme }) => theme.colors.primary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 24px;
+`;
+
+const ErrorIcon = styled.div`
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,6 +94,26 @@ const ActionLink = styled.a`
   &:hover {
     background: ${({ theme }) => theme.colors.primaryHover};
   }
+`;
+
+const SecondaryLink = styled.a`
+  display: inline-block;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  margin-top: 16px;
+  transition: color 0.2s;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.text};
+  }
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
 `;
 
 export default function PaymentSuccessPage() {
@@ -138,39 +171,95 @@ export default function PaymentSuccessPage() {
 
   const statusLabel = order?.status ?? "Checking...";
   const isFinished = order?.status === "Finished";
+  const isFailed = order?.status === "Failed";
+  const isExpired = order?.status === "Expired";
+  const isRefunded = order?.status === "Refunded";
+  const isError = isFailed || isExpired || isRefunded;
   const isPending = !order || ["Waiting", "Confirming", "Confirmed", "Sending"].includes(order.status);
+
+  const errorTitle = isFailed
+    ? "Payment Failed"
+    : isExpired
+    ? "Payment Expired"
+    : "Payment Refunded";
+
+  const errorDesc = isFailed
+    ? "Your payment could not be processed. This can happen if the transaction was declined or the network encountered an issue. No funds have been charged."
+    : isExpired
+    ? "The payment window expired before the transaction could be completed. No funds have been charged."
+    : "Your payment has been refunded. The funds will be returned to your wallet.";
+
+  const pageTitle = isFinished
+    ? "Payment Successful"
+    : isError
+    ? errorTitle
+    : "Payment Processing";
 
   return (
     <>
       <Head>
-        <title>Payment {isFinished ? "Successful" : "Processing"} - Fich</title>
+        <title>{pageTitle} - Fich</title>
       </Head>
       <Layout>
         <PageSection>
           <Card>
-            <Icon>{isFinished ? "✓" : "⏳"}</Icon>
-            <Title>
-              {isFinished ? "Payment Successful!" : "Processing Payment..."}
-            </Title>
-            <Desc>
-              {isFinished
-                ? `Your ${order?.planName} subscription is now active.`
-                : "Your payment is being processed. This may take a few minutes for blockchain confirmations."}
-            </Desc>
-            <StatusText $pending={isPending}>
-              Status: {statusLabel}
-              {polling && isPending && " (checking...)"}
-            </StatusText>
-            {isFinished && (
-              <Link href="/profile" passHref legacyBehavior>
-                <ActionLink>Go to Profile</ActionLink>
-              </Link>
+            {/* ── Error State ── */}
+            {isError && (
+              <>
+                <ErrorIcon>✕</ErrorIcon>
+                <Title>{errorTitle}</Title>
+                <Desc>{errorDesc}</Desc>
+                <StatusText>Status: {statusLabel}</StatusText>
+                <ButtonGroup>
+                  <Link href="/#pricing" passHref legacyBehavior>
+                    <ActionLink>Try Again</ActionLink>
+                  </Link>
+                  <Link href="/contact" passHref legacyBehavior>
+                    <SecondaryLink>Need help? Contact support</SecondaryLink>
+                  </Link>
+                </ButtonGroup>
+              </>
             )}
-            {!polling && !isFinished && (
-              <Desc style={{ fontSize: 13 }}>
-                Don&apos;t worry — your subscription will activate automatically once the payment confirms.
-                You can check your order status on your profile.
-              </Desc>
+
+            {/* ── Success State ── */}
+            {isFinished && (
+              <>
+                <SuccessIcon>✓</SuccessIcon>
+                <Title>Payment Successful!</Title>
+                <Desc>Your {order?.planName} subscription is now active.</Desc>
+                <StatusText>Status: {statusLabel}</StatusText>
+                <Link href="/profile" passHref legacyBehavior>
+                  <ActionLink>Go to Profile</ActionLink>
+                </Link>
+              </>
+            )}
+
+            {/* ── Pending / Polling State ── */}
+            {!isFinished && !isError && (
+              <>
+                <SuccessIcon>⏳</SuccessIcon>
+                <Title>Processing Payment...</Title>
+                <Desc>
+                  Your payment is being processed. This may take a few minutes for blockchain confirmations.
+                </Desc>
+                <StatusText $pending={isPending}>
+                  Status: {statusLabel}
+                  {polling && isPending && " (checking...)"}
+                </StatusText>
+                {!polling && (
+                  <ButtonGroup>
+                    <Desc style={{ fontSize: 13, marginBottom: 0 }}>
+                      Don&apos;t worry — your subscription will activate automatically once the payment confirms.
+                    </Desc>
+                    <Link href="/dashboard/account" passHref legacyBehavior>
+                      <SecondaryLink>Check order status on your account</SecondaryLink>
+                    </Link>
+                    <Link href="/contact" passHref legacyBehavior>
+                      <SecondaryLink>Need help? Contact support</SecondaryLink>
+                    </Link>
+                  </ButtonGroup>
+                )}
+              </>
             )}
           </Card>
         </PageSection>

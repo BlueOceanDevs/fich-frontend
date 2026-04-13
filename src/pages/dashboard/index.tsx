@@ -5,6 +5,7 @@ import type { PortfolioDto } from "@/api/types";
 import DashboardLayout from "@/components/DashboardLayout";
 import PortfolioSummary from "@/components/Dashboard/PortfolioSummary";
 import QuickStats from "@/components/Dashboard/QuickStats";
+import RebalanceStatus from "@/components/Dashboard/RebalanceStatus";
 import RecentTrades from "@/components/Dashboard/RecentTrades";
 import { LoadingState, EmptyState } from "@/components/Dashboard/styles";
 
@@ -41,6 +42,7 @@ export default function DashboardOverviewPage() {
           <>
             <PortfolioSummary portfolio={portfolio} />
             <QuickStats portfolio={portfolio} />
+            <RebalanceStatus />
             <RecentTrades />
           </>
         )}

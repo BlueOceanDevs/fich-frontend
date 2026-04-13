@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import {
   FaChartPie,
+  FaChartLine,
   FaWallet,
   FaHistory,
   FaUserCog,
@@ -54,6 +55,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { key: "overview", label: "Overview", href: "/dashboard", icon: <FaChartPie size={15} /> },
   { key: "portfolio", label: "Portfolio", href: "/dashboard/portfolio", icon: <FaWallet size={15} /> },
+  { key: "performance", label: "Performance", href: "/dashboard/performance", icon: <FaChartLine size={15} /> },
   { key: "trades", label: "Trades", href: "/dashboard/trades", icon: <FaHistory size={15} /> },
   { key: "account", label: "Account", href: "/dashboard/account", icon: <FaUserCog size={15} /> },
 ];

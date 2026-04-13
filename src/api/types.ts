@@ -241,6 +241,16 @@ export interface PortfolioSnapshotDto {
   valueUsd: number;
 }
 
+export interface LastRebalanceDto {
+  batchId: number;
+  signalDate: string;
+  status: string;
+  totalSignals: number;
+  userTradeCount: number;
+  userFailedCount: number;
+  receivedAt: string;
+}
+
 // ─────────────────────────────────────────────
 // Exchange Connection
 // ─────────────────────────────────────────────
