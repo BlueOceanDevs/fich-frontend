@@ -292,6 +292,10 @@ export default function ConnectExchangeModal({ onClose, strategy, strategyId, on
                 </PermissionRow>
                 <PermissionRow>
                   <PermissionCheck><FaCheck size={9} /></PermissionCheck>
+                  Enable Spot &amp; Margin Trading
+                </PermissionRow>
+                <PermissionRow>
+                  <PermissionCheck><FaCheck size={9} /></PermissionCheck>
                   Enable Futures
                 </PermissionRow>
                 <PermissionRow $danger>
