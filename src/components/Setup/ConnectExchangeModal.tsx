@@ -288,7 +288,11 @@ export default function ConnectExchangeModal({ onClose, strategy, strategyId, on
                 </span>
                 <PermissionRow>
                   <PermissionCheck><FaCheck size={9} /></PermissionCheck>
-                  Enable Spot &amp; Margin Trading
+                  Enable Reading
+                </PermissionRow>
+                <PermissionRow>
+                  <PermissionCheck><FaCheck size={9} /></PermissionCheck>
+                  Enable Futures
                 </PermissionRow>
                 <PermissionRow $danger>
                   <PermissionCross><FaTimes size={9} /></PermissionCross>
@@ -300,6 +304,12 @@ export default function ConnectExchangeModal({ onClose, strategy, strategyId, on
                 For <strong>Trusted IPs</strong>, add our server IP:
               </IpNote>
               <IpList>{SERVER_IP}</IpList>
+
+              <IpNote style={{ marginTop: 10 }}>
+                <strong>Important:</strong> before trading, transfer USDT from your
+                Spot wallet to your <strong>USD-M Futures</strong> wallet inside Binance.
+                Rebalancing uses your Futures wallet balance, not your Spot wallet.
+              </IpNote>
             </StepSection>
 
             {/* Step 2: Paste keys */}

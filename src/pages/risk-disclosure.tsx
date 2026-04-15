@@ -118,13 +118,15 @@ export default function RiskDisclosurePage() {
               </section>
 
               <section>
-                <SectionHeading>5. Leverage and Futures Trading</SectionHeading>
+                <SectionHeading>5. Binance USD-M Futures</SectionHeading>
                 <Paragraph>
-                  If you are trading on Binance Futures, you may be exposed to
-                  leveraged positions. Leveraged trading amplifies both potential
-                  gains and potential losses. You can lose more than your initial
-                  margin. Ensure you understand how futures and leverage work
-                  before using the platform.
+                  Fich executes trades on Binance USD-M Futures, but uses the
+                  platform purely for its larger symbol universe. All positions
+                  are opened at 1x leverage and are long-only — Fich never
+                  shorts and never takes leveraged exposure. Your risk profile
+                  is equivalent to holding the underlying assets on Spot. You
+                  must fund your USD-M Futures wallet (not your Spot wallet)
+                  with USDT for Fich to trade on your behalf.
                 </Paragraph>
               </section>
 
