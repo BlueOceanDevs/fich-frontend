@@ -16,6 +16,7 @@ import {
   TdRight,
   StatusBadge,
   SideBadge,
+  SourceBadge,
   EmptyState,
 } from "./styles";
 
@@ -72,20 +73,41 @@ const RecentTrades: React.FC = () => {
                 <tr key={t.id}>
                   <Td style={{ fontWeight: 600 }}>{t.symbol}</Td>
                   <Td>
-                    <SideBadge
-                      $side={t.side}
-                      // Admins may open short positions now, so a Sell can mean
-                      // either "close/reduce a long" or "open a short." Trade rows
-                      // don't (yet) carry the intent explicitly, so make the
-                      // ambiguity visible on hover instead of picking one story.
-                      title={
-                        t.side === "Buy"
-                          ? "Buy — opens/adds to a long, or closes a short"
-                          : "Sell — closes/reduces a long, or opens a short"
-                      }
-                    >
-                      {t.side}
-                    </SideBadge>
+                    <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+                      <SideBadge
+                        $side={t.side}
+                        // Admins may open short positions now, so a Sell can mean
+                        // either "close/reduce a long" or "open a short." Trade rows
+                        // don't (yet) carry the intent explicitly, so make the
+                        // ambiguity visible on hover instead of picking one story.
+                        title={
+                          t.side === "Buy"
+                            ? "Buy — opens/adds to a long, or closes a short"
+                            : "Sell — closes/reduces a long, or opens a short"
+                        }
+                      >
+                        {t.side}
+                      </SideBadge>
+                      {/* Source tag only shown for non-Signal trades — Signal is
+                          the default and the absence of a tag implies it. Keeps
+                          the compact view uncluttered for the common case. */}
+                      {t.source && t.source !== "Signal" && (
+                        <SourceBadge
+                          $source={t.source}
+                          title={
+                            t.source === "External"
+                              ? "Trade placed directly on Binance, outside our system"
+                              : t.source === "Manual"
+                              ? "Trade placed by an admin on your behalf"
+                              : t.source === "Liquidation"
+                              ? "Position force-closed by Binance"
+                              : undefined
+                          }
+                        >
+                          {t.source}
+                        </SourceBadge>
+                      )}
+                    </span>
                   </Td>
                   <Td>
                     <StatusBadge $status={t.status}>{t.status}</StatusBadge>

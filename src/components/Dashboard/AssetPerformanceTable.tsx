@@ -1,5 +1,5 @@
 import React from "react";
-import type { HoldingDto } from "@/api/types";
+import type { AssetPerformanceDto } from "@/api/types";
 import {
   TableCard,
   CardTitle,
@@ -14,12 +14,12 @@ import {
   AssetIcon,
   AssetName,
   AssetSymbol,
-  AssetPair,
   EmptyState,
 } from "./styles";
 
 interface Props {
-  holdings: HoldingDto[];
+  /** Per-asset aggregates from the Performance endpoint. Pre-aggregated server-side. */
+  perAsset: AssetPerformanceDto[];
 }
 
 const fmt = (val: number, digits = 2) =>
@@ -28,14 +28,29 @@ const fmt = (val: number, digits = 2) =>
     maximumFractionDigits: digits,
   });
 
-const AssetPerformanceTable: React.FC<Props> = ({ holdings }) => {
-  const sorted = [...holdings].sort((a, b) => b.pnlPercent - a.pnlPercent);
+/**
+ * Per-asset realized-P&L table, sorted best→worst by realized P&L.
+ *
+ * Backend sends one row per base asset over the chosen period window.
+ * Rows with zero closed trades never appear — the backend skips them, so
+ * we don't filter again here. Commissions are cumulative period-wide
+ * (open + close legs combined) to match how Binance reports them.
+ *
+ * An asset with losses still shows full-red P&L text. We intentionally
+ * don't colour win-rate — a 100% win rate on two trades reads misleading
+ * next to a 55% win rate on 200 trades, so we leave the number neutral
+ * and let the trade-count column provide context.
+ */
+const AssetPerformanceTable: React.FC<Props> = ({ perAsset }) => {
+  const sorted = [...perAsset].sort(
+    (a, b) => b.realizedPnlUsd - a.realizedPnlUsd
+  );
 
   return (
     <TableCard style={{ animationDelay: "0.2s" }}>
       <CardTitle>Asset Performance</CardTitle>
       {sorted.length === 0 ? (
-        <EmptyState>No holdings to display.</EmptyState>
+        <EmptyState>No closed trades in this period.</EmptyState>
       ) : (
         <TableScroll>
           <Table>
@@ -43,41 +58,39 @@ const AssetPerformanceTable: React.FC<Props> = ({ holdings }) => {
               <tr>
                 <Th>#</Th>
                 <Th>Asset</Th>
-                <ThRight>Avg Buy</ThRight>
-                <ThRight>Current</ThRight>
-                <ThRight>Value</ThRight>
-                <ThRight>P&L ($)</ThRight>
-                <ThRight>P&L (%)</ThRight>
-                <ThRight>Allocation</ThRight>
+                <ThRight>Closed Trades</ThRight>
+                <ThRight>Wins</ThRight>
+                <ThRight>Win Rate</ThRight>
+                <ThRight>Realized P&L</ThRight>
+                <ThRight>Commission</ThRight>
               </tr>
             </thead>
             <tbody>
-              {sorted.map((h, i) => (
-                <tr key={h.symbol}>
+              {sorted.map((a, i) => (
+                <tr key={a.asset}>
                   <Td>{i + 1}</Td>
                   <Td>
                     <AssetCell>
-                      <AssetIcon>{h.asset.slice(0, 3)}</AssetIcon>
+                      <AssetIcon>{a.asset.slice(0, 3)}</AssetIcon>
                       <AssetName>
-                        <AssetSymbol>{h.asset}</AssetSymbol>
-                        <AssetPair>{h.symbol}</AssetPair>
+                        <AssetSymbol>{a.asset}</AssetSymbol>
                       </AssetName>
                     </AssetCell>
                   </Td>
-                  <TdRight>${fmt(h.avgBuyPrice)}</TdRight>
-                  <TdRight>${fmt(h.currentPrice)}</TdRight>
-                  <TdRight>${fmt(h.valueUsd)}</TdRight>
+                  <TdRight>{a.closedTradeCount.toLocaleString()}</TdRight>
+                  <TdRight>{a.winningTradeCount.toLocaleString()}</TdRight>
                   <TdRight>
-                    <PnlText $positive={h.pnlUsd >= 0}>
-                      {h.pnlUsd >= 0 ? "+" : ""}${fmt(h.pnlUsd)}
-                    </PnlText>
+                    {a.closedTradeCount > 0
+                      ? `${fmt(a.winRatePercent, 1)}%`
+                      : "—"}
                   </TdRight>
                   <TdRight>
-                    <PnlText $positive={h.pnlPercent >= 0}>
-                      {h.pnlPercent >= 0 ? "+" : ""}{fmt(h.pnlPercent)}%
+                    <PnlText $positive={a.realizedPnlUsd >= 0}>
+                      {a.realizedPnlUsd >= 0 ? "+" : "-"}$
+                      {fmt(Math.abs(a.realizedPnlUsd))}
                     </PnlText>
                   </TdRight>
-                  <TdRight>{fmt(h.allocationPercent, 1)}%</TdRight>
+                  <TdRight>${fmt(a.commissionUsd)}</TdRight>
                 </tr>
               ))}
             </tbody>

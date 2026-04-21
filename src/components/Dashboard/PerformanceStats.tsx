@@ -1,5 +1,5 @@
 import React from "react";
-import type { PerformanceStats as Stats } from "@/utils/performanceUtils";
+import type { PerformanceDto } from "@/api/types";
 import {
   PerfStatsGrid,
   PerfStatCard,
@@ -9,82 +9,166 @@ import {
 } from "./performanceStyles";
 
 interface Props {
-  stats: Stats;
-  returns: { daily: number; weekly: number; monthly: number };
+  perf: PerformanceDto;
 }
 
-const fmt = (val: number) =>
-  `$${Math.abs(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+// ─────────────────────────────────────────────
+// Formatting helpers
+// ─────────────────────────────────────────────
+// Keep formatters colocated: every number on this page is money or percent,
+// and we always want the same rounding + sign convention. Defining them
+// inline avoids a shared-util ping-pong for two one-liners.
 
-const fmtPct = (val: number) =>
-  `${val >= 0 ? "+" : ""}${val.toFixed(2)}%`;
+const fmtMoney = (val: number) =>
+  `$${Math.abs(val).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 
-const PerformanceStats: React.FC<Props> = ({ stats, returns }) => {
+const fmtSignedMoney = (val: number) =>
+  `${val >= 0 ? "+" : "-"}${fmtMoney(val)}`;
+
+const fmtPct = (val: number) => `${val >= 0 ? "+" : ""}${val.toFixed(2)}%`;
+
+/**
+ * Top-of-page stat grid for the Performance view. All values come from a
+ * single `PerformanceDto` — no client-side aggregation.
+ *
+ * Period context (All / 1M / 7D / 1D) is owned by the page above; this
+ * component is period-agnostic so the same grid can render any window.
+ *
+ * Notes on two fields that surprise people:
+ *
+ * - **Return %** is `netPnl / netDeposits`, which matches how Binance
+ *   shows "ROI" on the wallet tab. It's _not_ a time-weighted return.
+ *   If `netDeposits` is zero (paper account, fully withdrawn), the
+ *   backend sends 0 and we render "—".
+ *
+ * - **Profit factor** is `sum(wins) / |sum(losses)|`. When losses are
+ *   zero the backend returns 0 rather than Infinity to stay JSON-safe;
+ *   we show "∞" in that case to communicate "all wins, no losses".
+ */
+const PerformanceStats: React.FC<Props> = ({ perf }) => {
+  const hasDeposits = perf.netDepositsUsd > 0;
+  const profitFactorDisplay =
+    perf.profitFactor > 0
+      ? perf.profitFactor.toFixed(2)
+      : perf.winningTradeCount > 0
+      ? "∞"
+      : "—";
+
   return (
     <PerfStatsGrid>
       <PerfStatCard>
-        <PerfStatLabel>Total Return</PerfStatLabel>
-        <PerfReturnValue $positive={stats.totalReturn >= 0}>
-          {stats.totalReturn >= 0 ? "+" : "-"}{fmt(stats.totalReturn)}
+        <PerfStatLabel>Net P&L</PerfStatLabel>
+        <PerfReturnValue $positive={perf.netPnlUsd >= 0}>
+          {fmtSignedMoney(perf.netPnlUsd)}
         </PerfReturnValue>
       </PerfStatCard>
 
       <PerfStatCard>
-        <PerfStatLabel>Total Return %</PerfStatLabel>
-        <PerfReturnValue $positive={stats.totalReturnPercent >= 0}>
-          {fmtPct(stats.totalReturnPercent)}
+        <PerfStatLabel>Return %</PerfStatLabel>
+        <PerfReturnValue $positive={perf.returnPercent >= 0}>
+          {hasDeposits ? fmtPct(perf.returnPercent) : "—"}
         </PerfReturnValue>
       </PerfStatCard>
 
       <PerfStatCard>
-        <PerfStatLabel>Daily Return</PerfStatLabel>
-        <PerfReturnValue $positive={returns.daily >= 0}>
-          {fmtPct(returns.daily)}
+        <PerfStatLabel>Realized P&L</PerfStatLabel>
+        <PerfReturnValue $positive={perf.realizedPnlUsd >= 0}>
+          {fmtSignedMoney(perf.realizedPnlUsd)}
         </PerfReturnValue>
       </PerfStatCard>
 
       <PerfStatCard>
-        <PerfStatLabel>Weekly Return</PerfStatLabel>
-        <PerfReturnValue $positive={returns.weekly >= 0}>
-          {fmtPct(returns.weekly)}
-        </PerfReturnValue>
-      </PerfStatCard>
-
-      <PerfStatCard>
-        <PerfStatLabel>Monthly Return</PerfStatLabel>
-        <PerfReturnValue $positive={returns.monthly >= 0}>
-          {fmtPct(returns.monthly)}
+        <PerfStatLabel>Unrealized P&L</PerfStatLabel>
+        <PerfReturnValue $positive={perf.unrealizedPnlUsd >= 0}>
+          {fmtSignedMoney(perf.unrealizedPnlUsd)}
         </PerfReturnValue>
       </PerfStatCard>
 
       <PerfStatCard>
         <PerfStatLabel>Win Rate</PerfStatLabel>
-        <PerfStatValue>{stats.winRate.toFixed(1)}%</PerfStatValue>
+        <PerfStatValue>
+          {perf.closedTradeCount > 0
+            ? `${perf.winRatePercent.toFixed(1)}%`
+            : "—"}
+        </PerfStatValue>
       </PerfStatCard>
 
       <PerfStatCard>
-        <PerfStatLabel>Winning / Losing</PerfStatLabel>
+        <PerfStatLabel>Wins / Losses</PerfStatLabel>
         <PerfStatValue>
-          <span style={{ color: "#00d897" }}>{stats.winningAssets}</span>
+          <span style={{ color: "#00d897" }}>{perf.winningTradeCount}</span>
           {" / "}
-          <span style={{ color: "#ef4444" }}>{stats.losingAssets}</span>
+          <span style={{ color: "#ef4444" }}>{perf.losingTradeCount}</span>
         </PerfStatValue>
       </PerfStatCard>
 
       <PerfStatCard>
-        <PerfStatLabel>Best Asset</PerfStatLabel>
-        <PerfStatValue>
-          {stats.bestAsset ? (
-            <>
-              {stats.bestAsset.asset}{" "}
-              <span style={{ fontSize: 14, color: stats.bestAsset.pnlPercent >= 0 ? "#00d897" : "#ef4444" }}>
-                {fmtPct(stats.bestAsset.pnlPercent)}
-              </span>
-            </>
-          ) : (
-            "—"
-          )}
-        </PerfStatValue>
+        <PerfStatLabel>Profit Factor</PerfStatLabel>
+        <PerfStatValue>{profitFactorDisplay}</PerfStatValue>
+      </PerfStatCard>
+
+      <PerfStatCard>
+        <PerfStatLabel>Max Drawdown</PerfStatLabel>
+        <PerfReturnValue $positive={false}>
+          {perf.maxDrawdownUsd > 0
+            ? `-${fmtMoney(perf.maxDrawdownUsd)} (${perf.maxDrawdownPercent.toFixed(
+                2
+              )}%)`
+            : "—"}
+        </PerfReturnValue>
+      </PerfStatCard>
+
+      <PerfStatCard>
+        <PerfStatLabel>Avg Win</PerfStatLabel>
+        <PerfReturnValue $positive={true}>
+          {perf.winningTradeCount > 0 ? fmtMoney(perf.avgWinUsd) : "—"}
+        </PerfReturnValue>
+      </PerfStatCard>
+
+      <PerfStatCard>
+        <PerfStatLabel>Avg Loss</PerfStatLabel>
+        <PerfReturnValue $positive={false}>
+          {perf.losingTradeCount > 0 ? fmtMoney(perf.avgLossUsd) : "—"}
+        </PerfReturnValue>
+      </PerfStatCard>
+
+      <PerfStatCard>
+        <PerfStatLabel>Largest Win</PerfStatLabel>
+        <PerfReturnValue $positive={true}>
+          {perf.winningTradeCount > 0 ? fmtMoney(perf.largestWinUsd) : "—"}
+        </PerfReturnValue>
+      </PerfStatCard>
+
+      <PerfStatCard>
+        <PerfStatLabel>Largest Loss</PerfStatLabel>
+        <PerfReturnValue $positive={false}>
+          {perf.losingTradeCount > 0 ? fmtMoney(perf.largestLossUsd) : "—"}
+        </PerfReturnValue>
+      </PerfStatCard>
+
+      <PerfStatCard>
+        <PerfStatLabel>Commission</PerfStatLabel>
+        <PerfStatValue>{fmtMoney(perf.commissionUsd)}</PerfStatValue>
+      </PerfStatCard>
+
+      <PerfStatCard>
+        <PerfStatLabel>Funding Fees</PerfStatLabel>
+        <PerfReturnValue $positive={perf.fundingFeeUsd >= 0}>
+          {fmtSignedMoney(perf.fundingFeeUsd)}
+        </PerfReturnValue>
+      </PerfStatCard>
+
+      <PerfStatCard>
+        <PerfStatLabel>Net Deposits</PerfStatLabel>
+        <PerfStatValue>{fmtMoney(perf.netDepositsUsd)}</PerfStatValue>
+      </PerfStatCard>
+
+      <PerfStatCard>
+        <PerfStatLabel>Closed Trades</PerfStatLabel>
+        <PerfStatValue>{perf.closedTradeCount.toLocaleString()}</PerfStatValue>
       </PerfStatCard>
     </PerfStatsGrid>
   );

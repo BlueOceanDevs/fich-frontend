@@ -341,6 +341,57 @@ export const DirectionBadge = styled.span<{ $side: string }>`
   border: 1px solid ${({ $side }) => ($side === "Short" ? "rgba(239, 68, 68, 0.3)" : "rgba(0, 216, 151, 0.3)")};
 `;
 
+// Provenance badge for the trade-history table. Signal trades are the
+// common case and render muted; Manual (admin-placed on user's behalf),
+// External (a trade we discovered on Binance but didn't place), and
+// Liquidation (forced-close by Binance) all get distinct colours so a user
+// scanning their history immediately sees where rows came from.
+export const SourceBadge = styled.span<{ $source: string }>`
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  background: ${({ $source }) => {
+    switch ($source) {
+      case "Manual": return "rgba(59, 130, 246, 0.12)";
+      case "External": return "rgba(234, 179, 8, 0.15)";
+      case "Liquidation": return "rgba(239, 68, 68, 0.15)";
+      case "Signal": default: return "rgba(100, 116, 139, 0.12)";
+    }
+  }};
+  color: ${({ $source }) => {
+    switch ($source) {
+      case "Manual": return "#3b82f6";
+      case "External": return "#eab308";
+      case "Liquidation": return "#ef4444";
+      case "Signal": default: return "#94a3b8";
+    }
+  }};
+  border: 1px solid ${({ $source }) => {
+    switch ($source) {
+      case "Manual": return "rgba(59, 130, 246, 0.3)";
+      case "External": return "rgba(234, 179, 8, 0.3)";
+      case "Liquidation": return "rgba(239, 68, 68, 0.3)";
+      case "Signal": default: return "transparent";
+    }
+  }};
+`;
+
+// Small signed P&L text, green for positive, red for negative, muted for
+// unknown/zero. Used in the trades table so users can see the realized
+// outcome of each closing trade at a glance.
+export const PnlCell = styled.span<{ $value: number | null }>`
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: ${({ $value }) =>
+    $value == null ? "#64748b" :
+    $value > 0 ? "#00d897" :
+    $value < 0 ? "#ef4444" :
+    "#94a3b8"};
+`;
+
 // Small leverage tag (e.g. "5×") shown next to the direction badge. Only
 // rendered for leverage > 1 — signal-based 1× trades are the common case and
 // don't need the visual clutter.

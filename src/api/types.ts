@@ -197,6 +197,12 @@ export interface TradeOrderDto {
   filledAt: string | null;
   lastCheckedAt: string | null;
   createdAt: string;
+  /** "Signal" | "Manual" | "External" | "Liquidation" — surfaces where this trade came from. */
+  source: string;
+  /** Signed realized P&L in USD. Null while Binance fills are still being ingested. */
+  realizedPnlUsd: number | null;
+  /** Commission in USD. Null while ingesting. */
+  commissionUsd: number | null;
 }
 
 export interface PagedResult<T> {
@@ -279,4 +285,82 @@ export interface ExchangeConnectionDto {
   strategyId: number;
   strategyName: string;
   strategySlug: string;
+}
+
+// ─────────────────────────────────────────────
+// Performance (Phase 5 endpoint)
+// ─────────────────────────────────────────────
+
+/**
+ * Period filter for the Performance endpoint. Values match the backend's
+ * `PerformancePeriod` enum names exactly because the API accepts them
+ * as strings in the query param.
+ *
+ * All windows are UTC — "OneDay" means last 24 hours, not "today so far
+ * in the user's timezone."
+ */
+export type PerformancePeriod = "All" | "OneMonth" | "SevenDays" | "OneDay";
+
+export interface AssetPerformanceDto {
+  asset: string;
+  closedTradeCount: number;
+  winningTradeCount: number;
+  winRatePercent: number;
+  realizedPnlUsd: number;
+  commissionUsd: number;
+}
+
+export interface StrategyPerformanceDto {
+  strategyName: string;
+  /** null for the "Manual" bucket (trades without a signal). */
+  strategyId: number | null;
+  closedTradeCount: number;
+  winningTradeCount: number;
+  winRatePercent: number;
+  realizedPnlUsd: number;
+  commissionUsd: number;
+  activeSince: string | null;
+  activeUntil: string | null;
+}
+
+export interface PerformanceDto {
+  period: string;
+  windowStart: string | null;
+  windowEnd: string;
+
+  // P&L core
+  realizedPnlUsd: number;
+  unrealizedPnlUsd: number;
+  commissionUsd: number;
+  fundingFeeUsd: number;
+  netPnlUsd: number;
+  netDepositsUsd: number;
+  returnPercent: number;
+
+  // Trade-level stats (closed-trades only)
+  closedTradeCount: number;
+  winningTradeCount: number;
+  losingTradeCount: number;
+  failedTradeCount: number;
+  cancelledTradeCount: number;
+  winRatePercent: number;
+  avgWinUsd: number;
+  avgLossUsd: number;
+  largestWinUsd: number;
+  largestLossUsd: number;
+  /** Zero means losses were zero; UI should render as "—" or "∞". */
+  profitFactor: number;
+
+  // Drawdown (from equity snapshots)
+  maxDrawdownUsd: number;
+  maxDrawdownPercent: number;
+
+  // Attribution
+  perAsset: AssetPerformanceDto[];
+  perStrategy: StrategyPerformanceDto[];
+
+  // Reconciliation markers
+  lastReconciliationAt: string | null;
+  lastReconciliationDriftUsd: number | null;
+  hasReconciliationDrift: boolean;
 }
