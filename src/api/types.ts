@@ -216,10 +216,15 @@ export interface PortfolioDto {
   totalInvestedUsd: number;
   pnlUsd: number;
   pnlPercent: number;
+  /** Available cash balance. Label with `cashAssetName` — not hardcoded "USDT". */
   usdtBalance: number;
+  /** Actual quote asset: "USDT" for normal accounts, "BNFCR" for EU Credits-mode. */
+  cashAssetName: string;
   totalTrades: number;
   activeHoldings: number;
   strategyName: string;
+  /** ISO timestamp of the user's first filled signal-based trade. Null until the first rebalance actually executes. */
+  firstSignalExecutedAt: string | null;
   holdings: HoldingDto[];
   history: PortfolioSnapshotDto[];
 }
@@ -227,10 +232,18 @@ export interface PortfolioDto {
 export interface HoldingDto {
   symbol: string;
   asset: string;
+  /** Absolute position size. Direction is in `side`. */
   quantity: number;
+  /** "Long" or "Short". Long = holding the asset; Short = sold borrowed asset. */
+  side: string;
+  /** Leverage multiplier (1 = spot-equivalent). */
+  leverage: number;
+  /** Weighted-average entry price. For longs: avg buy; for shorts: avg sell open. */
   avgBuyPrice: number;
   currentPrice: number;
+  /** Absolute notional value at current price (|quantity| × currentPrice). */
   valueUsd: number;
+  /** Signed unrealized P&L (positive = gain whether long or short). */
   pnlUsd: number;
   pnlPercent: number;
   allocationPercent: number;

@@ -7,11 +7,13 @@ interface Props {
   holdings: HoldingDto[];
   usdtBalance: number;
   totalValue: number;
+  /** Name of the cash asset — "USDT" for normal accounts, "BNFCR" for EU Credits-mode. */
+  cashAssetName?: string;
 }
 
 const COLORS = ["#00D897", "#627EEA", "#F7931A", "#9945FF", "#00AAE4", "#E8920A", "#FF4D4D", "#8B5CF6"];
 
-const AssetAllocation: React.FC<Props> = ({ holdings, usdtBalance, totalValue }) => {
+const AssetAllocation: React.FC<Props> = ({ holdings, usdtBalance, totalValue, cashAssetName }) => {
   if (holdings.length === 0 && usdtBalance <= 0) {
     return (
       <ChartCard>
@@ -21,13 +23,16 @@ const AssetAllocation: React.FC<Props> = ({ holdings, usdtBalance, totalValue })
     );
   }
 
+  // Pie slices use absolute notional value. Shorts already arrive with a positive
+  // `valueUsd` from the backend (|qty| × price), so they render as proper slices
+  // and the "S" marker in the label tells users this slot is short exposure.
   const data = [
     ...holdings.map((h) => ({
-      name: h.asset,
-      value: h.valueUsd,
+      name: h.side === "Short" ? `${h.asset} (Short${h.leverage > 1 ? ` ${h.leverage}×` : ""})` : h.asset,
+      value: Math.abs(h.valueUsd),
     })),
     ...(usdtBalance > 1
-      ? [{ name: "USDT", value: usdtBalance }]
+      ? [{ name: cashAssetName || "USDT", value: usdtBalance }]
       : []),
   ];
 

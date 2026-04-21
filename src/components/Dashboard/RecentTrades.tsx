@@ -72,7 +72,20 @@ const RecentTrades: React.FC = () => {
                 <tr key={t.id}>
                   <Td style={{ fontWeight: 600 }}>{t.symbol}</Td>
                   <Td>
-                    <SideBadge $side={t.side}>{t.side}</SideBadge>
+                    <SideBadge
+                      $side={t.side}
+                      // Admins may open short positions now, so a Sell can mean
+                      // either "close/reduce a long" or "open a short." Trade rows
+                      // don't (yet) carry the intent explicitly, so make the
+                      // ambiguity visible on hover instead of picking one story.
+                      title={
+                        t.side === "Buy"
+                          ? "Buy — opens/adds to a long, or closes a short"
+                          : "Sell — closes/reduces a long, or opens a short"
+                      }
+                    >
+                      {t.side}
+                    </SideBadge>
                   </Td>
                   <Td>
                     <StatusBadge $status={t.status}>{t.status}</StatusBadge>

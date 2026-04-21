@@ -53,11 +53,17 @@ export default function PortfolioPage() {
                 holdings={portfolio.holdings}
                 usdtBalance={portfolio.usdtBalance}
                 totalValue={portfolio.totalValueUsd}
+                cashAssetName={portfolio.cashAssetName}
               />
             </ChartsGrid>
 
             <TableWrapper>
-              <HoldingsTable holdings={portfolio.holdings} />
+              <HoldingsTable
+                holdings={portfolio.holdings}
+                cashBalance={portfolio.usdtBalance}
+                cashAssetName={portfolio.cashAssetName}
+                totalAllocationBase={portfolio.totalValueUsd}
+              />
             </TableWrapper>
           </>
         )}

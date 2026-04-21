@@ -73,7 +73,16 @@ const TradeHistory: React.FC = () => {
               <tr key={o.id}>
                 <Td style={{ fontWeight: 600 }}>{o.symbol}</Td>
                 <Td>
-                  <SideBadge $side={o.side}>{o.side}</SideBadge>
+                  <SideBadge
+                    $side={o.side}
+                    title={
+                      o.side === "Buy"
+                        ? "Buy — opens/adds to a long, or closes a short"
+                        : "Sell — closes/reduces a long, or opens a short"
+                    }
+                  >
+                    {o.side}
+                  </SideBadge>
                 </Td>
                 <Td>
                   <StatusBadge $status={o.status}>{o.status}</StatusBadge>

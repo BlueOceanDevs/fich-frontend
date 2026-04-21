@@ -323,6 +323,40 @@ export const SideBadge = styled.span<{ $side: string }>`
   color: ${({ $side }) => ($side === "Buy" ? "#00d897" : "#ef4444")};
 `;
 
+// Position direction badge used in the Holdings table — green pill for long,
+// red pill for short. Distinct from SideBadge (which marks a single trade's
+// Buy/Sell side) because a holding's direction is a stable attribute, not a
+// trade action, and deserves a more prominent visual treatment.
+export const DirectionBadge = styled.span<{ $side: string }>`
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  background: ${({ $side }) => ($side === "Short" ? "rgba(239, 68, 68, 0.12)" : "rgba(0, 216, 151, 0.12)")};
+  color: ${({ $side }) => ($side === "Short" ? "#ef4444" : "#00d897")};
+  border: 1px solid ${({ $side }) => ($side === "Short" ? "rgba(239, 68, 68, 0.3)" : "rgba(0, 216, 151, 0.3)")};
+`;
+
+// Small leverage tag (e.g. "5×") shown next to the direction badge. Only
+// rendered for leverage > 1 — signal-based 1× trades are the common case and
+// don't need the visual clutter.
+export const LeverageTag = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  margin-left: 4px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(255, 165, 0, 0.12);
+  color: #ffa500;
+  border: 1px solid rgba(255, 165, 0, 0.3);
+`;
+
 export const ViewAllLink = styled.a`
   display: inline-flex;
   align-items: center;
