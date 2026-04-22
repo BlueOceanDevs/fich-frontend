@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import type { StrategyPerformanceDto } from "@/api/types";
 import {
   TableCard,
@@ -12,6 +12,8 @@ import {
   PnlText,
   EmptyState,
 } from "./styles";
+import { ChartButton } from "./performanceStyles";
+import StrategyPerformanceChartModal from "./StrategyPerformanceChartModal";
 
 interface Props {
   /** Per-strategy aggregates from the Performance endpoint. */
@@ -57,6 +59,15 @@ const StrategyPerformanceTable: React.FC<Props> = ({ perStrategy }) => {
     (a, b) => b.realizedPnlUsd - a.realizedPnlUsd
   );
 
+  // Tracking the drill-down target as a key rather than the dto directly
+  // makes the cleanup on unmount simple and keeps the render idempotent
+  // on prop updates — if the parent re-fetches, the modal target is
+  // resolved from the current list on each render via key lookup.
+  const [activeKey, setActiveKey] = useState<string | null>(null);
+  const activeStrategy = activeKey
+    ? sorted.find((s) => (s.strategyId?.toString() ?? "manual") === activeKey) ?? null
+    : null;
+
   return (
     <TableCard style={{ animationDelay: "0.22s" }}>
       <CardTitle>Strategy Performance</CardTitle>
@@ -74,35 +85,64 @@ const StrategyPerformanceTable: React.FC<Props> = ({ perStrategy }) => {
                 <ThRight>Realized P&L</ThRight>
                 <ThRight>Commission</ThRight>
                 <ThRight>Active</ThRight>
+                <ThRight>Charts</ThRight>
               </tr>
             </thead>
             <tbody>
-              {sorted.map((s) => (
-                <tr key={s.strategyId ?? "manual"}>
-                  <Td>{s.strategyName}</Td>
-                  <TdRight>{s.closedTradeCount.toLocaleString()}</TdRight>
-                  <TdRight>{s.winningTradeCount.toLocaleString()}</TdRight>
-                  <TdRight>
-                    {s.closedTradeCount > 0
-                      ? `${fmt(s.winRatePercent, 1)}%`
-                      : "—"}
-                  </TdRight>
-                  <TdRight>
-                    <PnlText $positive={s.realizedPnlUsd >= 0}>
-                      {s.realizedPnlUsd >= 0 ? "+" : "-"}$
-                      {fmt(Math.abs(s.realizedPnlUsd))}
-                    </PnlText>
-                  </TdRight>
-                  <TdRight>${fmt(s.commissionUsd)}</TdRight>
-                  <TdRight>
-                    {fmtDate(s.activeSince)}
-                    {s.activeUntil ? ` → ${fmtDate(s.activeUntil)}` : ""}
-                  </TdRight>
-                </tr>
-              ))}
+              {sorted.map((s) => {
+                const key = s.strategyId?.toString() ?? "manual";
+                // "View charts" is meaningful only when there's at least
+                // one closed trade to plot; otherwise disable the button
+                // rather than opening an empty modal.
+                const hasChartsData = s.closedTradeCount > 0;
+                return (
+                  <tr key={key}>
+                    <Td>{s.strategyName}</Td>
+                    <TdRight>{s.closedTradeCount.toLocaleString()}</TdRight>
+                    <TdRight>{s.winningTradeCount.toLocaleString()}</TdRight>
+                    <TdRight>
+                      {s.closedTradeCount > 0
+                        ? `${fmt(s.winRatePercent, 1)}%`
+                        : "—"}
+                    </TdRight>
+                    <TdRight>
+                      <PnlText $positive={s.realizedPnlUsd >= 0}>
+                        {s.realizedPnlUsd >= 0 ? "+" : "-"}$
+                        {fmt(Math.abs(s.realizedPnlUsd))}
+                      </PnlText>
+                    </TdRight>
+                    <TdRight>${fmt(s.commissionUsd)}</TdRight>
+                    <TdRight>
+                      {fmtDate(s.activeSince)}
+                      {s.activeUntil ? ` → ${fmtDate(s.activeUntil)}` : ""}
+                    </TdRight>
+                    <TdRight>
+                      <ChartButton
+                        type="button"
+                        onClick={() => setActiveKey(key)}
+                        disabled={!hasChartsData}
+                        // Visually dim the button when there's nothing to
+                        // plot; still interactive so keyboard users can
+                        // focus past it without it being a mystery button.
+                        style={!hasChartsData ? { opacity: 0.4, cursor: "default" } : undefined}
+                        title={hasChartsData ? "View cumulative + monthly charts" : "No closed trades to chart"}
+                      >
+                        View
+                      </ChartButton>
+                    </TdRight>
+                  </tr>
+                );
+              })}
             </tbody>
           </Table>
         </TableScroll>
+      )}
+
+      {activeStrategy && (
+        <StrategyPerformanceChartModal
+          strategy={activeStrategy}
+          onClose={() => setActiveKey(null)}
+        />
       )}
     </TableCard>
   );

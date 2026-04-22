@@ -171,3 +171,158 @@ export const ExecQualityPill = styled.span<{ $health: "good" | "warn" | "bad" }>
     $health === "warn" ? theme.colors.warning :
     theme.colors.danger};
 `;
+
+// ── "View charts" row action + chart-drill-down modal ──
+// The Setup module already has a generic ModalOverlay/ModalCard pattern,
+// but its ModalCard is capped at 480px wide — too narrow for two side-by-
+// side charts. Define a chart-sized modal here so the strategy drill-down
+// has enough room without breaking the existing signup flow's sizing.
+
+export const ChartButton = styled.button`
+  background: transparent;
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  color: ${({ theme }) => theme.colors.textSecondary};
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+export const ChartModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+`;
+
+export const ChartModalCard = styled.div`
+  width: 100%;
+  max-width: 960px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: ${({ theme }) => theme.colors.card};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  padding: 28px 28px 24px;
+  position: relative;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    padding: 20px 16px;
+  }
+`;
+
+export const ChartModalClose = styled.button`
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: ${({ theme }) => theme.colors.textMuted};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.text};
+    background: ${({ theme }) => theme.colors.backgroundLight};
+  }
+`;
+
+export const ChartModalTitle = styled.h2`
+  font-size: 18px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.text};
+  margin-bottom: 4px;
+`;
+
+export const ChartModalSubtitle = styled.p`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  margin-bottom: 20px;
+`;
+
+// Two-column layout for the charts: cumulative (wider) on the left,
+// monthly bars on the right. Collapses to a single column on narrow
+// screens so nothing overflows the modal.
+export const ChartModalGrid = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const ChartPanel = styled.div`
+  min-width: 0; /* Let recharts ResponsiveContainer shrink below grid track size. */
+`;
+
+export const ChartPanelTitle = styled.h3`
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 8px;
+`;
+
+// Compact stat-row below the modal header — strategy's key numbers shown
+// inline so the modal is self-sufficient (user doesn't have to remember
+// which table row they clicked).
+export const ChartStatsRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+`;
+
+export const ChartStat = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+
+export const ChartStatLabel = styled.span`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+`;
+
+export const ChartStatValue = styled.span`
+  font-size: 15px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+  font-variant-numeric: tabular-nums;
+`;
+
+export const ChartEmptyState = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  font-size: 13px;
+  background: ${({ theme }) => theme.colors.backgroundLight};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+`;

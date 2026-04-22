@@ -310,6 +310,19 @@ export interface AssetPerformanceDto {
   commissionUsd: number;
 }
 
+/**
+ * One point on a strategy's realized-P&L time series.
+ *
+ * Interpretation depends on which list the point came from:
+ * - `cumulativeSeries` → running total lifetime-to-that-day (line chart)
+ * - `monthlySeries`   → that month's contribution in isolation (bar chart)
+ */
+export interface StrategyPnlPointDto {
+  /** Day-aligned UTC for cumulative, 1st-of-month UTC for monthly. */
+  date: string;
+  realizedPnlUsd: number;
+}
+
 export interface StrategyPerformanceDto {
   strategyName: string;
   /** null for the "Manual" bucket (trades without a signal). */
@@ -321,6 +334,10 @@ export interface StrategyPerformanceDto {
   commissionUsd: number;
   activeSince: string | null;
   activeUntil: string | null;
+  /** Daily running totals — feeds the cumulative line chart in the drill-down modal. */
+  cumulativeSeries: StrategyPnlPointDto[];
+  /** Per-month deltas — feeds the monthly bar chart. */
+  monthlySeries: StrategyPnlPointDto[];
 }
 
 export interface PerformanceDto {
