@@ -108,6 +108,15 @@ const StrategyPerformanceChartModal: React.FC<Props> = ({ strategy, onClose }) =
     label: fmtDateShort(p.date),
     value: p.realizedPnlUsd,
   }));
+
+  // Force the Y domain to always include zero so tiny-by-magnitude values
+  // look tiny. Without this, recharts auto-fits the axis to the data range
+  // and a single −$0.05 bar fills the whole chart — visually reading as
+  // "catastrophic loss" when it's actually a rounding-noise loss.
+  const yDomainIncludeZero: [(dataMin: number) => number, (dataMax: number) => number] = [
+    (dataMin) => (Number.isFinite(dataMin) ? Math.min(0, dataMin) : 0),
+    (dataMax) => (Number.isFinite(dataMax) ? Math.max(0, dataMax) : 0),
+  ];
   const monthlyData = strategy.monthlySeries.map((p) => ({
     label: fmtMonth(p.date),
     value: p.realizedPnlUsd,
@@ -211,6 +220,7 @@ const StrategyPerformanceChartModal: React.FC<Props> = ({ strategy, onClose }) =
                       tick={{ fontSize: 11, fill: COLOR_AXIS }}
                       tickFormatter={(v: number) => fmtSignedUsd(v)}
                       width={80}
+                      domain={yDomainIncludeZero}
                     />
                     <ReferenceLine y={0} stroke={COLOR_AXIS} strokeDasharray="2 4" />
                     <Tooltip
@@ -278,6 +288,7 @@ const StrategyPerformanceChartModal: React.FC<Props> = ({ strategy, onClose }) =
                       tick={{ fontSize: 11, fill: COLOR_AXIS }}
                       tickFormatter={(v: number) => fmtSignedUsd(v)}
                       width={70}
+                      domain={yDomainIncludeZero}
                     />
                     <ReferenceLine y={0} stroke={COLOR_AXIS} />
                     <Tooltip

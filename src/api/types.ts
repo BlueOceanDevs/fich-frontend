@@ -233,6 +233,10 @@ export interface PortfolioDto {
   firstSignalExecutedAt: string | null;
   holdings: HoldingDto[];
   history: PortfolioSnapshotDto[];
+  /** Echoes the period query param so the client can render the active selector without duplicating state. */
+  historyPeriod: PerformancePeriod;
+  /** Bucket size used for `history` — drives x-axis tick formatting. */
+  historyGranularity: ChartGranularity;
 }
 
 export interface HoldingDto {
@@ -292,14 +296,27 @@ export interface ExchangeConnectionDto {
 // ─────────────────────────────────────────────
 
 /**
- * Period filter for the Performance endpoint. Values match the backend's
- * `PerformancePeriod` enum names exactly because the API accepts them
- * as strings in the query param.
+ * Period filter for the Performance endpoint and the Portfolio history
+ * chart. Values match the backend's `PerformancePeriod` enum names exactly
+ * because the API accepts them as strings in the query param.
  *
  * All windows are UTC — "OneDay" means last 24 hours, not "today so far
  * in the user's timezone."
  */
-export type PerformancePeriod = "All" | "OneMonth" | "SevenDays" | "OneDay";
+export type PerformancePeriod =
+  | "All"
+  | "OneMonth"
+  | "SevenDays"
+  | "OneDay"
+  | "ThreeMonths"
+  | "OneYear";
+
+/**
+ * Bucket size used for time-series charts. Backend chooses this per
+ * period (Hourly for 24h/7d, Daily for 1m/3m, Weekly for 1y) and echoes
+ * it in the response so the frontend can format x-axis ticks to match.
+ */
+export type ChartGranularity = "Hourly" | "Daily" | "Weekly";
 
 export interface AssetPerformanceDto {
   asset: string;

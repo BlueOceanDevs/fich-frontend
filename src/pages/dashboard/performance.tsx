@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Head from "next/head";
 import { tradesApi } from "@/api/trades";
 import type { PerformanceDto, PerformancePeriod, PortfolioDto } from "@/api/types";
@@ -50,27 +50,56 @@ export default function PerformancePage() {
   const [perf, setPerf] = useState<PerformanceDto | null>(null);
   const [portfolio, setPortfolio] = useState<PortfolioDto | null>(null);
 
-  // Two independent loading flags. Portfolio only loads once on mount;
-  // performance reloads on every period change. Merging them would make
-  // the chart flash when switching tabs.
+  // The embedded Portfolio Value chart has its own period — users can zoom
+  // into the equity curve (24h / 7d / 1m / 3m / 1y) independently from the
+  // Performance-stats period above. Defaulting to OneMonth matches what the
+  // Portfolio page shows so a user switching between the two tabs sees the
+  // same starting window.
+  const [chartPeriod, setChartPeriod] = useState<PerformancePeriod>("OneMonth");
+
+  // Three independent loading flags. The stats (PerformanceDto) and the
+  // chart (PortfolioDto.history) reload on different triggers; merging
+  // them would make either widget flash unnecessarily when the other
+  // refetches.
   const [portfolioLoading, setPortfolioLoading] = useState(true);
+  const [chartRefreshing, setChartRefreshing] = useState(false);
   const [perfLoading, setPerfLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // ── Portfolio (one-shot) ──
-  useEffect(() => {
-    tradesApi
-      .getPortfolio()
-      .then((res) => {
+  const loadPortfolio = useCallback(
+    async (nextChartPeriod: PerformancePeriod, isInitial: boolean) => {
+      if (isInitial) setPortfolioLoading(true);
+      else setChartRefreshing(true);
+      try {
+        const res = await tradesApi.getPortfolio(nextChartPeriod);
         if (res.data.isSuccess && res.data.data) {
           setPortfolio(res.data.data);
-        } else {
+          setError(null);
+        } else if (isInitial) {
           setError("Failed to load portfolio data.");
         }
-      })
-      .catch(() => setError("Failed to load portfolio data."))
-      .finally(() => setPortfolioLoading(false));
-  }, []);
+      } catch {
+        if (isInitial) setError("Failed to load portfolio data.");
+      } finally {
+        if (isInitial) setPortfolioLoading(false);
+        else setChartRefreshing(false);
+      }
+    },
+    [],
+  );
+
+  // ── Portfolio (initial load + refetch on chart-period change) ──
+  useEffect(() => {
+    loadPortfolio("OneMonth", true);
+  }, [loadPortfolio]);
+
+  const handleChartPeriodChange = useCallback(
+    (next: PerformancePeriod) => {
+      setChartPeriod(next);
+      loadPortfolio(next, false);
+    },
+    [loadPortfolio],
+  );
 
   // ── Performance (reloads when period changes) ──
   useEffect(() => {
@@ -128,7 +157,13 @@ export default function PerformancePage() {
 
             {portfolio && (
               <PerfSection>
-                <PortfolioChart history={portfolio.history} />
+                <PortfolioChart
+                  history={portfolio.history}
+                  period={chartPeriod}
+                  granularity={portfolio.historyGranularity}
+                  loading={chartRefreshing}
+                  onPeriodChange={handleChartPeriodChange}
+                />
               </PerfSection>
             )}
 

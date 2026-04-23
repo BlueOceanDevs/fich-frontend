@@ -16,8 +16,16 @@ export const tradesApi = {
     });
   },
 
-  getPortfolio() {
-    return api.get<ApiResponseOf<PortfolioDto>>("/Trade/Portfolio");
+  /**
+   * Portfolio snapshot + value-history chart. The <code>historyPeriod</code>
+   * drives the chart window and its bucket granularity only — everything
+   * else in the response is live regardless. Defaults to OneMonth on the
+   * server so omitting it still returns a reasonable chart.
+   */
+  getPortfolio(historyPeriod: PerformancePeriod = "OneMonth") {
+    return api.get<ApiResponseOf<PortfolioDto>>("/Trade/Portfolio", {
+      params: { historyPeriod },
+    });
   },
 
   getLastRebalance() {

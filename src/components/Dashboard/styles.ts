@@ -182,6 +182,107 @@ export const ChartCard = styled(Card)`
   min-height: 320px;
 `;
 
+// ── Chart period selector ──
+//
+// Segmented-control pill buttons shown above a chart so users can toggle
+// the time window (24h / 7d / 1m / 3m / 1y). The active pill is filled;
+// the others are transparent with a subtle border. Wraps to a second row
+// on narrow screens rather than scrolling, because all buttons should be
+// reachable without horizontal gestures on mobile.
+
+export const PeriodSelectorRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+`;
+
+export const PeriodPill = styled.button<{ $active: boolean; $disabled?: boolean }>`
+  appearance: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: ${({ $disabled }) => ($disabled ? "not-allowed" : "pointer")};
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+  opacity: ${({ $disabled }) => ($disabled ? 0.5 : 1)};
+
+  background: ${({ $active, theme }) =>
+    $active ? theme.colors.success : "transparent"};
+  color: ${({ $active, theme }) =>
+    $active ? "#0A0A10" : theme.colors.textSecondary};
+  border: 1px solid
+    ${({ $active, theme }) => ($active ? theme.colors.success : theme.colors.cardBorder)};
+
+  &:hover {
+    color: ${({ $active, theme }) => ($active ? "#0A0A10" : theme.colors.text)};
+    border-color: ${({ $active, theme }) =>
+      $active ? theme.colors.success : theme.colors.textSecondary};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.success};
+    outline-offset: 2px;
+  }
+`;
+
+// Title row that carries the chart title on the left and the period
+// selector on the right. Flex-wraps on narrow screens so the selector
+// drops below the title instead of overlapping it.
+export const ChartHeaderRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+`;
+
+// Wrapper around the chart body whose sole purpose is to anchor the
+// absolutely-positioned loading overlay below. Sits between the header
+// row and the chart SVG so the spinner can overlay the chart without
+// covering the period selector — users can still see which period they
+// asked for while the new data loads.
+export const ChartBody = styled.div`
+  position: relative;
+`;
+
+// Keyframes for the spinner ring and the subtle backdrop fade-in.
+const spin = keyframes`
+  to { transform: rotate(360deg); }
+`;
+
+const overlayFadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
+// Semi-transparent backdrop + centered ring spinner shown over the chart
+// during period-change refetches. Fades in over 200ms so it doesn't
+// strobe for fast network requests but is clearly visible for slow ones.
+export const ChartLoadingOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${({ theme }) => `${theme.colors.card}CC`};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  animation: ${overlayFadeIn} 200ms ease-out both;
+  z-index: 2;
+  pointer-events: none;
+`;
+
+export const ChartSpinner = styled.div`
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-top-color: ${({ theme }) => theme.colors.success};
+  animation: ${spin} 800ms linear infinite;
+`;
+
 // ── Holdings Table ──
 
 export const TableWrapper = styled.div`
