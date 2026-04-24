@@ -22,6 +22,12 @@ export default function ConfirmEmailPage() {
     "loading"
   );
   const [message, setMessage] = useState("");
+  // True only if this device currently has a valid auth session (i.e. the
+  // user clicked the link on the same browser they signed up from). When
+  // false — common case, user opened email on a different device — we
+  // steer them to /login instead of a dead-end "Continue" button that
+  // would just bounce through the auth guard anyway.
+  const [authedHere, setAuthedHere] = useState(false);
 
   const { userId, token } = router.query as {
     userId?: string;
@@ -39,10 +45,19 @@ export default function ConfirmEmailPage() {
 
     authApi
       .confirmEmail({ userId, token })
-      .then(() => {
+      .then(async () => {
         setStatus("success");
         setMessage("Your email has been confirmed!");
-        dispatch(fetchUser());
+        // fetchUser() only succeeds if this browser has a session cookie —
+        // i.e. the same device the user signed up from. Use .unwrap() so a
+        // rejection (unauthenticated on this device) doesn't throw into the
+        // outer .catch(), which would incorrectly flip status back to error.
+        try {
+          await dispatch(fetchUser()).unwrap();
+          setAuthedHere(true);
+        } catch {
+          setAuthedHere(false);
+        }
       })
       .catch((err: any) => {
         setStatus("error");
@@ -76,12 +91,25 @@ export default function ConfirmEmailPage() {
         {status === "success" && (
           <>
             <Alert $variant="success">{message}</Alert>
-            <PrimaryButton
-              onClick={() => router.push("/")}
-              style={{ marginTop: 20 }}
-            >
-              Continue to Fich
-            </PrimaryButton>
+            {authedHere ? (
+              <PrimaryButton
+                onClick={() => router.push("/")}
+                style={{ marginTop: 20 }}
+              >
+                Continue to Fich
+              </PrimaryButton>
+            ) : (
+              // Cross-device case: we just confirmed the account but this
+              // browser has no session. Send them to /login rather than a
+              // "Continue" button that would silently bounce through the
+              // auth guard to the same place.
+              <PrimaryButton
+                onClick={() => router.push("/login")}
+                style={{ marginTop: 20 }}
+              >
+                Sign in to continue
+              </PrimaryButton>
+            )}
           </>
         )}
 

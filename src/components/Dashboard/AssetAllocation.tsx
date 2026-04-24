@@ -62,12 +62,16 @@ const AssetAllocation: React.FC<Props> = ({ holdings, usdtBalance, totalValue, c
               borderRadius: 8,
               fontSize: 12,
             }}
-            formatter={(value) => {
+            // Include the asset name so hovering a slice surfaces _which_
+            // asset it is — client feedback: "add coin name on pie chart,
+            // not only the % when you point with mouse."
+            // recharts passes the slice's `name` as the second arg; we
+            // return it as the label so the default Tooltip renderer
+            // prints "NAME: $X (Y%)".
+            formatter={(value, name) => {
               const v = Number(value);
-              return [
-                `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${totalValue > 0 ? ((v / totalValue) * 100).toFixed(1) : 0}%)`,
-                "",
-              ];
+              const label = `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${totalValue > 0 ? ((v / totalValue) * 100).toFixed(1) : 0}%)`;
+              return [label, String(name ?? "")];
             }}
           />
         </PieChart>
