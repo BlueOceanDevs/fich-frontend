@@ -8,7 +8,7 @@ export {
   Spinner,
   SpinnerLarge,
 } from "@/components/ui/Button";
-export { Input, Label, FieldGroup, FieldRow, FieldError } from "@/components/ui/Input";
+export { Input, Select, Label, FieldGroup, FieldRow, FieldError } from "@/components/ui/Input";
 export { PrimaryLink as AuthLink, PrimaryLink as InlineLink } from "@/components/ui/Link";
 export { Divider } from "@/components/ui/Typography";
 export { Alert } from "@/components/ui/Alert";

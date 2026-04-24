@@ -86,11 +86,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title }) =>
 
   if (!isAuthenticated) return null;
 
-  const displayName =
-    user?.displayName ||
-    (user?.firstName
-      ? `${user.firstName} ${user.lastName ?? ""}`.trim()
-      : null);
+  // FirstName/LastName were removed from the profile model — the only
+  // available presentation sources are now DisplayName (user-provided)
+  // and Email (guaranteed). Email is the last-resort fallback so there's
+  // always *something* to render in the sidebar greeting.
+  const displayName = user?.displayName || user?.email || null;
 
   const isActive = (href: string) => {
     if (href === "/dashboard") return router.pathname === "/dashboard";

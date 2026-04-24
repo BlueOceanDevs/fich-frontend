@@ -60,10 +60,10 @@ const UserMenu: React.FC = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const hasFetchedSub = useRef(false);
 
-  const displayName =
-    user?.displayName || user?.firstName
-      ? `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim()
-      : null;
+  // FirstName/LastName were removed from the profile model. Greet the
+  // user with DisplayName when present, otherwise their email — always a
+  // real identifier the user recognises.
+  const displayName = user?.displayName || user?.email || null;
 
   // Fetch subscription and exchange status once when menu component mounts
   useEffect(() => {

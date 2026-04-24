@@ -22,10 +22,13 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  firstName?: string;
-  lastName?: string;
   email: string;
   password: string;
+  /**
+   * Optional ISO 3166-1 alpha-2 country code ("US", "GB", "AE"). Users
+   * can skip on signup and set it later from the profile page.
+   */
+  country?: string;
 }
 
 export interface ConfirmEmailRequest {
@@ -54,17 +57,20 @@ export interface GoogleLoginRequest {
 export interface UserInfo {
   userId: string;
   email: string;
-  firstName: string | null;
-  lastName: string | null;
   displayName: string | null;
+  /** ISO 3166-1 alpha-2 country code, or null if the user hasn't set one. */
+  country: string | null;
   imageUrl: string | null;
   roles: string[];
   isEmailConfirmed: boolean;
 }
 
-export interface SetNameRequest {
-  firstName: string;
-  lastName: string;
+/**
+ * Body for `PUT /User/SetCountry`. Pass an ISO 3166-1 alpha-2 code, or
+ * null/empty to clear. Replaces the old SetNameRequest.
+ */
+export interface SetCountryRequest {
+  country: string | null;
 }
 
 // ─────────────────────────────────────────────

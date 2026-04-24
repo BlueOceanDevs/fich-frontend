@@ -1,5 +1,5 @@
 import api from "./client";
-import type { ApiResponse, ApiResponseOf, UserInfo, SetNameRequest, OnboardingStatusDto } from "./types";
+import type { ApiResponse, ApiResponseOf, UserInfo, SetCountryRequest, OnboardingStatusDto } from "./types";
 import { validateImageFile } from "../utils/validate-image";
 
 // ─────────────────────────────────────────────
@@ -17,8 +17,13 @@ export const userApi = {
     });
   },
 
-  setName(data: SetNameRequest) {
-    return api.put<ApiResponse>("/user/SetName", data);
+  /**
+   * Set or clear the user's country (ISO 3166-1 alpha-2 code). Pass
+   * `{ country: null }` or an empty string to clear. Replaces the old
+   * `setName` endpoint — name fields were removed from the profile.
+   */
+  setCountry(data: SetCountryRequest) {
+    return api.put<ApiResponse>("/user/SetCountry", data);
   },
 
   getOnboardingStatus() {

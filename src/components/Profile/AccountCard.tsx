@@ -3,12 +3,11 @@ import { FaCamera } from "react-icons/fa";
 import { userApi } from "@/api/user";
 import { fetchUser, updateUser } from "@/store/authSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import CountrySelect from "@/components/ui/CountrySelect";
 import {
   Alert,
   AuthForm,
-  FieldError,
   FieldGroup,
-  FieldRow,
   Input,
   Label,
   PrimaryButton,
@@ -26,19 +25,16 @@ import {
   SectionLabel,
 } from "./styles";
 
-function trimOrEmpty(value: string) {
-  return value.trim();
-}
-
 const AccountCard: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [firstName, setFirstName] = useState(user?.firstName ?? "");
-  const [lastName, setLastName] = useState(user?.lastName ?? "");
+  // FirstName/LastName were removed in the profile-model simplification.
+  // The editable fields on this card are now DisplayName (free-form) and
+  // Country (optional ISO 3166-1 alpha-2 code). Email stays read-only.
   const [displayName, setDisplayName] = useState(user?.displayName ?? "");
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [country, setCountry] = useState(user?.country ?? "");
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
@@ -46,22 +42,12 @@ const AccountCard: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      setFirstName(user.firstName ?? "");
-      setLastName(user.lastName ?? "");
       setDisplayName(user.displayName ?? "");
+      setCountry(user.country ?? "");
     }
   }, [user]);
 
   if (!user) return null;
-
-  const clearFieldError = (field: "firstName" | "lastName") => {
-    setErrors((prev) => {
-      if (!prev[field]) return prev;
-      const next = { ...prev };
-      delete next[field];
-      return next;
-    });
-  };
 
   const handleAvatarClick = () => fileInputRef.current?.click();
 
@@ -93,29 +79,15 @@ const AccountCard: React.FC = () => {
     e.preventDefault();
     setSuccessMsg("");
     setErrorMsg("");
-    setErrors({});
 
-    const trimmedFirstName = trimOrEmpty(firstName);
-    const trimmedLastName = trimOrEmpty(lastName);
-    const trimmedDisplayName = trimOrEmpty(displayName);
+    const trimmedDisplayName = displayName.trim();
+    // Normalize "" → null so the diff below correctly flags a clear.
+    const normalizedCountry = country || null;
 
-    const newErrors: Record<string, string> = {};
-    if (trimmedFirstName && trimmedFirstName.length < 2)
-      newErrors.firstName = "Must be at least 2 characters";
-    if (trimmedLastName && trimmedLastName.length < 2)
-      newErrors.lastName = "Must be at least 2 characters";
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    const nameChanged =
-      trimmedFirstName !== (user.firstName ?? "") ||
-      trimmedLastName !== (user.lastName ?? "");
     const displayNameChanged = trimmedDisplayName !== (user.displayName ?? "");
+    const countryChanged = normalizedCountry !== (user.country ?? null);
 
-    if (!nameChanged && !displayNameChanged) {
+    if (!displayNameChanged && !countryChanged) {
       setSuccessMsg("No changes to save.");
       return;
     }
@@ -123,21 +95,17 @@ const AccountCard: React.FC = () => {
     setSaving(true);
 
     try {
-      if (nameChanged) {
-        await userApi.setName({
-          firstName: trimmedFirstName,
-          lastName: trimmedLastName,
-        });
-      }
       if (displayNameChanged) {
         await userApi.setDisplayName(trimmedDisplayName);
+      }
+      if (countryChanged) {
+        await userApi.setCountry({ country: normalizedCountry });
       }
 
       dispatch(
         updateUser({
-          firstName: trimmedFirstName || null,
-          lastName: trimmedLastName || null,
           displayName: trimmedDisplayName || null,
+          country: normalizedCountry,
         })
       );
 
@@ -196,47 +164,7 @@ const AccountCard: React.FC = () => {
           />
         </FieldGroup>
 
-        <SectionLabel>Name</SectionLabel>
-
-        <FieldRow>
-          <FieldGroup>
-            <Label htmlFor="firstName">First name</Label>
-            <Input
-              id="firstName"
-              type="text"
-              placeholder="First name"
-              value={firstName}
-              onChange={(e) => {
-                setFirstName(e.target.value);
-                clearFieldError("firstName");
-              }}
-              $hasError={!!errors.firstName}
-              autoComplete="given-name"
-            />
-            {errors.firstName && (
-              <FieldError>{errors.firstName}</FieldError>
-            )}
-          </FieldGroup>
-
-          <FieldGroup>
-            <Label htmlFor="lastName">Last name</Label>
-            <Input
-              id="lastName"
-              type="text"
-              placeholder="Last name"
-              value={lastName}
-              onChange={(e) => {
-                setLastName(e.target.value);
-                clearFieldError("lastName");
-              }}
-              $hasError={!!errors.lastName}
-              autoComplete="family-name"
-            />
-            {errors.lastName && (
-              <FieldError>{errors.lastName}</FieldError>
-            )}
-          </FieldGroup>
-        </FieldRow>
+        <SectionLabel>Profile</SectionLabel>
 
         <FieldGroup>
           <Label htmlFor="displayName">Display name</Label>
@@ -247,6 +175,19 @@ const AccountCard: React.FC = () => {
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             autoComplete="nickname"
+          />
+        </FieldGroup>
+
+        <FieldGroup>
+          <Label htmlFor="country">Country (optional)</Label>
+          {/* Searchable combobox — see signup.tsx for the rationale.
+              Empty string is "Prefer not to say" and normalizes to null
+              on the API request inside handleSubmit. */}
+          <CountrySelect
+            id="country"
+            value={country}
+            onChange={setCountry}
+            autoComplete="country"
           />
         </FieldGroup>
 

@@ -10,10 +10,10 @@ import { useAuthForm } from "@/hooks/useAuthForm";
 import { getPostLoginRoute } from "@/utils/post-login-redirect";
 import AuthLayout from "@/components/Auth/AuthLayout";
 import GoogleAuthButton from "@/components/Auth/GoogleAuthButton";
+import CountrySelect from "@/components/ui/CountrySelect";
 import {
   AuthForm,
   FieldGroup,
-  FieldRow,
   Label,
   Input,
   FieldError,
@@ -32,18 +32,20 @@ export default function SignupPage() {
   const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
 
+  // FirstName/LastName were removed from the profile model. Signup now
+  // collects email + password + (optionally) an ISO 3166-1 alpha-2
+  // country code. Country is skippable and can be set later from the
+  // profile page.
   const form = useAuthForm({
-    firstName: "",
-    lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
+    country: "",
   });
 
   const validate = (): boolean => {
     let valid = true;
-    const { firstName, lastName, email, password, confirmPassword } =
-      form.values;
+    const { email, password, confirmPassword } = form.values;
 
     if (!email.trim()) {
       form.setFieldError("email", "Email is required");
@@ -66,16 +68,8 @@ export default function SignupPage() {
       valid = false;
     }
 
-    if (firstName.trim() && firstName.trim().length < 2) {
-      form.setFieldError("firstName", "Must be at least 2 characters");
-      valid = false;
-    }
-
-    if (lastName.trim() && lastName.trim().length < 2) {
-      form.setFieldError("lastName", "Must be at least 2 characters");
-      valid = false;
-    }
-
+    // Country is optional — empty string means "prefer not to say"
+    // and maps to null on the API.
     return valid;
   };
 
@@ -87,10 +81,9 @@ export default function SignupPage() {
     form.setLoading(true);
     try {
       await authApi.register({
-        firstName: form.values.firstName.trim() || undefined,
-        lastName: form.values.lastName.trim() || undefined,
         email: form.values.email.trim(),
         password: form.values.password,
+        country: form.values.country || undefined,
       });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
@@ -138,40 +131,6 @@ export default function SignupPage() {
         {form.globalError && <Alert $variant="error">{form.globalError}</Alert>}
 
         <AuthForm onSubmit={handleSubmit}>
-          <FieldRow>
-            <FieldGroup>
-              <Label htmlFor="firstName">First name (optional)</Label>
-              <Input
-                id="firstName"
-                type="text"
-                placeholder="John"
-                value={form.values.firstName}
-                onChange={(e) => form.setValue("firstName", e.target.value)}
-                $hasError={!!form.errors.firstName}
-                autoComplete="given-name"
-              />
-              {form.errors.firstName && (
-                <FieldError>{form.errors.firstName}</FieldError>
-              )}
-            </FieldGroup>
-
-            <FieldGroup>
-              <Label htmlFor="lastName">Last name (optional)</Label>
-              <Input
-                id="lastName"
-                type="text"
-                placeholder="Doe"
-                value={form.values.lastName}
-                onChange={(e) => form.setValue("lastName", e.target.value)}
-                $hasError={!!form.errors.lastName}
-                autoComplete="family-name"
-              />
-              {form.errors.lastName && (
-                <FieldError>{form.errors.lastName}</FieldError>
-              )}
-            </FieldGroup>
-          </FieldRow>
-
           <FieldGroup>
             <Label htmlFor="email">Email</Label>
             <Input
@@ -186,6 +145,19 @@ export default function SignupPage() {
             {form.errors.email && (
               <FieldError>{form.errors.email}</FieldError>
             )}
+          </FieldGroup>
+
+          <FieldGroup>
+            <Label htmlFor="country">Country (optional)</Label>
+            {/* Searchable combobox — type to filter the ~250-entry ISO
+                list. Empty value means "Prefer not to say" and maps to
+                null on the API request. */}
+            <CountrySelect
+              id="country"
+              value={form.values.country}
+              onChange={(code) => form.setValue("country", code)}
+              autoComplete="country"
+            />
           </FieldGroup>
 
           <FieldGroup>
