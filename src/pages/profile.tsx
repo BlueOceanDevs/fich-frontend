@@ -7,6 +7,8 @@ import Layout from "@/components/Layout";
 import AccountCard from "@/components/Profile/AccountCard";
 import SubscriptionCard from "@/components/Profile/SubscriptionCard";
 import ExchangeCard from "@/components/Profile/ExchangeCard";
+import EmailConfirmationBanner from "@/components/EmailConfirmationBanner";
+import SetupIncompleteBanner from "@/components/SetupIncompleteBanner";
 import {
   ProfileSection,
   ProfileContainer,
@@ -50,6 +52,16 @@ export default function ProfilePage() {
                 connection.
               </ProfileSubtitle>
             </ProfileHeader>
+
+            {/* Banners: each renders itself conditionally based on user
+                state. EmailConfirmationBanner shows only for users with
+                isEmailConfirmed=false; SetupIncompleteBanner fetches
+                onboarding status and shows only when setup is incomplete.
+                Order is intentional — email confirmation is the first
+                blocker (without it, the backend refuses subscription
+                creation), so it reads top-down as a checklist. */}
+            <EmailConfirmationBanner />
+            <SetupIncompleteBanner />
 
             <CardsGrid>
               <AccountCard />
