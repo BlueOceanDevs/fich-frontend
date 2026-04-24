@@ -49,7 +49,11 @@ const fmtPct = (val: number) => `${val >= 0 ? "+" : ""}${val.toFixed(2)}%`;
  *   we show "∞" in that case to communicate "all wins, no losses".
  */
 const PerformanceStats: React.FC<Props> = ({ perf }) => {
-  const hasDeposits = perf.netDepositsUsd > 0;
+  // Match PerformanceService.MinNetDepositsForReturnPct (backend returns 0
+  // for Return % when NetDeposits is below this threshold). Keeping the
+  // frontend threshold in sync means the "—" placeholder renders for the
+  // exact same accounts that the backend refuses to compute a percent for.
+  const hasDeposits = perf.netDepositsUsd >= 1;
   const profitFactorDisplay =
     perf.profitFactor > 0
       ? perf.profitFactor.toFixed(2)
