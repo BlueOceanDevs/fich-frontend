@@ -38,6 +38,33 @@ const CASH_COLOR = "#4A90E2";
 const fmt = (n: number, decimals = 2) =>
   n.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 
+/**
+ * Format an ISO date as "Apr 24" / "Apr 24, 2025" depending on whether
+ * the year is the current year. Compact representation that fits the
+ * existing tabular layout — full timestamp lives in the column tooltip.
+ *
+ * Returns "—" for null / unparseable input. The backend explicitly
+ * returns null when no matching TradeOrder records exist (positions
+ * opened externally before the connection was added), so this branch
+ * is on the happy path, not an error path.
+ */
+const fmtOpenedAt = (iso: string | null): string => {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  const sameYear = d.getFullYear() === new Date().getFullYear();
+  return d.toLocaleDateString(undefined, sameYear
+    ? { month: "short", day: "numeric" }
+    : { year: "numeric", month: "short", day: "numeric" });
+};
+
+const fmtOpenedAtFull = (iso: string | null): string => {
+  if (!iso) return "Position opened before the connection was linked, or older than backfill window.";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleString();
+};
+
 const HoldingsTable: React.FC<Props> = ({ holdings, cashBalance, cashAssetName, totalAllocationBase }) => {
   // Show a cash row when there's any meaningful balance — otherwise an empty row
   // just adds noise. The 1 USDT threshold matches the "skip dust" filter the
@@ -66,6 +93,7 @@ const HoldingsTable: React.FC<Props> = ({ holdings, cashBalance, cashAssetName, 
                 <ThRight>Price</ThRight>
                 <ThRight>Value</ThRight>
                 <ThRight>P&L</ThRight>
+                <Th>Opened</Th>
                 <Th style={{ width: 120 }}>Allocation</Th>
               </tr>
             </thead>
@@ -92,6 +120,9 @@ const HoldingsTable: React.FC<Props> = ({ holdings, cashBalance, cashAssetName, 
                   <TdRight>$1.00</TdRight>
                   <TdRight>${fmt(cashBalance ?? 0)}</TdRight>
                   <TdRight>—</TdRight>
+                  {/* Cash has no "opened" timestamp — it's the residual
+                      balance, not a position. */}
+                  <Td>—</Td>
                   <Td>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <AllocationBar>
@@ -135,6 +166,9 @@ const HoldingsTable: React.FC<Props> = ({ holdings, cashBalance, cashAssetName, 
                         {positive ? "+" : ""}{fmt(h.pnlUsd)} ({positive ? "+" : ""}{fmt(h.pnlPercent)}%)
                       </PnlText>
                     </TdRight>
+                    <Td title={fmtOpenedAtFull(h.openedAt)}>
+                      {fmtOpenedAt(h.openedAt)}
+                    </Td>
                     <Td>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <AllocationBar>

@@ -263,6 +263,14 @@ export interface HoldingDto {
   pnlUsd: number;
   pnlPercent: number;
   allocationPercent: number;
+  /**
+   * Timestamp of the trade that opened the current position run for this
+   * symbol — the most recent fill where the user's net position crossed
+   * from zero to non-zero. Null when the position was opened outside Fich
+   * or before the backfill window covered. Frontend renders "—" in that
+   * case.
+   */
+  openedAt: string | null;
 }
 
 export interface PortfolioSnapshotDto {
