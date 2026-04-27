@@ -51,6 +51,27 @@ export interface GoogleLoginRequest {
 }
 
 // ─────────────────────────────────────────────
+// Marketing-email unsubscribe (public, anonymous)
+// ─────────────────────────────────────────────
+
+/**
+ * Response of `GET /auth/UnsubscribeStatus?token=...`. Lets the
+ * /unsubscribe page render "We've unsubscribed jane@example.com" before
+ * the user clicks the confirm button — avoids GET-causes-state-change
+ * pitfalls (link prefetchers, email security scanners hitting the URL).
+ */
+export interface UnsubscribeStatusDto {
+  email: string;
+  /** True after a successful unsubscribe (or if the user was already opted out). */
+  isOptedOut: boolean;
+}
+
+/** Body for `POST /auth/Unsubscribe`. */
+export interface UnsubscribeRequest {
+  token: string;
+}
+
+// ─────────────────────────────────────────────
 // User
 // ─────────────────────────────────────────────
 

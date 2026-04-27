@@ -8,6 +8,8 @@ import type {
   ForgotPasswordRequest,
   ResetPasswordRequest,
   GoogleLoginRequest,
+  UnsubscribeStatusDto,
+  UnsubscribeRequest,
 } from "./types";
 
 // ─────────────────────────────────────────────
@@ -53,5 +55,23 @@ export const authApi = {
 
   googleLogin(data: GoogleLoginRequest) {
     return api.post<ApiResponse>("/auth/GoogleLogin", data);
+  },
+
+  // ── Marketing-email unsubscribe (public, anonymous, signed-token) ──
+  //
+  // Companion to the admin Bulk Email feature. Tokens come from the
+  // unsubscribe footer of every broadcast email; they're HMAC-signed and
+  // bound to a userId, so the link works forever from any browser, no
+  // session required.
+
+  getUnsubscribeStatus(token: string) {
+    return api.get<ApiResponseOf<UnsubscribeStatusDto>>(
+      "/auth/UnsubscribeStatus",
+      { params: { token } },
+    );
+  },
+
+  unsubscribe(data: UnsubscribeRequest) {
+    return api.post<ApiResponse>("/auth/Unsubscribe", data);
   },
 };

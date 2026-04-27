@@ -36,6 +36,7 @@ const PUBLIC_PATHS = [
   "/forgot-password",
   "/reset-password",
   "/confirm-email",
+  "/unsubscribe",
 ];
 
 function isPublicPage(): boolean {
