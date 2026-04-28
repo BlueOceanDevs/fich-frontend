@@ -1,5 +1,6 @@
 import React from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
+import { useTheme } from "styled-components";
 import type { HoldingDto } from "@/api/types";
 import { ChartCard, CardTitle, EmptyState } from "./styles";
 
@@ -11,9 +12,17 @@ interface Props {
   cashAssetName?: string;
 }
 
+// Slice palette is intentionally theme-INDEPENDENT — these are the brand
+// crypto colors we want consistent across light/dark. Only the chrome
+// (tooltip background, legend label color) reads from the theme.
 const COLORS = ["#00D897", "#627EEA", "#F7931A", "#9945FF", "#00AAE4", "#E8920A", "#FF4D4D", "#8B5CF6"];
 
 const AssetAllocation: React.FC<Props> = ({ holdings, usdtBalance, totalValue, cashAssetName }) => {
+  const theme = useTheme();
+  const tooltipBg = theme.colors.card;
+  const tooltipBorder = theme.colors.cardBorder;
+  const tooltipText = theme.colors.text;
+  const legendColor = theme.colors.textSecondary;
   if (holdings.length === 0 && usdtBalance <= 0) {
     return (
       <ChartCard>
@@ -57,11 +66,14 @@ const AssetAllocation: React.FC<Props> = ({ holdings, usdtBalance, totalValue, c
           </Pie>
           <Tooltip
             contentStyle={{
-              background: "#14141C",
-              border: "1px solid #1E1E28",
+              background: tooltipBg,
+              border: `1px solid ${tooltipBorder}`,
               borderRadius: 8,
               fontSize: 12,
+              color: tooltipText,
             }}
+            itemStyle={{ color: tooltipText }}
+            labelStyle={{ color: tooltipText }}
             // Include the asset name so hovering a slice surfaces _which_
             // asset it is — client feedback: "add coin name on pie chart,
             // not only the % when you point with mouse."
@@ -80,7 +92,7 @@ const AssetAllocation: React.FC<Props> = ({ holdings, usdtBalance, totalValue, c
         {data.map((d, i) => (
           <div key={d.name} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: COLORS[i % COLORS.length] }} />
-            <span style={{ color: "#8A8A9A" }}>{d.name}</span>
+            <span style={{ color: legendColor }}>{d.name}</span>
           </div>
         ))}
       </div>

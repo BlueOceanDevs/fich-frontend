@@ -8,6 +8,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import { useTheme } from "styled-components";
 import type {
   ChartGranularity,
   PerformancePeriod,
@@ -115,6 +116,18 @@ const PortfolioChart: React.FC<Props> = ({
   const tickFormatter = makeTickFormatter(granularity, history);
   const labelFormatter = tooltipLabelFormatter(granularity);
 
+  // Theme-aware colors. recharts props expect raw color strings, so we
+  // can't rely on styled-components for the chart innards — we read from
+  // the active theme manually. Re-renders flow through naturally because
+  // useTheme subscribes to the ThemeProvider.
+  const theme = useTheme();
+  const lineColor = theme.colors.primary;
+  const gridColor = theme.colors.cardBorder;
+  const axisColor = theme.colors.textMuted;
+  const tooltipBg = theme.colors.card;
+  const tooltipBorder = theme.colors.cardBorder;
+  const tooltipText = theme.colors.text;
+
   return (
     <ChartCard>
       <ChartHeaderRow>
@@ -144,15 +157,15 @@ const PortfolioChart: React.FC<Props> = ({
             <AreaChart data={history} margin={{ top: 4, right: 8, left: 8, bottom: 0 }}>
               <defs>
                 <linearGradient id="portfolioGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#00D897" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#00D897" stopOpacity={0} />
+                  <stop offset="5%" stopColor={lineColor} stopOpacity={0.25} />
+                  <stop offset="95%" stopColor={lineColor} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1E1E28" />
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
               <XAxis
                 dataKey="date"
                 tickFormatter={tickFormatter}
-                tick={{ fill: "#5A5A6A", fontSize: 11 }}
+                tick={{ fill: axisColor, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
                 // Let recharts thin ticks automatically for dense hourly series
@@ -161,29 +174,32 @@ const PortfolioChart: React.FC<Props> = ({
               />
               <YAxis
                 tickFormatter={formatValue}
-                tick={{ fill: "#5A5A6A", fontSize: 11 }}
+                tick={{ fill: axisColor, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
                 width={70}
               />
               <Tooltip
                 contentStyle={{
-                  background: "#14141C",
-                  border: "1px solid #1E1E28",
+                  background: tooltipBg,
+                  border: `1px solid ${tooltipBorder}`,
                   borderRadius: 8,
                   fontSize: 12,
+                  color: tooltipText,
                 }}
+                itemStyle={{ color: tooltipText }}
+                labelStyle={{ color: tooltipText }}
                 labelFormatter={(label) => labelFormatter(String(label))}
                 formatter={(value) => [formatValue(Number(value)), "Value"]}
               />
               <Area
                 type="monotone"
                 dataKey="valueUsd"
-                stroke="#00D897"
+                stroke={lineColor}
                 strokeWidth={2}
                 fill="url(#portfolioGradient)"
                 dot={false}
-                activeDot={{ r: 4, fill: "#00D897" }}
+                activeDot={{ r: 4, fill: lineColor }}
               />
             </AreaChart>
           </ResponsiveContainer>

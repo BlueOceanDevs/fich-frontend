@@ -14,6 +14,7 @@ import {
   Tooltip,
   ReferenceLine,
 } from "recharts";
+import { useTheme } from "styled-components";
 import type { StrategyPerformanceDto } from "@/api/types";
 import {
   ChartModalOverlay,
@@ -35,15 +36,6 @@ interface Props {
   strategy: StrategyPerformanceDto;
   onClose: () => void;
 }
-
-// Kept in sync with the backend/user-style dark theme: green for positive
-// P&L, red for negative, neutral for axes. These ARE the user-dashboard
-// accent colors from the theme; reading them from the theme via the
-// ThemeContext would be more correct but adds noise for values that
-// don't change.
-const COLOR_POSITIVE = "#00D897";
-const COLOR_NEGATIVE = "#EF4444";
-const COLOR_AXIS = "#5A5A6A";
 
 const fmtUsd = (v: number) =>
   `$${Math.abs(v).toLocaleString("en-US", {
@@ -124,10 +116,23 @@ const StrategyPerformanceChartModal: React.FC<Props> = ({ strategy, onClose }) =
 
   const hasAnyTrades = strategy.closedTradeCount > 0;
 
+  // Theme-aware chart colors. recharts props expect raw color strings, so
+  // we read from the active theme and pass values through. This means
+  // toggling the dashboard light/dark switch repaints the chart on the
+  // next render without any extra wiring.
+  const theme = useTheme();
+  const colorPositive = theme.colors.success;
+  const colorNegative = theme.colors.danger;
+  const colorAxis = theme.colors.textMuted;
+  const colorGrid = theme.colors.cardBorder;
+  const tooltipBg = theme.colors.card;
+  const tooltipBorder = theme.colors.cardBorder;
+  const tooltipText = theme.colors.text;
+
   // Strategy's overall P&L drives the cumulative line colour — green when
   // net positive across the window, red when net negative. Matches the
   // row colour in the table so the chart's identity is obvious.
-  const lineColor = strategy.realizedPnlUsd >= 0 ? COLOR_POSITIVE : COLOR_NEGATIVE;
+  const lineColor = strategy.realizedPnlUsd >= 0 ? colorPositive : colorNegative;
   // Unique gradient id per strategy so two modals rapid-opened don't
   // stomp each other's SVG defs (unlikely, but cheap to make safe).
   const gradientId = `cumulative-fill-${strategy.strategyId ?? "manual"}`;
@@ -164,7 +169,7 @@ const StrategyPerformanceChartModal: React.FC<Props> = ({ strategy, onClose }) =
           <ChartStat>
             <ChartStatLabel>Realized P&amp;L</ChartStatLabel>
             <ChartStatValue
-              style={{ color: strategy.realizedPnlUsd >= 0 ? COLOR_POSITIVE : COLOR_NEGATIVE }}
+              style={{ color: strategy.realizedPnlUsd >= 0 ? colorPositive : colorNegative }}
             >
               {fmtSignedUsd(strategy.realizedPnlUsd)}
             </ChartStatValue>
@@ -207,31 +212,34 @@ const StrategyPerformanceChartModal: React.FC<Props> = ({ strategy, onClose }) =
                         <stop offset="100%" stopColor={lineColor} stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1E1E28" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={colorGrid} vertical={false} />
                     <XAxis
                       dataKey="label"
-                      stroke={COLOR_AXIS}
-                      tick={{ fontSize: 11, fill: COLOR_AXIS }}
+                      stroke={colorAxis}
+                      tick={{ fontSize: 11, fill: colorAxis }}
                       interval="preserveStartEnd"
                       minTickGap={30}
                     />
                     <YAxis
-                      stroke={COLOR_AXIS}
-                      tick={{ fontSize: 11, fill: COLOR_AXIS }}
+                      stroke={colorAxis}
+                      tick={{ fontSize: 11, fill: colorAxis }}
                       tickFormatter={(v: number) => fmtSignedUsd(v)}
                       width={80}
                       domain={yDomainIncludeZero}
                     />
-                    <ReferenceLine y={0} stroke={COLOR_AXIS} strokeDasharray="2 4" />
+                    <ReferenceLine y={0} stroke={colorAxis} strokeDasharray="2 4" />
                     <Tooltip
-                      // Dark popup to match the rest of the user dashboard.
+                      // Theme-aware popup so the floating box reads
+                      // correctly on both dark and light dashboards.
                       contentStyle={{
-                        background: "#14141C",
-                        border: "1px solid #1E1E28",
+                        background: tooltipBg,
+                        border: `1px solid ${tooltipBorder}`,
                         borderRadius: 8,
                         fontSize: 12,
+                        color: tooltipText,
                       }}
-                      labelStyle={{ color: "#E5E5EC" }}
+                      itemStyle={{ color: tooltipText }}
+                      labelStyle={{ color: tooltipText }}
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       formatter={(v: any) => [
                         fmtSignedUsd(typeof v === "number" ? v : Number(v)),
@@ -275,30 +283,32 @@ const StrategyPerformanceChartModal: React.FC<Props> = ({ strategy, onClose }) =
                     data={monthlyData}
                     margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1E1E28" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={colorGrid} vertical={false} />
                     <XAxis
                       dataKey="label"
-                      stroke={COLOR_AXIS}
-                      tick={{ fontSize: 11, fill: COLOR_AXIS }}
+                      stroke={colorAxis}
+                      tick={{ fontSize: 11, fill: colorAxis }}
                       interval="preserveStartEnd"
                       minTickGap={20}
                     />
                     <YAxis
-                      stroke={COLOR_AXIS}
-                      tick={{ fontSize: 11, fill: COLOR_AXIS }}
+                      stroke={colorAxis}
+                      tick={{ fontSize: 11, fill: colorAxis }}
                       tickFormatter={(v: number) => fmtSignedUsd(v)}
                       width={70}
                       domain={yDomainIncludeZero}
                     />
-                    <ReferenceLine y={0} stroke={COLOR_AXIS} />
+                    <ReferenceLine y={0} stroke={colorAxis} />
                     <Tooltip
                       contentStyle={{
-                        background: "#14141C",
-                        border: "1px solid #1E1E28",
+                        background: tooltipBg,
+                        border: `1px solid ${tooltipBorder}`,
                         borderRadius: 8,
                         fontSize: 12,
+                        color: tooltipText,
                       }}
-                      labelStyle={{ color: "#E5E5EC" }}
+                      itemStyle={{ color: tooltipText }}
+                      labelStyle={{ color: tooltipText }}
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       formatter={(v: any) => [
                         fmtSignedUsd(typeof v === "number" ? v : Number(v)),
@@ -309,7 +319,7 @@ const StrategyPerformanceChartModal: React.FC<Props> = ({ strategy, onClose }) =
                       {monthlyData.map((d, i) => (
                         <Cell
                           key={i}
-                          fill={d.value >= 0 ? COLOR_POSITIVE : COLOR_NEGATIVE}
+                          fill={d.value >= 0 ? colorPositive : colorNegative}
                         />
                       ))}
                     </Bar>

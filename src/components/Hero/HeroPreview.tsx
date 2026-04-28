@@ -11,6 +11,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { useTheme } from "styled-components";
 import {
   PreviewWrapper,
   PreviewCard,
@@ -66,6 +67,18 @@ const HOLDINGS = [
 ];
 
 const HeroPreview: React.FC = () => {
+  // Theme-aware colors so the marketing-page preview matches the
+  // surrounding light/dark page chrome instead of always rendering as a
+  // dark widget. Slice colors stay theme-independent on purpose (brand
+  // palette).
+  const theme = useTheme();
+  const lineColor = theme.colors.primary;
+  const gridColor = theme.colors.cardBorder;
+  const axisColor = theme.colors.textMuted;
+  const tooltipBg = theme.colors.card;
+  const tooltipBorder = theme.colors.cardBorder;
+  const tooltipText = theme.colors.text;
+
   return (
     <PreviewWrapper>
       {/* Summary */}
@@ -101,37 +114,39 @@ const HeroPreview: React.FC = () => {
             <AreaChart data={CHART_DATA}>
               <defs>
                 <linearGradient id="heroGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#00D897" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#00D897" stopOpacity={0} />
+                  <stop offset="0%" stopColor={lineColor} stopOpacity={0.3} />
+                  <stop offset="100%" stopColor={lineColor} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1E1E28" />
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
               <XAxis
                 dataKey="date"
-                tick={{ fill: "#5A5A6A", fontSize: 11 }}
+                tick={{ fill: axisColor, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fill: "#5A5A6A", fontSize: 11 }}
+                tick={{ fill: axisColor, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
               />
               <Tooltip
                 contentStyle={{
-                  background: "#14141C",
-                  border: "1px solid #1E1E28",
+                  background: tooltipBg,
+                  border: `1px solid ${tooltipBorder}`,
                   borderRadius: 8,
                   fontSize: 12,
+                  color: tooltipText,
                 }}
-                labelStyle={{ color: "#8A8A9A" }}
+                itemStyle={{ color: tooltipText }}
+                labelStyle={{ color: tooltipText }}
                 formatter={(v) => [`$${Number(v).toLocaleString()}`, "Value"]}
               />
               <Area
                 type="monotone"
                 dataKey="value"
-                stroke="#00D897"
+                stroke={lineColor}
                 strokeWidth={2}
                 fill="url(#heroGrad)"
               />

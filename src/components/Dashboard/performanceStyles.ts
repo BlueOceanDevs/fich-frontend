@@ -122,6 +122,31 @@ export const PeriodTab = styled.button<{ $active: boolean }>`
   }
 `;
 
+// ── "Active since" header line ──
+// Single small caption between the period tabs and the stats grid that
+// tells the user when the platform first started managing their portfolio.
+// Anchored to the user's first executed signal (PortfolioDto.firstSignalExecutedAt)
+// because account creation / subscription start aren't meaningful "trading
+// began" moments. Hidden entirely when null (no trades yet).
+export const ActiveSinceRow = styled.div`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+`;
+
+export const ActiveSinceDate = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  font-weight: 600;
+`;
+
+export const ActiveSinceSeparator = styled.span`
+  color: ${({ theme }) => theme.colors.cardBorder};
+`;
+
 // ── Reconciliation footer (Phase 6) ──
 // Small honesty marker at the bottom of the Performance page. Green tick when
 // reconciled recently + clean; yellow when drift detected. Users reading fine

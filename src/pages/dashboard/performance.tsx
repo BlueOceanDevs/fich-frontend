@@ -14,6 +14,9 @@ import {
   PerfSection,
   PeriodTabsRow,
   PeriodTab,
+  ActiveSinceRow,
+  ActiveSinceDate,
+  ActiveSinceSeparator,
 } from "@/components/Dashboard/performanceStyles";
 
 // ─────────────────────────────────────────────
@@ -27,6 +30,26 @@ const PERIOD_TABS: { label: string; value: PerformancePeriod }[] = [
   { label: "7 Days", value: "SevenDays" },
   { label: "24 Hours", value: "OneDay" },
 ];
+
+// "Active since" date format: "Apr 20, 2026" — same shape as the dashboard
+// summary's "Member since" line so the two views feel consistent. Locale-
+// aware (undefined locale = browser default), day-precision only.
+const activeSinceFormatter = new Intl.DateTimeFormat(undefined, {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+});
+
+// Days-of-trading line — round down to whole days. We compute against
+// "now" client-side rather than asking the backend so the value updates
+// without a round-trip; the precision (whole days) is loose enough that
+// clock drift doesn't matter.
+const daysSince = (iso: string): number => {
+  const startMs = new Date(iso).getTime();
+  if (!Number.isFinite(startMs)) return 0;
+  const elapsedMs = Date.now() - startMs;
+  return Math.max(0, Math.floor(elapsedMs / (24 * 60 * 60 * 1000)));
+};
 
 /**
  * Performance page — Phase 6 of the P&L accuracy plan.
@@ -146,6 +169,34 @@ export default function PerformancePage() {
             </PeriodTab>
           ))}
         </PeriodTabsRow>
+
+        {/*
+          "Active since" line — when did the platform first start managing
+          this user's portfolio? Anchored to the first executed signal
+          (firstSignalExecutedAt), not account creation or subscription
+          start. Hidden entirely until the user has executed their first
+          trade (the field is null until then).
+        */}
+        {portfolio?.firstSignalExecutedAt && (
+          <ActiveSinceRow>
+            <span>Active since</span>
+            <ActiveSinceDate>
+              {activeSinceFormatter.format(new Date(portfolio.firstSignalExecutedAt))}
+            </ActiveSinceDate>
+            {(() => {
+              const days = daysSince(portfolio.firstSignalExecutedAt);
+              if (days <= 0) return null;
+              return (
+                <>
+                  <ActiveSinceSeparator>·</ActiveSinceSeparator>
+                  <span>
+                    {days} day{days === 1 ? "" : "s"} of trading
+                  </span>
+                </>
+              );
+            })()}
+          </ActiveSinceRow>
+        )}
 
         {loading && !perf ? (
           <LoadingState>Loading performance data...</LoadingState>
