@@ -58,6 +58,11 @@ export default function LoginPage() {
       await authApi.login({
         email: form.values.email.trim(),
         password: form.values.password,
+        // User frontend logins are always User context — server skips
+        // 2FA and issues scope=user cookies. Admin users land here as
+        // regular sessions and use the admin panel separately for
+        // admin actions (which goes through 2FA there).
+        context: "User",
       });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
@@ -77,7 +82,7 @@ export default function LoginPage() {
     form.setLoading(true);
 
     try {
-      await authApi.googleLogin({ idToken: credential });
+      await authApi.googleLogin({ idToken: credential, context: "User" });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
       const dest = explicitRedirect || (await getPostLoginRoute());

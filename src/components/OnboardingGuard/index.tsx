@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { useAppSelector } from "@/store/hooks";
 import { userApi } from "@/api/user";
+import { SpinnerLarge } from "@/components/ui/Button";
 
 /**
  * Pages that don't require onboarding completion.
@@ -34,11 +35,17 @@ function isExempt(path: string): boolean {
 }
 
 /**
- * Global guard that redirects authenticated users to /setup
- * if their onboarding is not yet complete.
+ * Global guard that redirects authenticated users to /setup if their
+ * onboarding is not yet complete.
  *
- * Renders children immediately — does NOT block rendering.
- * The redirect happens in the background once the check resolves.
+ * <para>
+ * On a fresh load of a protected page the auth bootstrap
+ * (DashboardLayout's spinner) runs first, then this guard's onboarding
+ * status check runs. We render a loader during BOTH so users never see
+ * a flash of dashboard chrome before being redirected to /setup, and
+ * never see a blank screen between the two checks. Exempt paths bypass
+ * the guard entirely.
+ * </para>
  */
 export default function OnboardingGuard({
   children,
@@ -97,13 +104,34 @@ export default function OnboardingGuard({
     };
   }, [isAuthenticated, router.pathname, router]);
 
-  // On exempt pages or after check passes, render children
-  // On protected pages while checking, render nothing to avoid flash
+  // Exempt pages bypass the guard entirely (login, signup, public
+  // pages, the setup flow itself). Unauthenticated users also fall
+  // through — DashboardLayout's own auth gate handles bouncing them
+  // to /login once hasCheckedAuth resolves.
   if (!isAuthenticated || isExempt(router.pathname)) {
     return <>{children}</>;
   }
 
-  if (!checked) return null;
+  // Authenticated, non-exempt page, onboarding check still in flight:
+  // show a centered spinner instead of returning null. Without this,
+  // users see a blank frame between DashboardLayout's bootstrap
+  // spinner and the dashboard rendering — jarring transition that
+  // looks like a broken page. The check is fast (single GET) so this
+  // typically renders for ~100-300ms.
+  if (!checked) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <SpinnerLarge />
+      </div>
+    );
+  }
 
   return <>{children}</>;
 }

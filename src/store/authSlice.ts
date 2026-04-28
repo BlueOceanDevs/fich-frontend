@@ -12,6 +12,15 @@ interface AuthState {
   user: UserInfo | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  /**
+   * True after the bootstrap fetchUser() has resolved (success OR fail).
+   * Lets protected pages render a loader while the initial auth-check
+   * round-trip is in flight, instead of flashing public-mode chrome and
+   * then resolving to logged-in (or vice versa). Always starts false on
+   * page load — the auth slice is NOT persisted, so this resets every
+   * reload.
+   */
+  hasCheckedAuth: boolean;
   error: string | null;
 }
 
@@ -19,6 +28,7 @@ const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
   isLoading: false,
+  hasCheckedAuth: false,
   error: null,
 };
 
@@ -79,6 +89,10 @@ const authSlice = createSlice({
     clearAuth(state) {
       state.user = null;
       state.isAuthenticated = false;
+      // Refresh failed / session expired → we DID check, the answer is
+      // "not logged in." Don't reset hasCheckedAuth — that would flash
+      // a loader on every protected page after a 401-induced cleanup.
+      state.hasCheckedAuth = true;
       state.error = null;
     },
   },
@@ -93,11 +107,13 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.hasCheckedAuth = true;
       })
       .addCase(fetchUser.rejected, (state, action) => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+        state.hasCheckedAuth = true;
         state.error = action.payload as string;
       });
 
@@ -105,6 +121,9 @@ const authSlice = createSlice({
     builder.addCase(logout.fulfilled, (state) => {
       state.user = null;
       state.isAuthenticated = false;
+      // hasCheckedAuth stays true — we DID check, the user is now confirmed
+      // logged out. Resetting to false would cause protected pages to flash
+      // their loader unnecessarily after an explicit logout.
       state.error = null;
     });
   },

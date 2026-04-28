@@ -16,9 +16,19 @@ export interface ApiResponseOf<T> extends ApiResponse {
 // Auth
 // ─────────────────────────────────────────────
 
+/**
+ * Surface a login is being attempted from. Mirrors backend
+ * `LoginContext` enum. The user-facing app always sends "User"; the
+ * admin panel sends "Admin". Drives whether 2FA is enforced and what
+ * scope is baked into the resulting JWT.
+ */
+export type LoginContext = "User" | "Admin";
+
 export interface LoginRequest {
   email: string;
   password: string;
+  /** Always "User" from this app — JWT will be issued with scope=user. */
+  context: LoginContext;
 }
 
 export interface RegisterRequest {
@@ -48,6 +58,8 @@ export interface ResetPasswordRequest {
 
 export interface GoogleLoginRequest {
   idToken: string;
+  /** Always "User" from this app. Same semantics as LoginRequest.context. */
+  context: LoginContext;
 }
 
 // ─────────────────────────────────────────────

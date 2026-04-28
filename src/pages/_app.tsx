@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import type { AppProps } from "next/app";
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import { store, persistor, type RootState } from "@/store";
+import { store, persistor } from "@/store";
 import { clearAuth, fetchUser } from "@/store/authSlice";
 import { clearSubscription } from "@/store/subscriptionSlice";
 import { setOnAuthExpired } from "@/api/client";
@@ -11,8 +11,6 @@ import PageLoader from "@/components/PageLoader";
 import OnboardingGuard from "@/components/OnboardingGuard";
 
 function AppInner({ Component, pageProps }: AppProps) {
-  const isAuthenticated = useSelector((s: RootState) => s.auth.isAuthenticated);
-
   // Wire up the auth-expired callback once on mount
   useEffect(() => {
     setOnAuthExpired(() => {
@@ -21,12 +19,20 @@ function AppInner({ Component, pageProps }: AppProps) {
     });
   }, []);
 
-  // Re-fetch user profile on page reload when already authenticated
+  // Bootstrap auth on every page load. We always fire fetchUser() once,
+  // independent of any cached `isAuthenticated` flag — the auth slice is
+  // no longer persisted, so the only reliable signal that the user is
+  // logged in is "the cookies still work, the API returns the profile."
+  //
+  // For anonymous visitors this costs one round-trip that returns 401
+  // and resolves quickly; the response interceptor's refresh attempt
+  // also fails fast, and `hasCheckedAuth` flips to true so protected
+  // pages can stop showing a loader. For returning logged-in users the
+  // cookies refresh transparently and they land on their dashboard
+  // without ever seeing a logged-out flash.
   useEffect(() => {
-    if (isAuthenticated) {
-      store.dispatch(fetchUser());
-    }
-  }, [isAuthenticated]);
+    store.dispatch(fetchUser());
+  }, []);
 
   return (
     <ThemeWrapper>

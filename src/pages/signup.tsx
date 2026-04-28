@@ -104,7 +104,7 @@ export default function SignupPage() {
     form.setLoading(true);
 
     try {
-      await authApi.googleLogin({ idToken: credential });
+      await authApi.googleLogin({ idToken: credential, context: "User" });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
       const dest = await getPostLoginRoute();

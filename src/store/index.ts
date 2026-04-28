@@ -41,7 +41,13 @@ const persistConfig = {
   key: "fich",
   version: 1,
   storage,
-  whitelist: ["auth", "ui"], // only persist auth & ui (theme preference)
+  // Only persist UI prefs (theme, etc.). Auth state is intentionally NOT
+  // persisted — the cookies are the single source of truth for "logged
+  // in" and rehydrating an `isAuthenticated: true` flag from localStorage
+  // produces a "ghost logged-in" flash where the UI renders as logged-in,
+  // makes its first API call, hits 401, then bounces to /login. Always
+  // bootstrap auth from a fresh fetchUser() round-trip instead.
+  whitelist: ["ui"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

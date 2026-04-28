@@ -18,6 +18,7 @@ import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { logout } from "@/store/authSlice";
 import { clearSubscription } from "@/store/subscriptionSlice";
 import { toggleTheme } from "@/store/uiSlice";
+import { SpinnerLarge } from "@/components/ui/Button";
 import {
   DashboardWrapper,
   Sidebar,
@@ -68,22 +69,49 @@ interface DashboardLayoutProps {
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isAuthenticated, user } = useAppSelector((s) => s.auth);
+  const { isAuthenticated, hasCheckedAuth, user } = useAppSelector((s) => s.auth);
   const themeName = useAppSelector((s) => s.ui.themeName);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Auth guard — redirect unauthenticated users
+  // Auth guard — redirect unauthenticated users.
+  //
+  // Gate on hasCheckedAuth: until the bootstrap fetchUser() has resolved,
+  // we don't know whether the user is actually logged in or not. Without
+  // this gate, every page load would briefly see isAuthenticated=false
+  // (the initial state since the auth slice is no longer persisted) and
+  // bounce the user to /login before the cookie-backed check completes.
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (hasCheckedAuth && !isAuthenticated) {
       router.replace("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [hasCheckedAuth, isAuthenticated, router]);
 
   // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [router.pathname]);
 
+  // While the auth bootstrap is in flight, show a centered spinner
+  // instead of a blank page. The bootstrap is typically <300ms but on
+  // slow connections can be longer; users seeing a spinner read it as
+  // "still loading" rather than "broken / blank page."
+  if (!hasCheckedAuth) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <SpinnerLarge />
+      </div>
+    );
+  }
+  // hasCheckedAuth is true but the answer is "not logged in" — the
+  // useEffect above is mid-redirect to /login. Render nothing so we
+  // don't paint dashboard chrome for a frame on the way out.
   if (!isAuthenticated) return null;
 
   // FirstName/LastName were removed from the profile model — the only
