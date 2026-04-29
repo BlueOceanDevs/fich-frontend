@@ -8,7 +8,6 @@ import {
   AuthCard,
   AuthHeader,
   AuthLogo,
-  LogoDot,
   AuthTitle,
   AuthSubtitle,
   ThemeToggleFloat,
@@ -37,10 +36,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       <AuthCard>
         <AuthHeader>
           <Link href="/" passHref legacyBehavior>
-            <AuthLogo>
-              <LogoDot />
-              Fich
-            </AuthLogo>
+            <AuthLogo>fich</AuthLogo>
           </Link>
           <AuthTitle>{title}</AuthTitle>
           <AuthSubtitle>{subtitle}</AuthSubtitle>

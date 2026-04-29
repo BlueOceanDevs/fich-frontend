@@ -6,7 +6,6 @@ import {
   FooterGrid,
   FooterBrand,
   FooterLogo,
-  LogoDot,
   FooterDescription,
   FooterColumn,
   FooterColumnTitle,
@@ -24,10 +23,7 @@ const Footer: React.FC = () => {
       <FooterContainer>
         <FooterGrid>
           <FooterBrand>
-            <FooterLogo>
-              <LogoDot />
-              Fich
-            </FooterLogo>
+            <FooterLogo>fich</FooterLogo>
             <FooterDescription>
               Secure, fast, and streamline crypto trading. Fich makes digital
               asset trading effortless.

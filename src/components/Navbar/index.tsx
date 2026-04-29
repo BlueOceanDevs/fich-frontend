@@ -13,7 +13,6 @@ import {
   Nav,
   NavContainer,
   Logo,
-  LogoDot,
   NavLinks,
   NavLink,
   ThemeToggle,
@@ -47,10 +46,7 @@ const Navbar: React.FC = () => {
   return (
     <Nav>
       <NavContainer>
-        <Logo href="/">
-          <LogoDot />
-          Fich
-        </Logo>
+        <Logo href="/">fich</Logo>
 
         <NavLinks>
           {NAV_ITEMS.map((item) => (

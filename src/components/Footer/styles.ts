@@ -27,20 +27,15 @@ export const FooterGrid = styled.div`
 
 export const FooterBrand = styled.div``;
 
+// Footer wordmark — same brand mark as Navbar (lowercase "fich" in
+// heavy green, no separate dot — the i tittle is the dot).
 export const FooterLogo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 28px;
+  font-weight: 900;
+  color: ${({ theme }) => theme.colors.primary};
+  letter-spacing: -1px;
+  line-height: 1;
   margin-bottom: 16px;
-`;
-
-export const LogoDot = styled.span`
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.primary};
 `;
 
 export const FooterDescription = styled.p`

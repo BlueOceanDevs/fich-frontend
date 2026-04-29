@@ -25,21 +25,20 @@ export const NavContainer = styled.div`
   justify-content: space-between;
 `;
 
+// Brand wordmark — lowercase "fich" in heavy weight, brand green.
+// The "i" tittle (the natural dot above the i) IS the brand dot — no
+// separate LogoDot component. Color reads from the theme's primary,
+// which is green in both light and dark themes (just slightly different
+// shades to match the surrounding chrome).
 export const Logo = styled.a`
-  font-size: 20px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.text};
-  display: flex;
+  font-size: 26px;
+  font-weight: 900;
+  color: ${({ theme }) => theme.colors.primary};
+  letter-spacing: -1px;
+  line-height: 1;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-`;
-
-export const LogoDot = styled.span`
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.primary};
-  display: inline-block;
+  text-decoration: none;
 `;
 
 export const NavLinks = styled.div`

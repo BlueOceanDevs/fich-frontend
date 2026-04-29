@@ -65,22 +65,16 @@ export const AuthHeader = styled.div`
   margin-bottom: 32px;
 `;
 
+// Auth-page wordmark — same brand mark as Navbar/Footer.
 export const AuthLogo = styled.a`
-  font-size: 24px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.text};
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 32px;
+  font-weight: 900;
+  color: ${({ theme }) => theme.colors.primary};
+  letter-spacing: -1px;
+  line-height: 1;
+  display: inline-block;
   margin-bottom: 24px;
   text-decoration: none;
-`;
-
-export const LogoDot = styled.span`
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.primary};
 `;
 
 export const AuthTitle = styled.h1`

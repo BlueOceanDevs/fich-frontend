@@ -36,24 +36,16 @@ export const SidebarHeader = styled.div`
   padding: 20px 20px 28px;
 `;
 
+// Sidebar wordmark — same brand mark as the rest of the app.
 export const SidebarLogo = styled.a`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  color: ${({ theme }) => theme.colors.text};
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1;
+  color: ${({ theme }) => theme.colors.primary};
   text-decoration: none;
   cursor: pointer;
-`;
-
-export const SidebarLogoDot = styled.span`
   display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.primary};
 `;
 
 export const SidebarNav = styled.nav`

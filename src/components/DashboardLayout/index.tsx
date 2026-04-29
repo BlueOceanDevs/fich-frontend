@@ -24,7 +24,6 @@ import {
   Sidebar,
   SidebarHeader,
   SidebarLogo,
-  SidebarLogoDot,
   SidebarNav,
   SidebarSection,
   SidebarLink,
@@ -139,10 +138,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title }) =>
       <Sidebar $mobileOpen={mobileOpen}>
         <SidebarHeader>
           <Link href="/" passHref legacyBehavior>
-            <SidebarLogo>
-              <SidebarLogoDot />
-              Fich
-            </SidebarLogo>
+            <SidebarLogo>fich</SidebarLogo>
           </Link>
         </SidebarHeader>
 
