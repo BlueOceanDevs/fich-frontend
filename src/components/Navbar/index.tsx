@@ -29,12 +29,16 @@ import {
   MobileSignupButton,
 } from "./styles";
 
+// Public navigation. Performance and FAQ get their own dedicated
+// pages (FAQ landed its full version after the homepage preview was
+// trimmed to 4 questions); Pricing remains an anchor into the
+// homepage's pricing section. Contact Us points to /contact.
 const NAV_ITEMS = [
-  { label: "Cryptos", href: "/#cryptos" },
-  { label: "How it works", href: "/#how-it-works" },
-  { label: "Testimonials", href: "/#testimonials" },
-  { label: "Pricing", href: "/plans" },
-  { label: "FAQ", href: "/#faq" },
+  { label: "Home", href: "/" },
+  { label: "Performance", href: "/performance" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Contact Us", href: "/contact" },
 ];
 
 const Navbar: React.FC = () => {

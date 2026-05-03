@@ -43,8 +43,8 @@ const Footer: React.FC = () => {
           <FooterColumn>
             <FooterColumnTitle>Legal</FooterColumnTitle>
             <FooterLink href="/privacy-policy">Privacy Policy</FooterLink>
-            <FooterLink href="/terms">Terms of Service</FooterLink>
-            <FooterLink href="/risk-disclosure">Risk Disclosure</FooterLink>
+            <FooterLink href="/terms">Terms and Conditions</FooterLink>
+            <FooterLink href="/risk-disclosure">Disclaimer</FooterLink>
           </FooterColumn>
         </FooterGrid>
 

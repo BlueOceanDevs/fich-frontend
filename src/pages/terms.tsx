@@ -17,203 +17,238 @@ export default function TermsPage() {
   return (
     <>
       <Head>
-        <title>Terms of Service - Fich</title>
+        <title>Terms and Conditions - Fich</title>
         <meta
           name="description"
-          content="Fich terms of service — the rules and conditions for using the Fich trading platform."
+          content="Fich terms and conditions — the legally binding agreement that governs your use of the fich.ai trading software."
         />
       </Head>
       <Layout>
         <LegalSection>
           <LegalContainer>
-            <LegalTitle>Terms of Service</LegalTitle>
-            <LegalUpdated>Last updated: April 13, 2026</LegalUpdated>
+            <LegalTitle>Terms and Conditions</LegalTitle>
+            <LegalUpdated>Last Updated: April 2026</LegalUpdated>
 
             <LegalBody>
               <section>
                 <Paragraph>
-                  These Terms of Service (&quot;Terms&quot;) govern your access
-                  to and use of the Fich platform (&quot;Service&quot;). By
-                  creating an account or using the Service, you agree to be bound
-                  by these Terms. If you do not agree, do not use the Service.
+                  By checking the &quot;I Agree&quot; box, connecting your
+                  Binance API to fich.ai, or using our software in any
+                  capacity, you (the &quot;User&quot;) are entering into a
+                  legally binding agreement with fich.ai (the
+                  &quot;Company,&quot; &quot;we,&quot; &quot;us,&quot; or
+                  &quot;our&quot;).
                 </Paragraph>
-              </section>
-
-              <section>
-                <SectionHeading>1. Eligibility</SectionHeading>
                 <Paragraph>
-                  You must be at least 18 years old and legally permitted to use
-                  cryptocurrency trading services in your jurisdiction. By using
-                  Fich, you represent that you meet these requirements.
+                  Please read these Terms and Conditions carefully. If you do
+                  not agree with any part of these terms, do not connect your
+                  API or use our software.
                 </Paragraph>
               </section>
 
               <section>
-                <SectionHeading>2. Account Responsibilities</SectionHeading>
+                <SectionHeading>
+                  1. Nature of the Service (Software, Not Custody)
+                </SectionHeading>
+                <Paragraph>
+                  fich.ai provides cloud-based, algorithmic trade execution
+                  software designed to automate quantitative momentum
+                  strategies.
+                </Paragraph>
                 <List>
                   <ListItem>
-                    You are responsible for maintaining the confidentiality of
-                    your account credentials.
+                    <strong>100% Non-Custodial:</strong> We do not provide
+                    wallet services, nor do we hold, custody, or manage your
+                    digital assets. All funds remain entirely in your
+                    personal Binance account.
                   </ListItem>
                   <ListItem>
-                    You are responsible for all activity that occurs under your
-                    account.
-                  </ListItem>
-                  <ListItem>
-                    You must provide accurate and complete information during
-                    registration.
-                  </ListItem>
-                  <ListItem>
-                    You must notify us immediately if you suspect any
-                    unauthorised access to your account.
+                    <strong>API Permissions:</strong> You agree to provide a
+                    Binance API key with &quot;Read&quot; and &quot;Futures
+                    Trading&quot; permissions only. You agree that you will
+                    NEVER enable &quot;Withdrawal&quot; permissions on the
+                    API key provided to fich.ai. If you enable withdrawal
+                    permissions, you do so at your own absolute risk, and
+                    fich.ai accepts zero liability for any resulting loss
+                    of funds.
                   </ListItem>
                 </List>
               </section>
 
               <section>
-                <SectionHeading>3. Service Description</SectionHeading>
+                <SectionHeading>2. No Financial Advice</SectionHeading>
                 <Paragraph>
-                  Fich provides an automated portfolio rebalancing service for
-                  cryptocurrency assets. When you subscribe and connect a
-                  supported exchange account, the platform executes trades on
-                  your behalf based on predefined strategy signals. You
-                  acknowledge that:
+                  The algorithms, momentum strategies, historical backtests,
+                  and trade logs provided by fich.ai are for informational
+                  and execution purposes only.
                 </Paragraph>
                 <List>
                   <ListItem>
-                    Trades are executed automatically based on signals and your
-                    selected strategy.
+                    We are a software provider, not a registered investment
+                    advisor, broker, or financial planner.
                   </ListItem>
                   <ListItem>
-                    Trade execution depends on exchange availability, liquidity,
-                    and API access.
-                  </ListItem>
-                  <ListItem>
-                    Past performance does not guarantee future results.
+                    Nothing on the fich.ai website or dashboard constitutes
+                    personalized financial, investment, or legal advice. You
+                    are solely responsible for evaluating whether our
+                    algorithmic strategy aligns with your personal risk
+                    tolerance.
                   </ListItem>
                 </List>
               </section>
 
               <section>
-                <SectionHeading>4. Exchange API Keys</SectionHeading>
+                <SectionHeading>3. Absolute Assumption of Risk</SectionHeading>
                 <Paragraph>
-                  You grant Fich permission to use your exchange API keys solely
-                  to execute trades on your behalf. You must provide
-                  trade-only API keys (not withdrawal-enabled). Fich encrypts
-                  your API keys at rest and never exposes them in plaintext. You
-                  may disconnect your exchange at any time, which will
-                  immediately stop all trading activity.
+                  Cryptocurrency trading is highly speculative and involves a
+                  significant risk of loss. By using fich.ai, you explicitly
+                  acknowledge and accept the following risks:
                 </Paragraph>
-              </section>
-
-              <section>
-                <SectionHeading>5. Subscriptions & Payments</SectionHeading>
                 <List>
                   <ListItem>
-                    Access to trading features requires an active paid
-                    subscription.
+                    <strong>Total Loss of Capital:</strong> You can lose some
+                    or all of the funds connected to the API.
                   </ListItem>
                   <ListItem>
-                    Subscription fees are billed according to your selected plan
-                    and billing cycle.
+                    <strong>Historical Drawdowns:</strong> Our strategy takes
+                    calculated, systematic losses. You agree that sudden and
+                    severe drops in portfolio value (drawdowns) are a normal
+                    part of this strategy&apos;s mathematical execution.
                   </ListItem>
                   <ListItem>
-                    All payments are processed through third-party payment
-                    providers.
+                    <strong>Slippage and Fees:</strong> Real-world trading
+                    involves exchange fees and slippage (the difference
+                    between expected price and actual execution price). Your
+                    live results will always vary from anyone else&apos;s.
                   </ListItem>
                   <ListItem>
-                    You may cancel your subscription at any time. Cancellation
-                    takes effect at the end of the current billing period.
-                  </ListItem>
-                  <ListItem>
-                    We reserve the right to change pricing with reasonable
-                    notice.
+                    <strong>No Guarantees:</strong> Past performance—including
+                    our advertised historical CAGR of 107% or any total
+                    return percentages—is not a guarantee, prediction, or
+                    projection of future results.
                   </ListItem>
                 </List>
               </section>
 
               <section>
-                <SectionHeading>6. Risk Disclosure</SectionHeading>
+                <SectionHeading>
+                  4. Absolute Disclaimer of Liability and Waiver of Losses
+                </SectionHeading>
                 <Paragraph>
-                  Cryptocurrency trading involves substantial risk of loss. By
-                  using Fich, you acknowledge that you understand these risks.
-                  Please review our{" "}
-                  <a
-                    href="/risk-disclosure"
-                    style={{ color: "inherit", textDecoration: "underline" }}
-                  >
-                    Risk Disclosure
-                  </a>{" "}
-                  page for full details.
+                  <strong>READ CAREFULLY:</strong> By using the fich.ai
+                  software, you explicitly acknowledge and agree that
+                  fich.ai, its founders, developers, employees, and
+                  affiliates bear <strong>ZERO RESPONSIBILITY AND ZERO
+                  LIABILITY</strong> for any financial losses you may incur,
+                  regardless of the cause.
                 </Paragraph>
-              </section>
-
-              <section>
-                <SectionHeading>7. Limitation of Liability</SectionHeading>
                 <Paragraph>
-                  To the maximum extent permitted by law, Fich and its operators
-                  shall not be liable for any indirect, incidental, special, or
-                  consequential damages, including but not limited to loss of
-                  profits, data, or trading losses arising from your use of the
-                  Service. Our total liability shall not exceed the amount you
-                  paid for the Service during the twelve months preceding the
-                  claim.
+                  You explicitly agree that fich.ai is{" "}
+                  <strong>NOT liable</strong> for financial losses resulting
+                  from, but not limited to:
                 </Paragraph>
-              </section>
-
-              <section>
-                <SectionHeading>8. Prohibited Conduct</SectionHeading>
                 <List>
                   <ListItem>
-                    You may not use the Service for any unlawful purpose.
+                    <strong>Software and Algorithmic Errors:</strong> Bugs,
+                    glitches, calculation errors, logic failures, delayed
+                    executions, or unintended trades executed by the FICH
+                    algorithm.
                   </ListItem>
                   <ListItem>
-                    You may not attempt to interfere with, compromise, or disrupt
-                    the Service.
+                    <strong>Market Volatility:</strong> Sudden market
+                    crashes, flash crashes, lack of liquidity, extreme
+                    volatility, or the failure of the algorithm&apos;s
+                    defensive filters to rotate funds quickly enough.
                   </ListItem>
                   <ListItem>
-                    You may not reverse-engineer, decompile, or attempt to
-                    extract the source code of the platform.
+                    <strong>Third-Party Exchange Failures:</strong> Downtime,
+                    API rate limits, server crashes, trading halts,
+                    maintenance, or insolvency of Binance.
                   </ListItem>
                   <ListItem>
-                    You may not create multiple accounts to circumvent
-                    restrictions or abuse free trials.
+                    <strong>User Error:</strong> Incorrectly configuring API
+                    keys, manually interfering with bot trades, failing to
+                    use a dedicated Sub-Account, or failing to secure your
+                    account credentials.
+                  </ListItem>
+                  <ListItem>
+                    <strong>Network Outages:</strong> Server outages,
+                    internet service disruptions, or cloud provider failures
+                    that prevent the algorithm from executing trades.
                   </ListItem>
                 </List>
               </section>
 
               <section>
-                <SectionHeading>9. Termination</SectionHeading>
+                <SectionHeading>
+                  5. Subscription, Payments, and Refunds
+                </SectionHeading>
+                <List>
+                  <ListItem>
+                    <strong>Crypto-Native Billing:</strong> Subscriptions are
+                    paid month-to-month via cryptocurrency (e.g., USDC, USDT)
+                    using our designated decentralized payment gateways.
+                  </ListItem>
+                  <ListItem>
+                    <strong>Strict No-Refund Policy:</strong> Because we
+                    provide immediate access to proprietary software,
+                    algorithmic execution, and digital trade logs, all
+                    subscription payments are final and non-refundable.
+                  </ListItem>
+                  <ListItem>
+                    <strong>Cancellation:</strong> You may cancel your
+                    recurring subscription at any time. Your bot will simply
+                    cease executing trades at the end of your current active
+                    billing cycle. No prorated refunds will be issued.
+                  </ListItem>
+                </List>
+              </section>
+
+              <section>
+                <SectionHeading>
+                  6. User Account &amp; API Responsibilities
+                </SectionHeading>
                 <Paragraph>
-                  We may suspend or terminate your access to the Service at our
-                  discretion if you violate these Terms. You may terminate your
-                  account at any time by contacting support. Upon termination,
-                  your exchange connection will be removed and all trading
-                  activity will cease.
+                  You are solely responsible for maintaining the
+                  confidentiality of your API keys, your fich.ai account
+                  credentials, and the security of your underlying Binance
+                  account. fich.ai is not responsible for losses resulting
+                  from your failure to secure your own devices, emails, or
+                  exchange passwords. Furthermore, you are responsible for
+                  handling your own tax liabilities and reporting generated
+                  by the bot&apos;s trading activity.
                 </Paragraph>
               </section>
 
               <section>
-                <SectionHeading>10. Changes to These Terms</SectionHeading>
+                <SectionHeading>7. Intellectual Property</SectionHeading>
                 <Paragraph>
-                  We may update these Terms from time to time. Continued use of
-                  the Service after changes constitutes acceptance of the revised
-                  Terms. Material changes will be communicated via email or
-                  on-platform notification.
+                  The fich.ai algorithms, momentum engines, code, UI/UX, and
+                  historical data logs are the exclusive intellectual
+                  property of fich.ai. You are granted a limited,
+                  non-exclusive license to use the software. You may not
+                  copy, reverse-engineer, decompile, or distribute any part
+                  of our proprietary trading system.
                 </Paragraph>
               </section>
 
               <section>
-                <SectionHeading>11. Contact</SectionHeading>
+                <SectionHeading>8. Right to Terminate</SectionHeading>
                 <Paragraph>
-                  For questions about these Terms, contact us at{" "}
-                  <a
-                    href="mailto:support@fich.ai"
-                    style={{ color: "inherit", textDecoration: "underline" }}
-                  >
-                    support@fich.ai
-                  </a>
-                  .
+                  We reserve the right to suspend or terminate your access to
+                  the fich.ai platform at any time, without notice or refund,
+                  if we suspect you are violating these Terms, engaging in
+                  malicious activity against our servers, or attempting to
+                  reverse-engineer our proprietary algorithms.
+                </Paragraph>
+              </section>
+
+              <section>
+                <Paragraph>
+                  By proceeding and connecting your API key, you
+                  electronically sign and agree that you have read,
+                  understood, and accepted all the risks and terms outlined
+                  above.
                 </Paragraph>
               </section>
             </LegalBody>

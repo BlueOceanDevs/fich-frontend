@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toggleFaq } from "@/store/faqSlice";
 import { FaPlus } from "react-icons/fa";
@@ -16,14 +17,24 @@ import {
   FaqQuestion,
   FaqIcon,
   FaqAnswer,
+  ReadMoreRow,
+  ReadMoreLink,
 } from "./styles";
 
+// Homepage FAQ — shows only the 4 questions tagged
+// `featuredOnHomepage` in the slice, with a "Read more" link routing
+// to the full /faq page. Two-column layout matches the existing
+// design vocabulary.
 const FAQ: React.FC = () => {
   const dispatch = useAppDispatch();
   const { items, openId } = useAppSelector((s) => s.faq);
 
-  const leftItems = items.filter((_, i) => i % 2 === 0);
-  const rightItems = items.filter((_, i) => i % 2 !== 0);
+  // Slice's master list contains all 16 entries; filter to the
+  // homepage-featured subset.
+  const featured = items.filter((it) => it.featuredOnHomepage);
+
+  const leftItems = featured.filter((_, i) => i % 2 === 0);
+  const rightItems = featured.filter((_, i) => i % 2 !== 0);
 
   return (
     <Section id="faq">
@@ -37,7 +48,7 @@ const FAQ: React.FC = () => {
                 supported assets.
               </Subtitle>
             </HeaderLeft>
-            <CreateLink href="#">Create account now &rarr;</CreateLink>
+            <CreateLink href="/signup">Create account now &rarr;</CreateLink>
           </Header>
         </ScrollReveal>
 
@@ -81,6 +92,12 @@ const FAQ: React.FC = () => {
             </div>
           </FaqGrid>
         </ScrollReveal>
+
+        <ReadMoreRow>
+          <Link href="/faq" passHref legacyBehavior>
+            <ReadMoreLink>Read more &rarr;</ReadMoreLink>
+          </Link>
+        </ReadMoreRow>
       </Container>
     </Section>
   );

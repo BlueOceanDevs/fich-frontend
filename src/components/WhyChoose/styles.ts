@@ -6,9 +6,16 @@ export { Section } from "@/components/ui/Section";
 export { Container } from "@/components/ui/Section";
 export { SectionTitle } from "@/components/ui/Typography";
 
+// Centers title + subtitle as a block. Per the design ask: "Why Choose
+// Fich, How it Works, Choose your plan should be centered."
+export const SectionHeading = styled.div`
+  text-align: center;
+  margin-bottom: 60px;
+`;
+
 export const SectionSubtitle = styled(BaseSectionSubtitle)`
-  max-width: 420px;
-  margin: 0 auto 60px;
+  max-width: 540px;
+  margin: 12px auto 0;
 `;
 
 export const Card = styled(BaseCard)`

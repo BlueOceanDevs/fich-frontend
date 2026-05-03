@@ -1,14 +1,10 @@
 import Head from "next/head";
 import Layout from "@/components/Layout";
 import Hero from "@/components/Hero";
-import Tagline from "@/components/Tagline";
 import WhyChoose from "@/components/WhyChoose";
-import AllCryptos from "@/components/AllCryptos";
 import HowItWorks from "@/components/HowItWorks";
-import Testimonials from "@/components/Testimonials";
 import Pricing from "@/components/Pricing";
 import FAQ from "@/components/FAQ";
-import CTA from "@/components/CTA";
 
 export default function Home() {
   return (
@@ -28,14 +24,10 @@ export default function Home() {
       </Head>
       <Layout>
         <Hero />
-        <Tagline />
         <WhyChoose />
-        <AllCryptos />
         <HowItWorks />
-        <Testimonials />
         <Pricing />
         <FAQ />
-        <CTA />
       </Layout>
     </>
   );

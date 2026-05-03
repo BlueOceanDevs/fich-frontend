@@ -1,16 +1,16 @@
 import React from "react";
-import { FaUserPlus, FaWallet, FaExchangeAlt } from "react-icons/fa";
+import { FaUserPlus, FaEnvelopeOpenText, FaExchangeAlt } from "react-icons/fa";
 import ScrollReveal, { StaggerChildren } from "@/components/ScrollReveal";
 import {
   Section,
   Container,
   Header,
+  HeaderTextBlock,
   Title,
   Subtitle,
   CreateLink,
   StepsGrid,
   StepCard,
-  StepImage,
   StepIconWrapper,
   StepTitle,
   StepDescription,
@@ -18,24 +18,23 @@ import {
 
 const STEPS = [
   {
-    icon: <FaUserPlus size={24} />,
+    icon: <FaUserPlus size={20} />,
     title: "Create your account",
     description:
       "Sign up easily and securely. Set your profile in just a few clicks.",
     color: "#627EEA",
   },
   {
-    icon: <FaWallet size={24} />,
-    title: "Fund your wallet",
-    description:
-      "Deposit your crypto or make a transfer to start trading.",
+    icon: <FaEnvelopeOpenText size={20} />,
+    title: "Start receiving our newsletter",
+    description: "Weekly email with portfolio positions.",
     color: "#00D897",
   },
   {
-    icon: <FaExchangeAlt size={24} />,
-    title: "Buy, sell, or convert",
+    icon: <FaExchangeAlt size={20} />,
+    title: "Connect your Binance account",
     description:
-      "Enjoy the simplicity of a platform that makes every transaction seamless in real-time.",
+      "Connect your exchange API keys and follow our investment strategy on autopilot.",
     color: "#9945FF",
   },
 ];
@@ -46,14 +45,14 @@ const HowItWorks: React.FC = () => {
       <Container>
         <ScrollReveal>
           <Header>
-            <div>
+            <HeaderTextBlock>
               <Title>How It Works</Title>
               <Subtitle>
-                A simple, fast, and secure platform to manage your
-                crypto investments in just a few steps.
+                Believe in the potential of crypto? Fich is how you get the
+                best of it.
               </Subtitle>
-            </div>
-            <CreateLink href="#">
+            </HeaderTextBlock>
+            <CreateLink href="/signup">
               Create account now &rarr;
             </CreateLink>
           </Header>
@@ -62,11 +61,9 @@ const HowItWorks: React.FC = () => {
           <StepsGrid>
             {STEPS.map((step) => (
               <StepCard key={step.title}>
-                <StepImage>
-                  <StepIconWrapper $color={step.color}>
-                    {step.icon}
-                  </StepIconWrapper>
-                </StepImage>
+                <StepIconWrapper $color={step.color}>
+                  {step.icon}
+                </StepIconWrapper>
                 <StepTitle>{step.title}</StepTitle>
                 <StepDescription>{step.description}</StepDescription>
               </StepCard>

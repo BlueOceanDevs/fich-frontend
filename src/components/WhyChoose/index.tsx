@@ -1,9 +1,10 @@
 import React from "react";
-import { FaShieldAlt, FaBolt, FaChartLine, FaPalette } from "react-icons/fa";
+import { FaShieldAlt, FaBolt, FaUmbrella, FaChartLine } from "react-icons/fa";
 import ScrollReveal, { StaggerChildren } from "@/components/ScrollReveal";
 import {
   Section,
   Container,
+  SectionHeading,
   SectionTitle,
   SectionSubtitle,
   CardsGrid,
@@ -13,30 +14,40 @@ import {
   CardDescription,
 } from "./styles";
 
+// ─────────────────────────────────────────────
+// Why Choose Fich? — 4 value props
+// ─────────────────────────────────────────────
+//
+// Each icon is chosen to be visually distinct so the cards read at a
+// glance. Shield for Non-Custodial (your account is shielded from
+// us), bolt for Weekly Rebalancing (fast/automatic), umbrella for
+// Crash Protection (shelter from the storm — visually distinct from
+// the shield in card #1), chart-line for Verified Track Record (data
+// over time).
 const FEATURES = [
   {
     icon: <FaShieldAlt size={22} />,
-    title: "Maximum Security",
+    title: "100% Non-Custodial",
     description:
-      "Your assets are protected with cutting-edge security protocols.",
+      "Your capital never leaves your personal Binance account.",
   },
   {
     icon: <FaBolt size={22} />,
-    title: "Instant Transactions",
+    title: "Weekly Rebalancing",
     description:
-      "Execute your transactions in real-time, without delays.",
+      "Automatically rotate into the strongest altcoins every week.",
+  },
+  {
+    icon: <FaUmbrella size={22} />,
+    title: "Crash Protection",
+    description:
+      "We automatically move to cash when the market bleeds.",
   },
   {
     icon: <FaChartLine size={22} />,
-    title: "Optimized Fees",
+    title: "Verified Track Record",
     description:
-      "Benefit from some of the lowest fees on the market.",
-  },
-  {
-    icon: <FaPalette size={22} />,
-    title: "Premium Interface",
-    description:
-      "An intuitive design that's easy to use, even for beginners.",
+      "Six years of fully transparent, verifiable trade data.",
   },
 ];
 
@@ -45,11 +56,13 @@ const WhyChoose: React.FC = () => {
     <Section>
       <Container>
         <ScrollReveal>
-          <SectionTitle>Why Choose Fich?</SectionTitle>
-          <SectionSubtitle>
-            Carefully designed to provide a seamless, secure, and accessible
-            experience for all users.
-          </SectionSubtitle>
+          <SectionHeading>
+            <SectionTitle>Why Choose Fich?</SectionTitle>
+            <SectionSubtitle>
+              Built for serious investors who want exposure to the right
+              assets without watching charts every day.
+            </SectionSubtitle>
+          </SectionHeading>
         </ScrollReveal>
         <StaggerChildren staggerDelay={120} distance={30}>
           <CardsGrid>

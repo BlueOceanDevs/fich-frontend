@@ -3,13 +3,16 @@ import { fadeInUp } from "@/components/ui/animations";
 
 export { CTAButton as HeroButton } from "@/components/ui/Button";
 
+// "See historical performance" link uses the same green-pill anchor
+// shape as the main CTA — distinct from anything else on the page.
+export { CTAButton as HistoricalPerformanceButton } from "@/components/ui/Button";
+
 export const HeroSection = styled.section`
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 140px 24px 60px;
+  padding: 140px 24px 80px;
   text-align: center;
   position: relative;
   overflow: hidden;

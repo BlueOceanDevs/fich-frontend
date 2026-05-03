@@ -5,188 +5,120 @@ import {
   LegalSection,
   LegalContainer,
   LegalTitle,
-  LegalUpdated,
   LegalBody,
-  SectionHeading,
   Paragraph,
   List,
   ListItem,
 } from "@/components/Legal/styles";
 
+/**
+ * Public `/risk-disclosure` route — the platform's Absolute Disclaimer
+ * of Liability. The URL stays `/risk-disclosure` (referenced from
+ * Terms, Footer, and the OnboardingGuard whitelist) but the document
+ * displayed is the stronger "we accept zero liability" version.
+ */
 export default function RiskDisclosurePage() {
   return (
     <>
       <Head>
-        <title>Risk Disclosure - Fich</title>
+        <title>Disclaimer of Liability - Fich</title>
         <meta
           name="description"
-          content="Fich risk disclosure — understand the risks involved in automated cryptocurrency trading."
+          content="Fich absolute disclaimer of liability and waiver of losses — the legal terms you accept by using the platform."
         />
       </Head>
       <Layout>
         <LegalSection>
           <LegalContainer>
-            <LegalTitle>Risk Disclosure</LegalTitle>
-            <LegalUpdated>Last updated: April 13, 2026</LegalUpdated>
+            <LegalTitle>
+              Absolute Disclaimer of Liability and Waiver of Losses
+            </LegalTitle>
 
             <LegalBody>
               <section>
                 <Paragraph>
-                  This Risk Disclosure statement is provided in accordance with
-                  best practices for cryptocurrency services. Please read it
-                  carefully before using the Fich platform.
+                  <strong>READ CAREFULLY:</strong> By using the fich.ai
+                  software, you explicitly acknowledge and agree that
+                  fich.ai, its founders, developers, employees, and
+                  affiliates bear <strong>ZERO RESPONSIBILITY AND ZERO
+                  LIABILITY</strong> for any financial losses you may incur,
+                  regardless of the cause.
                 </Paragraph>
               </section>
 
               <section>
-                <SectionHeading>
-                  1. Cryptocurrency Trading Risks
-                </SectionHeading>
                 <Paragraph>
-                  Cryptocurrency trading involves a high degree of risk and is
-                  not suitable for all investors. The value of digital assets can
-                  fluctuate significantly, and you may lose some or all of your
-                  invested capital. You should not trade with money you cannot
-                  afford to lose.
+                  Trading cryptocurrency involves a high risk of total
+                  capital loss. fich.ai provides algorithmic execution
+                  software &quot;as is&quot; and &quot;as available.&quot;
+                  You are solely responsible for all trading decisions and
+                  the outcomes of using our automated tools.
                 </Paragraph>
               </section>
 
               <section>
-                <SectionHeading>2. Market Volatility</SectionHeading>
                 <Paragraph>
-                  Cryptocurrency markets are highly volatile. Prices can change
-                  rapidly in very short periods of time. This volatility may
-                  result in significant gains but also significant losses. Market
-                  conditions can change drastically due to regulatory news,
-                  technological developments, macroeconomic events, or changes in
-                  market sentiment.
+                  You explicitly agree that fich.ai is{" "}
+                  <strong>NOT liable</strong> for financial losses resulting
+                  from, but not limited to, the following reasons:
                 </Paragraph>
-              </section>
-
-              <section>
-                <SectionHeading>3. Automated Trading Risks</SectionHeading>
                 <List>
                   <ListItem>
-                    <strong>Strategy risk</strong> — The trading strategies used
-                    by Fich are based on predefined signals. No strategy is
-                    guaranteed to be profitable. Past performance is not
-                    indicative of future results.
+                    <strong>Software and Algorithmic Errors:</strong> Any
+                    bugs, glitches, calculation errors, logic failures,
+                    delayed executions, or unintended trades executed by the
+                    fich.ai algorithm or dashboard.
                   </ListItem>
                   <ListItem>
-                    <strong>Execution risk</strong> — Trades may not execute at
-                    the expected price due to slippage, low liquidity, or rapid
-                    market movements between signal generation and order
-                    placement.
+                    <strong>Market Volatility and Black Swan Events:</strong>{" "}
+                    Sudden market crashes, flash crashes, lack of liquidity,
+                    extreme volatility, or failure of the &quot;Cash
+                    Filter&quot; to rotate funds quickly enough to prevent
+                    portfolio drawdowns.
                   </ListItem>
                   <ListItem>
-                    <strong>Technical risk</strong> — Automated systems depend on
-                    software, network connectivity, and exchange API
-                    availability. System downtime, bugs, or exchange outages may
-                    prevent trades from executing or cause unexpected behaviour.
+                    <strong>Third-Party Exchange Failures:</strong> Downtime,
+                    API rate limits, server crashes, trading halts,
+                    maintenance, or insolvency of Binance or any other
+                    connected third-party exchange.
                   </ListItem>
                   <ListItem>
-                    <strong>Timing risk</strong> — Rebalancing occurs on a
-                    scheduled basis. Market conditions between rebalancing
-                    periods may change adversely.
+                    <strong>Execution Discrepancies:</strong> Slippage, high
+                    exchange trading fees, or differences between theoretical
+                    backtested results and live execution prices.
+                  </ListItem>
+                  <ListItem>
+                    <strong>User Error:</strong> Incorrectly configuring API
+                    keys, granting unauthorized withdrawal permissions,
+                    manually interfering with bot trades, or failing to
+                    secure your account credentials.
+                  </ListItem>
+                  <ListItem>
+                    <strong>Network and Infrastructure Outages:</strong>{" "}
+                    Server outages, internet service disruptions, or cloud
+                    provider failures that prevent the algorithm from
+                    reading market data or executing trades.
+                  </ListItem>
+                  <ListItem>
+                    <strong>Regulatory Actions:</strong> Freezing of assets,
+                    delisting of specific altcoins by the exchange, or
+                    government bans on cryptocurrency trading in your
+                    jurisdiction.
                   </ListItem>
                 </List>
               </section>
 
               <section>
-                <SectionHeading>4. Exchange Risks</SectionHeading>
                 <Paragraph>
-                  Fich connects to third-party exchanges (currently Binance) to
-                  execute trades. You are subject to the terms, risks, and
-                  policies of the exchange you use. Risks include but are not
-                  limited to:
-                </Paragraph>
-                <List>
-                  <ListItem>
-                    Exchange downtime or maintenance during trading periods.
-                  </ListItem>
-                  <ListItem>
-                    API rate limits that may delay or prevent trade execution.
-                  </ListItem>
-                  <ListItem>
-                    Changes to exchange policies, fees, or supported trading
-                    pairs.
-                  </ListItem>
-                  <ListItem>
-                    Exchange security breaches or insolvency events.
-                  </ListItem>
-                </List>
-              </section>
-
-              <section>
-                <SectionHeading>5. Binance USD-M Futures</SectionHeading>
-                <Paragraph>
-                  Fich executes trades on Binance USD-M Futures, but uses the
-                  platform purely for its larger symbol universe. All positions
-                  are opened at 1x leverage and are long-only — Fich never
-                  shorts and never takes leveraged exposure. Your risk profile
-                  is equivalent to holding the underlying assets on Spot. You
-                  must fund your USD-M Futures wallet (not your Spot wallet)
-                  with USDT for Fich to trade on your behalf.
-                </Paragraph>
-              </section>
-
-              <section>
-                <SectionHeading>6. Regulatory Risks</SectionHeading>
-                <Paragraph>
-                  Cryptocurrency regulations vary by jurisdiction and are subject
-                  to change. Regulatory actions may affect the legality, value,
-                  or transferability of digital assets. It is your responsibility
-                  to ensure that using Fich and trading cryptocurrencies complies
-                  with the laws of your jurisdiction.
-                </Paragraph>
-              </section>
-
-              <section>
-                <SectionHeading>7. No Financial Advice</SectionHeading>
-                <Paragraph>
-                  Fich does not provide investment, financial, legal, or tax
-                  advice. The information provided on this platform is for
-                  informational purposes only and should not be construed as a
-                  recommendation to buy, sell, or hold any digital asset. You
-                  should consult a qualified financial advisor before making any
-                  investment decisions.
-                </Paragraph>
-              </section>
-
-              <section>
-                <SectionHeading>8. No Guarantee of Returns</SectionHeading>
-                <Paragraph>
-                  Fich makes no guarantee of profits or returns. Performance
-                  statistics and historical data shown on the platform are
-                  provided for informational purposes and do not represent a
-                  promise of future performance. All trading is conducted at your
-                  own risk.
-                </Paragraph>
-              </section>
-
-              <section>
-                <SectionHeading>9. Your Responsibility</SectionHeading>
-                <Paragraph>
-                  By using Fich, you acknowledge that you have read and
-                  understood this Risk Disclosure. You accept full responsibility
-                  for your decision to use the platform and for any financial
-                  outcomes resulting from trades executed on your behalf. You
-                  should regularly monitor your exchange account and portfolio.
-                </Paragraph>
-              </section>
-
-              <section>
-                <SectionHeading>10. Contact</SectionHeading>
-                <Paragraph>
-                  If you have questions about the risks described here, please
-                  contact us at{" "}
-                  <a
-                    href="mailto:support@fich.ai"
-                    style={{ color: "inherit", textDecoration: "underline" }}
-                  >
-                    support@fich.ai
-                  </a>
-                  .
+                  <strong>THE BOTTOM LINE:</strong> fich.ai is an execution
+                  tool, not a guarantee of profit. If the software
+                  malfunctions, if the market crashes, or if the exchange
+                  goes offline, you may lose some or all of your money. By
+                  connecting your API, you agree that you are using this
+                  software entirely at your own risk and you permanently
+                  waive any right to sue, seek damages, or demand
+                  compensation from fich.ai for any negative financial
+                  outcomes.
                 </Paragraph>
               </section>
             </LegalBody>

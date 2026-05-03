@@ -63,6 +63,71 @@ export interface GoogleLoginRequest {
 }
 
 // ─────────────────────────────────────────────
+// Homepage performance (public, anonymous)
+// ─────────────────────────────────────────────
+//
+// Mirrors the backend `HomepagePerformanceDto`. Powers the hero block:
+// dynamic headline ("If you invested $X..."), 3-stat card (Annual
+// Return / Max DD / Sharpe), 3-line equity-curve chart, monthly-
+// returns table. Single fetch on hero mount; backend caches in Redis
+// with a 1-hour TTL so this is cheap to call.
+
+/** One point on the equity-curve chart. ISO date + 3 dollar values. */
+export interface EquityPointDto {
+  /** UTC month-start, e.g. "2020-01-01T00:00:00Z". */
+  date: string;
+  strategyValueUsd: number;
+  btcValueUsd: number;
+  ethValueUsd: number;
+}
+
+/**
+ * One year of monthly strategy returns + YTD aggregate. Each month is
+ * nullable — partial-year rows (e.g. current year through last
+ * complete month) leave future months as null. Stored as DECIMAL
+ * RATIOS (0.2640 = +26.40%); the FE multiplies by 100 for display.
+ */
+export interface MonthlyReturnsRowDto {
+  year: number;
+  jan: number | null;
+  feb: number | null;
+  mar: number | null;
+  apr: number | null;
+  may: number | null;
+  jun: number | null;
+  jul: number | null;
+  aug: number | null;
+  sep: number | null;
+  oct: number | null;
+  nov: number | null;
+  dec: number | null;
+  /** YTD = product of (1 + filled month) − 1. Null when all months null. */
+  ytd: number | null;
+}
+
+/**
+ * Single payload powering the entire hero performance block. Decimal
+ * ratios throughout: 1.14 = +114%, -0.68 = -68%.
+ */
+export interface HomepagePerformanceDto {
+  // Headline
+  baselineAmountUsd: number;          // 1000
+  baselineStartLabel: string;         // "Jan 2020"
+  currentValueUsd: number;            // 107758.94
+
+  // Stats card
+  annualReturnPct: number;            // 1.14 = +114%
+  maxDrawdownPct: number;             // -0.68 = -68%
+  sharpeRatio: number;                // 1.45
+
+  // Chart
+  equityCurve: EquityPointDto[];
+
+  // Monthly returns table
+  monthlyReturns: MonthlyReturnsRowDto[];
+}
+
+// ─────────────────────────────────────────────
 // Marketing-email unsubscribe (public, anonymous)
 // ─────────────────────────────────────────────
 

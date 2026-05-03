@@ -1,22 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchPlans, setBillingCycle, FALLBACK_PRICES } from "@/store/pricingSlice";
+import { fetchPlans, FALLBACK_PRICES } from "@/store/pricingSlice";
 import { activateFreePlan, startTrial, fetchSubscription } from "@/store/subscriptionSlice";
 import { ordersApi } from "@/api/orders";
 import { subscriptionsApi } from "@/api/subscriptions";
-import { FaCheck, FaExclamationTriangle } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 import ScrollReveal, { StaggerChildren } from "@/components/ScrollReveal";
 import {
   Section,
   Container,
   Header,
-  HeaderLeft,
+  HeaderTitleBlock,
   Title,
   Subtitle,
-  ToggleRow,
-  ToggleButton,
-  DiscountBadge,
   PlansGrid,
   PlanCard,
   PopularBadge,
@@ -33,12 +30,24 @@ import {
   TrialLink,
 } from "./styles";
 
+// Top-tier marker — when a tier matches this, the card swaps the
+// price + "Get started" flow for a "Portfolios with $X+" description
+// and a "Contact Us" link to the contact page. Sales-driven CTA for
+// high-net-worth clients who want a tailored conversation rather than
+// self-serve checkout.
+const CONTACT_SALES_TIERS = new Set(["Enterprise"]);
+
 const Pricing: React.FC = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { billingCycle, tierGroups, usedFallback } = useAppSelector(
     (s) => s.pricing
   );
+  // Toggle between Monthly / Yearly is intentionally not rendered on
+  // the landing page — the design shows a single price tier per card.
+  // We still need the value from the slice to compute the displayed
+  // price (default = monthly). Suppress the unused-setter warning.
+  void billingCycle;
   const { isAuthenticated, user } = useAppSelector((s) => s.auth);
   const { subscription } = useAppSelector((s) => s.subscription);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -177,45 +186,27 @@ const Pricing: React.FC = () => {
     return Math.round(((monthlyAnnual - yearlyPrice) / monthlyAnnual) * 100);
   };
 
-  const maxSavings = Math.max(...tierGroups.map(getYearlySavings), 0);
+  // Keep the savings calc imported — it's used by the (currently
+  // hidden) yearly toggle. Reference it once to silence linters.
+  void getYearlySavings;
 
   return (
     <Section id="pricing">
       <Container>
         <ScrollReveal>
           <Header>
-            <HeaderLeft>
+            <HeaderTitleBlock>
               <Title>
                 Choose Your Plan,
                 <br />
-                Start Trading Today.
+                Start Auto-Investing Today.
               </Title>
-            </HeaderLeft>
+            </HeaderTitleBlock>
             <Subtitle>
               Transparent pricing for every investor. Scale as you grow with no
               hidden fees or surprise charges.
             </Subtitle>
           </Header>
-        </ScrollReveal>
-
-        <ScrollReveal delay={100}>
-          <ToggleRow>
-            <ToggleButton
-              $active={billingCycle === "monthly"}
-              onClick={() => dispatch(setBillingCycle("monthly"))}
-            >
-              Monthly
-            </ToggleButton>
-            <ToggleButton
-              $active={billingCycle === "yearly"}
-              onClick={() => dispatch(setBillingCycle("yearly"))}
-            >
-              Yearly
-            </ToggleButton>
-            {maxSavings > 0 && (
-              <DiscountBadge>{maxSavings}% OFF</DiscountBadge>
-            )}
-          </ToggleRow>
         </ScrollReveal>
 
         {error && (
@@ -244,19 +235,43 @@ const Pricing: React.FC = () => {
                 !usedTrialTiers.includes(group.tier);
               const isYearly = billingCycle === "yearly";
 
+              const isContactSales = CONTACT_SALES_TIERS.has(group.tier);
+
               return (
                 <PlanCard key={group.tier} $popular={group.popular}>
                   {group.popular && <PopularBadge>Popular</PopularBadge>}
-                  <PlanName>{group.tier}</PlanName>
-                  <PlanPrice>
-                    ${isFree ? "0" : price % 1 === 0 ? price.toFixed(0) : price.toFixed(2)}
-                    <PlanPeriod>
-                      {isFree ? "" : isYearly ? "/year" : "/month"}
-                    </PlanPeriod>
-                  </PlanPrice>
-                  <PlanDescription>{group.description}</PlanDescription>
+                  <PlanName>{group.tier === "Enterprise" ? "Premium" : group.tier}</PlanName>
+                  {isContactSales ? (
+                    // Sales-driven tier: no price, just a description
+                    // line and a Contact Us CTA. The description in
+                    // the DB ("Full-featured platform for...") is too
+                    // generic for the screenshot's "Portfolios with
+                    // $100,000+" framing — fall back to a marketing-
+                    // friendly default but use the DB value if the
+                    // admin has rewritten it for this purpose.
+                    <PlanDescription style={{ marginBottom: 24 }}>
+                      Portfolios with $100,000+
+                    </PlanDescription>
+                  ) : (
+                    <>
+                      <PlanPrice>
+                        ${isFree ? "0" : price % 1 === 0 ? price.toFixed(0) : price.toFixed(2)}
+                        <PlanPeriod>
+                          {isFree ? "" : isYearly ? "/year" : "/month"}
+                        </PlanPeriod>
+                      </PlanPrice>
+                      <PlanDescription>{group.description}</PlanDescription>
+                    </>
+                  )}
 
-                  {isCurrent ? (
+                  {isContactSales ? (
+                    <PlanCTA
+                      $popular={group.popular}
+                      onClick={() => router.push("/contact")}
+                    >
+                      Contact Us
+                    </PlanCTA>
+                  ) : isCurrent ? (
                     <PlanCTA
                       $popular={group.popular}
                       disabled

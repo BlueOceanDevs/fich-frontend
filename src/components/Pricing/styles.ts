@@ -3,13 +3,36 @@ import { SectionSubtitle } from "@/components/ui/Typography";
 
 export { Section } from "@/components/ui/Section";
 export { Container } from "@/components/ui/Section";
-export { SectionHeader as Header } from "@/components/ui/Section";
-export { SectionHeaderLeft as HeaderLeft } from "@/components/ui/Section";
 export { SectionTitle as Title } from "@/components/ui/Typography";
 
+// Two-column header at desktop: title block on the left, subtitle on
+// the right (aligned to the bottom so the type baselines line up).
+// Stacks vertically on mobile.
+export const Header = styled.div`
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 48px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
+export const HeaderTitleBlock = styled.div`
+  flex: 1 1 auto;
+`;
+
 export const Subtitle = styled(SectionSubtitle)`
-  max-width: 380px;
-  padding-top: 8px;
+  max-width: 360px;
+  margin: 0;
+  text-align: right;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    text-align: left;
+  }
 `;
 
 export const ToggleRow = styled.div`

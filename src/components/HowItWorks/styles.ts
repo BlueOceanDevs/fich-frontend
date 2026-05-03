@@ -4,18 +4,39 @@ import { IconSquare } from "@/components/ui/IconWrapper";
 
 export { Section } from "@/components/ui/Section";
 export { Container } from "@/components/ui/Section";
-export { SectionHeader as Header } from "@/components/ui/Section";
 export { SectionTitle as Title } from "@/components/ui/Typography";
 export { SubtleLink as CreateLink } from "@/components/ui/Link";
 
+// Header is a two-column flex row at desktop: title + subtitle on the
+// left, "Create account now →" link on the right (same baseline). On
+// mobile it stacks vertically with the link last.
+export const Header = styled.div`
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 48px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
+export const HeaderTextBlock = styled.div`
+  flex: 1;
+`;
+
 export const Subtitle = styled(SectionSubtitle)`
-  max-width: 450px;
+  margin-top: 12px;
+  max-width: 540px;
 `;
 
 export const StepIconWrapper = styled(IconSquare)`
-  width: 64px;
-  height: 64px;
+  width: 44px;
+  height: 44px;
   border-radius: ${({ theme }) => theme.borderRadius.md};
+  margin-bottom: 28px;
 `;
 
 export const StepsGrid = styled.div`
@@ -28,37 +49,30 @@ export const StepsGrid = styled.div`
   }
 `;
 
+// Each step is a single card with the icon at the top, then title +
+// description. No separate image/photo area — the screenshot shows
+// the icon directly inside the card.
 export const StepCard = styled.div`
   background: ${({ theme }) => theme.colors.card};
   border: 1px solid ${({ theme }) => theme.colors.cardBorder};
   border-radius: ${({ theme }) => theme.borderRadius.md};
-  overflow: hidden;
-  transition: border-color 0.3s;
+  padding: 24px;
+  transition: border-color 0.3s, transform 0.3s;
 
   &:hover {
     border-color: ${({ theme }) => theme.colors.primary};
+    transform: translateY(-2px);
   }
-`;
-
-export const StepImage = styled.div`
-  width: 100%;
-  height: 180px;
-  background: ${({ theme }) => theme.colors.backgroundLight};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
 `;
 
 export const StepTitle = styled.h3`
   font-size: 16px;
   font-weight: 600;
-  padding: 20px 20px 8px;
+  margin-bottom: 8px;
 `;
 
 export const StepDescription = styled.p`
   font-size: 13px;
   color: ${({ theme }) => theme.colors.textSecondary};
-  padding: 0 20px 24px;
   line-height: 1.6;
 `;
