@@ -62,31 +62,7 @@ export const ListItem = styled.li`
   color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
-export const ContactCard = styled.div`
-  padding: 28px;
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-export const ContactLabel = styled.span`
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.textMuted};
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-`;
-
-export const ContactValue = styled.a`
-  font-size: 15px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.primary};
-  text-decoration: none;
-  transition: opacity 0.2s;
-
-  &:hover {
-    opacity: 0.8;
-  }
-`;
+// `ContactCard` / `ContactLabel` / `ContactValue` were declared here
+// but never imported anywhere — dead code. Removed alongside the
+// contact-form simplification. Live contact-info styling lives in
+// `Legal/contactStyles.ts` (ContactInfoGrid / ContactInfoItem / etc).
