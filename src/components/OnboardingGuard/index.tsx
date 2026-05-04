@@ -5,8 +5,23 @@ import { userApi } from "@/api/user";
 import { SpinnerLarge } from "@/components/ui/Button";
 
 /**
- * Pages that don't require onboarding completion.
- * Public pages, the setup flow itself, and auth pages are excluded.
+ * Pages that don't require onboarding completion. A logged-in user
+ * who hasn't finished onboarding visiting any of these paths is
+ * allowed through (no /setup redirect). Categories covered:
+ *
+ *   - Auth flow: /login, /signup, /forgot-password, /reset-password,
+ *     /confirm-email
+ *   - Public marketing pages: /, /performance, /faq, /contact,
+ *     /plans
+ *   - Legal documents: /privacy-policy, /terms, /risk-disclosure
+ *   - User self-management: /setup (and sub-routes), /profile
+ *   - Payment redirects: /payment/success, /payment/cancel
+ *   - Public token-driven flows: /unsubscribe (HMAC token from email
+ *     footer; recipient may not be the logged-in user, must work
+ *     regardless of session state)
+ *
+ * Anything NOT on this list, when visited by an authenticated user
+ * with incomplete onboarding, force-redirects to /setup.
  */
 const EXEMPT_PATHS = [
   "/",
@@ -22,6 +37,9 @@ const EXEMPT_PATHS = [
   "/terms",
   "/risk-disclosure",
   "/contact",
+  "/performance",
+  "/faq",
+  "/unsubscribe",
   "/payment/success",
   "/payment/cancel",
 ];
