@@ -3,53 +3,32 @@ import { useRouter } from "next/router";
 import { useAppSelector } from "@/store/hooks";
 import { userApi } from "@/api/user";
 import { SpinnerLarge } from "@/components/ui/Button";
+import { isPublicPath } from "@/utils/publicPaths";
 
-/**
- * Pages that don't require onboarding completion. A logged-in user
- * who hasn't finished onboarding visiting any of these paths is
- * allowed through (no /setup redirect). Categories covered:
- *
- *   - Auth flow: /login, /signup, /forgot-password, /reset-password,
- *     /confirm-email
- *   - Public marketing pages: /, /performance, /faq, /contact,
- *     /plans
- *   - Legal documents: /privacy-policy, /terms, /risk-disclosure
- *   - User self-management: /setup (and sub-routes), /profile
- *   - Payment redirects: /payment/success, /payment/cancel
- *   - Public token-driven flows: /unsubscribe (HMAC token from email
- *     footer; recipient may not be the logged-in user, must work
- *     regardless of session state)
- *
- * Anything NOT on this list, when visited by an authenticated user
- * with incomplete onboarding, force-redirects to /setup.
- */
-const EXEMPT_PATHS = [
-  "/",
-  "/login",
-  "/signup",
-  "/forgot-password",
-  "/reset-password",
-  "/confirm-email",
-  "/plans",
-  "/setup",
-  "/profile",
-  "/privacy-policy",
-  "/terms",
-  "/risk-disclosure",
-  "/contact",
-  "/performance",
-  "/faq",
-  "/unsubscribe",
-  "/payment/success",
-  "/payment/cancel",
-];
+// Pages exempt from the "redirect to /setup if onboarding incomplete"
+// check are: every public path (defined in utils/publicPaths.ts) +
+// the bare /setup page + /profile.
+//
+//   - Public paths (homepage, /performance, /faq, /contact, /plans,
+//     /terms, /privacy-policy, /risk-disclosure, /unsubscribe, all
+//     auth-flow pages, payment-return URLs) come from the shared
+//     utility — same list the API client checks before bouncing
+//     unauthenticated visitors to /login. Sharing the list keeps the
+//     two guards from drifting out of sync (the previous local
+//     copies had drifted, missing /performance and /faq, which is
+//     what surfaced the original bug).
+//
+//   - `/setup` (the bare path, no trailing slash) is the redirect
+//     TARGET — it must be exempt to avoid a redirect loop. Sub-paths
+//     under `/setup/` are matched by isPublicPath()'s prefix rule.
+//
+//   - `/profile` is exempt so users mid-onboarding can update their
+//     account info (or sign out) without getting kicked back to
+//     setup.
+const ONBOARDING_EXEMPT_EXTRA: readonly string[] = ["/setup", "/profile"];
 
 function isExempt(path: string): boolean {
-  // Exact match or starts with /setup (covers /setup/connect-exchange etc.)
-  return (
-    EXEMPT_PATHS.includes(path) ||
-    path.startsWith("/setup/")
-  );
+  return isPublicPath(path) || ONBOARDING_EXEMPT_EXTRA.includes(path);
 }
 
 /**

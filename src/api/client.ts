@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import type { ApiResponse } from "./types";
+import { isPublicPath } from "@/utils/publicPaths";
 
 // ─────────────────────────────────────────────
 // Axios instance
@@ -26,23 +27,17 @@ export function setOnAuthExpired(cb: () => void) {
 }
 
 // ─────────────────────────────────────────────
-// Public pages that should NOT redirect on 401
+// Public-page check — uses the centralized list in
+// utils/publicPaths.ts so we don't drift from the OnboardingGuard's
+// version (the previous local copy was missing /contact, /performance,
+// /faq, /plans, /terms, /privacy-policy, /risk-disclosure — which
+// caused unauthenticated visitors to those pages to get bounced to
+// /login after the bootstrap fetchUser() returned 401).
 // ─────────────────────────────────────────────
-
-const PUBLIC_PATHS = [
-  "/",
-  "/login",
-  "/signup",
-  "/forgot-password",
-  "/reset-password",
-  "/confirm-email",
-  "/unsubscribe",
-];
 
 function isPublicPage(): boolean {
   if (typeof window === "undefined") return true;
-  const path = window.location.pathname;
-  return PUBLIC_PATHS.some((p) => path === p || path.startsWith("/#"));
+  return isPublicPath(window.location.pathname);
 }
 
 // ─────────────────────────────────────────────
