@@ -164,19 +164,31 @@ export const TableScroll = styled.div`
 `;
 
 export const ReturnsTable = styled.table`
-  /* No min-width on desktop — let the table fit the card. The cell
-     padding/font is tuned so the widest YTD values (like "1214%")
-     still fit within the ~830px parent. On mobile we drop a min-
-     width to keep the columns legible and let the parent scroll. */
+  /* table-layout: fixed forces the table to honour width: 100% and
+     distribute column space evenly regardless of content size,
+     guaranteeing YTD is always visible within the parent card on
+     desktop. On narrow viewports (< sm), we re-introduce a minimum
+     width so columns stay legible and the parent scrolls.
+
+     Cell formatting (no plus sign, no percent suffix, dynamic
+     decimals) keeps even the widest values like "1214" inside
+     their column. */
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+  table-layout: fixed;
   font-size: 12px;
   color: ${({ theme }) => theme.colors.text};
   background: transparent;
-  table-layout: auto;
+
+  /* Year column slightly wider to fit "2026"; months get equal
+     width; YTD slightly wider since it can hit "1214". */
+  col.year { width: 7%; }
+  col.month { width: 6.5%; }
+  col.ytd { width: 9%; }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    table-layout: auto;
     min-width: 720px;
     font-size: 11px;
   }
@@ -187,18 +199,21 @@ export const TableHead = styled.thead`
 
   th {
     text-align: right;
-    padding: 8px 6px;
+    padding: 8px 4px;
     font-weight: 600;
     font-size: 11px;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.3px;
     text-transform: uppercase;
     color: ${({ theme }) => theme.colors.textSecondary};
     background: ${({ theme }) => theme.colors.backgroundLight};
     border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   th:first-child {
     text-align: left;
+    padding-left: 10px;
     border-top-left-radius: ${({ theme }) => theme.borderRadius.md};
     border-bottom-left-radius: 0;
   }
@@ -207,16 +222,19 @@ export const TableHead = styled.thead`
     border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
     color: ${({ theme }) => theme.colors.text};
     border-top-right-radius: ${({ theme }) => theme.borderRadius.md};
+    padding-right: 10px;
   }
 `;
 
 export const TableBody = styled.tbody`
   td {
     text-align: right;
-    padding: 8px 6px;
+    padding: 8px 4px;
     border-bottom: 1px solid ${({ theme }) => theme.colors.divider};
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     background: ${({ theme }) => theme.colors.card};
   }
   td:first-child {

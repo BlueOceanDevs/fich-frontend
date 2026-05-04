@@ -21,22 +21,24 @@ const MONTH_LABELS = [
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ] as const;
 
-// Format a decimal ratio cell. Compact width-aware formatting so all
-// 14 columns (Year + 12 months + YTD) fit in the parent card without
-// horizontal scroll on desktop:
+// Format a decimal ratio cell. Aggressively compact so all 14 columns
+// (Year + 12 months + YTD) fit in the ~830px parent card without
+// horizontal scroll:
 //   - null → "—" (em-dash, future month)
-//   - |val| ≥ 100% → no decimals: "+1214%" / "-105%"
-//   - |val| < 100%  → 2 decimals: "+26.40%" / "-36.06%"
-//   - Sign omitted for positives in compact mode is tempting, but we
-//     keep it because the green/red color is the primary signal and
-//     the explicit "+" reads cleaner alongside negatives.
+//   - "+" prefix dropped — color (green/red) is the primary signal
+//     and saves 1 character per positive cell
+//   - "%" suffix dropped — the table title "Monthly returns" already
+//     implies these are percentages; saves 1 character per cell
+//   - |val| ≥ 100% → no decimals (e.g. "1214" / "-105")
+//   - 10 ≤ |val| < 100 → 1 decimal (e.g. "26.4")
+//   - |val| < 10 → 2 decimals (e.g. "0.46" / "-0.78")
+// Negative sign always shown.
 function formatCell(value: number | null): string {
   if (value == null) return "—";
   const pct = value * 100;
-  const sign = pct > 0 ? "+" : "";
   const abs = Math.abs(pct);
-  const decimals = abs >= 100 ? 0 : 2;
-  return `${sign}${pct.toFixed(decimals)}%`;
+  const decimals = abs >= 100 ? 0 : abs >= 10 ? 1 : 2;
+  return pct.toFixed(decimals);
 }
 
 // Pull a row's value for column index 0..11 (Jan..Dec).
@@ -63,9 +65,24 @@ const MonthlyReturnsTable: React.FC<Props> = ({ rows }) => {
 
   return (
     <TableCard>
-      <TableTitle>Monthly returns</TableTitle>
+      <TableTitle>Monthly returns (%)</TableTitle>
       <TableScroll>
         <ReturnsTable>
+          {/*
+            Column-width hints used by `table-layout: fixed` in
+            styles.ts. Year and YTD get a hair more room than the
+            month columns; everything's relative so it scales with
+            the parent card width. Without these hints the table
+            would split the available width equally — fine, but
+            this gives YTD breathing room for "1214"-class values.
+          */}
+          <colgroup>
+            <col className="year" />
+            {MONTH_LABELS.map((m) => (
+              <col key={m} className="month" />
+            ))}
+            <col className="ytd" />
+          </colgroup>
           <TableHead>
             <tr>
               <th>Year</th>
