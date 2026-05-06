@@ -27,18 +27,21 @@ const MONTH_LABELS = [
 //   - null → "—" (em-dash, future month)
 //   - "+" prefix dropped — color (green/red) is the primary signal
 //     and saves 1 character per positive cell
-//   - "%" suffix dropped — the table title "Monthly returns" already
-//     implies these are percentages; saves 1 character per cell
+//   - "%" suffix dropped on month cells — the table title
+//     "Monthly returns (%)" already implies units; saves 1 char each
+//   - "%" suffix KEPT on YTD cells — the YTD column is wider (9% vs
+//     6.5% for months) and is the headline figure for each year, so
+//     making the unit explicit there reads cleaner
 //   - |val| ≥ 100% → no decimals (e.g. "1214" / "-105")
 //   - 10 ≤ |val| < 100 → 1 decimal (e.g. "26.4")
 //   - |val| < 10 → 2 decimals (e.g. "0.46" / "-0.78")
 // Negative sign always shown.
-function formatCell(value: number | null): string {
+function formatCell(value: number | null, withPctSuffix = false): string {
   if (value == null) return "—";
   const pct = value * 100;
   const abs = Math.abs(pct);
   const decimals = abs >= 100 ? 0 : abs >= 10 ? 1 : 2;
-  return pct.toFixed(decimals);
+  return `${pct.toFixed(decimals)}${withPctSuffix ? "%" : ""}`;
 }
 
 // Pull a row's value for column index 0..11 (Jan..Dec).
@@ -104,8 +107,12 @@ const MonthlyReturnsTable: React.FC<Props> = ({ rows }) => {
                     </ReturnCell>
                   );
                 })}
-                {/* YTD also color-coded — bold via td:last-child rule. */}
-                <ReturnCell $value={row.ytd}>{formatCell(row.ytd)}</ReturnCell>
+                {/* YTD also color-coded — bold via td:last-child rule.
+                    Renders with explicit "%" suffix (the YTD column
+                    is wider and is the headline figure per year). */}
+                <ReturnCell $value={row.ytd}>
+                  {formatCell(row.ytd, /* withPctSuffix */ true)}
+                </ReturnCell>
               </tr>
             ))}
           </TableBody>
