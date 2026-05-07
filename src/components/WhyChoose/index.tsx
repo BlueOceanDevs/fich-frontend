@@ -53,7 +53,7 @@ const FEATURES = [
 
 const WhyChoose: React.FC = () => {
   return (
-    <Section>
+    <Section id="why-fich">
       <Container>
         <ScrollReveal>
           <SectionHeading>

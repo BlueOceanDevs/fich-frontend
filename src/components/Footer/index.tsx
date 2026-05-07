@@ -32,11 +32,18 @@ const Footer: React.FC = () => {
 
           <FooterColumn>
             <FooterColumnTitle>Navigation</FooterColumnTitle>
-            <FooterLink href="#hero">Why Fich?</FooterLink>
-            <FooterLink href="#how-it-works">How it works</FooterLink>
-            <FooterLink href="#testimonials">Testimonials</FooterLink>
-            <FooterLink href="#pricing">Pricing</FooterLink>
-            <FooterLink href="#faq">FAQ</FooterLink>
+            {/* All anchor-style links must use the absolute "/#x"
+                form, NOT bare "#x". Bare hash links resolve relative
+                to the current path — clicking "Pricing" from /contact
+                used to land on "/contact#pricing" (no-op). The "/"
+                prefix forces the browser to navigate to the homepage
+                first, then scroll to the anchor. */}
+            <FooterLink href="/#why-fich">Why Fich?</FooterLink>
+            <FooterLink href="/#how-it-works">How it works</FooterLink>
+            <FooterLink href="/#pricing">Pricing</FooterLink>
+            {/* FAQ has its own dedicated page now, not a homepage
+                anchor — match the navbar. */}
+            <FooterLink href="/faq">FAQ</FooterLink>
             <FooterLink href="/contact">Contact</FooterLink>
           </FooterColumn>
 

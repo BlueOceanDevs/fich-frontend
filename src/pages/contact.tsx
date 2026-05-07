@@ -23,7 +23,7 @@ import {
  * backend endpoint. The "Contact Us" navbar link, the footer link,
  * and the Premium-tier pricing CTA all route here. Users who want
  * to reach the team click the email link, which opens their default
- * mail client with `support@fich.ai` pre-filled.
+ * mail client with `contact@fich.ai` pre-filled.
  */
 export default function ContactPage() {
   return (
@@ -53,8 +53,8 @@ export default function ContactPage() {
                   </ContactInfoIcon>
                   <ContactInfoText>
                     <ContactInfoTitle>Email</ContactInfoTitle>
-                    <InfoValue href="mailto:support@fich.ai">
-                      support@fich.ai
+                    <InfoValue href="mailto:contact@fich.ai">
+                      contact@fich.ai
                     </InfoValue>
                   </ContactInfoText>
                 </ContactInfoItem>

@@ -177,10 +177,10 @@ export default function PrivacyPolicyPage() {
                   If you have questions about this Privacy Policy, please contact
                   us at{" "}
                   <a
-                    href="mailto:support@fich.ai"
+                    href="mailto:contact@fich.ai"
                     style={{ color: "inherit", textDecoration: "underline" }}
                   >
-                    support@fich.ai
+                    contact@fich.ai
                   </a>
                   .
                 </Paragraph>
