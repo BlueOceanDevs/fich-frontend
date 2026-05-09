@@ -128,6 +128,112 @@ export interface HomepagePerformanceDto {
 }
 
 // ─────────────────────────────────────────────
+// Rich /performance page DTOs
+// ─────────────────────────────────────────────
+//
+// The public performance page has its own richer payload (6 stats
+// instead of 3, plus winners/losers/cash%/per-week breakdowns).
+// Mirror of backend `PerformancePageDto` and `WeekDetailDto`.
+
+/**
+ * Period selector values. Default `Inception` shows the full
+ * backtest. The 4 trailing-window values use the latest weekly row
+ * as the anchor (not "today") so the period stays stable as data
+ * extends.
+ */
+// NB: name differs from the existing dashboard `PerformancePeriod`
+// (which has OneDay/SevenDays/OneMonth/etc. values for the user's
+// own portfolio chart). The public /performance page deals in
+// trailing-year windows over the audited backtest, so it gets its
+// own type. Backend C# enum is `PerformancePeriod` (no namespace
+// clash there).
+export type PerformancePagePeriod =
+  | "Inception"
+  | "ThreeYears"
+  | "TwoYears"
+  | "OneYear"
+  | "SixMonths";
+
+/**
+ * Headline stats — period-aware. Nullable fields render as "—" in
+ * the UI when the underlying weekly metric isn't populated.
+ */
+export interface PerformancePageStatsDto {
+  /** CAGR as PERCENT, e.g. 110.0. */
+  annualReturnPct: number | null;
+  /** NEGATIVE percent, e.g. -65.0. */
+  maxDrawdownPct: number | null;
+  sharpeRatio: number | null;
+  /** Profitable weeks as PERCENT of weeks in the period. */
+  profitableWeeksPct: number | null;
+  calmarRatio: number | null;
+  profitFactor: number | null;
+}
+
+/** One row in the top-winners or top-losers table. */
+export interface ClosedTradeDto {
+  symbol: string;
+  buyPrice: number;
+  sellPrice: number;
+  buyDate: string;       // ISO datetime
+  sellDate: string;      // ISO datetime
+  /** P&L as PERCENT, e.g. +786.71. */
+  profitPnlPercent: number;
+}
+
+/** One point on the all-time Cash% chart. */
+export interface CashPctPointDto {
+  /** ISO date "yyyy-MM-dd". */
+  date: string;
+  /** Cash as PERCENT of equity, e.g. 5.49. */
+  cashPct: number;
+}
+
+/** Full payload for `GET /Performance/Page?period=...`. */
+export interface PerformancePageDto {
+  period: PerformancePagePeriod;
+  stats: PerformancePageStatsDto;
+  equityCurve: EquityPointDto[];
+  monthlyReturns: MonthlyReturnsRowDto[];
+  topWinners: ClosedTradeDto[];
+  topLosers: ClosedTradeDto[];
+  cashPctSeries: CashPctPointDto[];
+  /** ISO dates "yyyy-MM-dd", descending — drives the dropdown. */
+  availableWeeks: string[];
+  /** ISO date or null. Default value of the week selector on first load. */
+  latestWeek: string | null;
+}
+
+/** One slice of the donut chart on a week's view. */
+export interface PieSliceDto {
+  /** Asset symbol or "Cash (BNFCR)". */
+  label: string;
+  /** Slice weight as PERCENT, e.g. 24.2. */
+  weightPct: number;
+  /** True for the cash slice — FE renders with the neutral colour. */
+  isCash: boolean;
+}
+
+/** One row in the weekly BUYs and SELLs table. */
+export interface WeeklyTradeDto {
+  /** ISO datetime. */
+  tradeDate: string;
+  /** "BUY" or "SELL". */
+  type: string;
+  symbol: string;
+  price: number;
+  /** Already converted to PERCENT (e.g. 9.03 = 9.03 %) on the wire. */
+  costPctBalance: number;
+}
+
+/** Payload for `GET /Performance/Week/{weekEndDate}`. */
+export interface WeekDetailDto {
+  weekEndDate: string;
+  pieSlices: PieSliceDto[];
+  trades: WeeklyTradeDto[];
+}
+
+// ─────────────────────────────────────────────
 // Marketing-email unsubscribe (public, anonymous)
 // ─────────────────────────────────────────────
 

@@ -19,6 +19,101 @@ export const PerfBlockWrapper = styled.div`
   margin-right: auto;
 `;
 
+// ── Public /performance page chrome ──
+//
+// Wider than the homepage hero block (the page renders winners/losers
+// side-by-side on desktop, which needs more room). Each section gets
+// a card wrapper + a left-aligned title.
+
+export const PageWrapper = styled.div`
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 64px 24px 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    padding: 32px 16px 64px;
+    gap: 20px;
+  }
+`;
+
+export const SectionCard = styled.section`
+  background: ${({ theme }) => theme.colors.card};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  padding: 24px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    padding: 16px;
+  }
+`;
+
+export const SectionHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+`;
+
+export const SectionTitle = styled.h3`
+  font-size: 18px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+  margin: 0;
+`;
+
+export const PageTitle = styled.h1`
+  font-size: 36px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.text};
+  text-align: center;
+  margin: 0 0 6px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 28px;
+  }
+`;
+
+export const PageSubtitle = styled.p`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  text-align: center;
+  margin: 0 auto 24px;
+  max-width: 640px;
+  line-height: 1.6;
+`;
+
+export const TwoColumn = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const LoadingWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-size: 14px;
+`;
+
+export const ErrorWrap = styled.div`
+  text-align: center;
+  padding: 32px 16px;
+  color: ${({ theme }) => theme.colors.danger};
+  font-size: 14px;
+`;
+
 // ── "If you invested $X in {Month} {Year} you would now have $Y" ──
 
 export const HeadlineCallout = styled.div`
