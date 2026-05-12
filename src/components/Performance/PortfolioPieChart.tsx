@@ -80,7 +80,14 @@ const PortfolioPieChart: React.FC<Props> = ({ slices }) => {
                 color: theme.colors.text,
                 fontSize: 13,
               }}
-              formatter={(value: any) => [`${Number(value).toFixed(2)}%`, ""]}
+              // Show the slice label (e.g. "SUNUSDT") as the metric
+              // name with the percent as the value. Recharts renders
+              // this as "SUNUSDT : 31.47%" — the symbol is the
+              // primary information so it leads the tooltip.
+              formatter={(value: any, _name: any, item: any) => [
+                `${Number(value).toFixed(2)}%`,
+                item?.payload?.label ?? "",
+              ]}
             />
           </PieChart>
         </ResponsiveContainer>
