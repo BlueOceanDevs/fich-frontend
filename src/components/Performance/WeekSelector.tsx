@@ -52,7 +52,12 @@ const Select = styled.select`
   /* Right padding leaves room for the bigger chevron. */
   padding: 10px 44px 10px 16px;
   border-radius: ${({ theme }) => theme.borderRadius.sm};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  /* Thicker border with a brighter color so the dropdown reads as
+     an interactive control rather than blending into the card. The
+     theme's cardBorder is intentionally subtle for card surfaces —
+     we override it here with textSecondary (one step brighter than
+     textMuted) which contrasts cleanly on both dark and light themes. */
+  border: 2px solid ${({ theme }) => theme.colors.textSecondary};
   background: ${({ theme }) => theme.colors.card};
   color: ${({ theme }) => theme.colors.text};
   font-size: 14px;
@@ -69,6 +74,7 @@ const Select = styled.select`
   background-repeat: no-repeat;
   background-position: right 14px center;
   background-size: 18px;
+  transition: border-color 0.15s;
 
   &:hover:not(:disabled) {
     border-color: ${({ theme }) => theme.colors.primary};
@@ -77,6 +83,7 @@ const Select = styled.select`
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.primary}33;
   }
 
   &:disabled {

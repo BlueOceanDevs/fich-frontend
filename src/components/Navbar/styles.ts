@@ -1,8 +1,52 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
-export { NavLink } from "@/components/ui/Link";
 export { PillButton as NavSignupButton } from "@/components/ui/Button";
 export { GhostButton as NavLoginButton } from "@/components/ui/Button";
+
+// ─────────────────────────────────────────────
+// Navbar's own NavLink. Replaces the bare
+// re-export from @/components/ui/Link so we can
+// thread an `$active` prop through for current-
+// page highlighting. The base typography matches
+// the shared NavLink so other consumers of that
+// component are unaffected.
+// ─────────────────────────────────────────────
+
+export const NavLink = styled.a<{ $active?: boolean }>`
+  font-size: 14px;
+  color: ${({ theme, $active }) =>
+    $active ? theme.colors.primary : theme.colors.textSecondary};
+  text-decoration: none;
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+  transition: color 0.2s;
+  position: relative;
+  /* Reserve space for the active underline so the surrounding
+     layout doesn't shift when a link becomes active on navigation. */
+  padding-bottom: 4px;
+
+  &:hover {
+    color: ${({ theme, $active }) =>
+      $active ? theme.colors.primary : theme.colors.text};
+  }
+
+  ${({ $active, theme }) =>
+    $active &&
+    css`
+      /* Subtle underline pinned to the baseline. Same primary colour
+         as the text so the active state reads as a single emphasis,
+         not two competing accents. */
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        background: ${theme.colors.primary};
+        border-radius: 1px;
+      }
+    `}
+`;
 
 export const Nav = styled.nav`
   position: fixed;
@@ -128,14 +172,23 @@ export const MobileMenu = styled.div<{ $open: boolean }>`
   }
 `;
 
-export const MobileNavLink = styled.a`
+export const MobileNavLink = styled.a<{ $active?: boolean }>`
   font-size: 16px;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme, $active }) =>
+    $active ? theme.colors.primary : theme.colors.textSecondary};
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
   text-decoration: none;
   transition: color 0.2s;
+  /* Left accent stripe for the active item — works better on a
+     stacked mobile menu than an underline (vertical layout, more
+     visual breathing room between rows). */
+  border-left: 3px solid
+    ${({ theme, $active }) => ($active ? theme.colors.primary : "transparent")};
+  padding-left: ${({ $active }) => ($active ? "12px" : "0")};
 
   &:hover {
-    color: ${({ theme }) => theme.colors.text};
+    color: ${({ theme, $active }) =>
+      $active ? theme.colors.primary : theme.colors.text};
   }
 `;
 

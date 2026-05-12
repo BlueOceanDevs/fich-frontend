@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
@@ -41,8 +42,26 @@ const NAV_ITEMS = [
   { label: "Contact Us", href: "/contact" },
 ];
 
+/**
+ * Whether a nav item should render as "current page".
+ *
+ *  - Home (`/`)            → only when pathname is exactly "/"
+ *  - Hash-anchor items     → never (they live on the homepage; marking
+ *                            them active would double up with Home).
+ *  - Everything else       → pathname equals href, OR pathname starts
+ *                            with `href + "/"` so nested routes
+ *                            (e.g. `/performance/details`) still
+ *                            highlight the parent tab.
+ */
+function isItemActive(href: string, pathname: string): boolean {
+  if (href.startsWith("/#")) return false;
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(href + "/");
+}
+
 const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const mobileMenuOpen = useAppSelector((s) => s.ui.mobileMenuOpen);
   const themeName = useAppSelector((s) => s.ui.themeName);
   const { isAuthenticated, user } = useAppSelector((s) => s.auth);
@@ -54,7 +73,11 @@ const Navbar: React.FC = () => {
 
         <NavLinks>
           {NAV_ITEMS.map((item) => (
-            <NavLink key={item.label} href={item.href}>
+            <NavLink
+              key={item.label}
+              href={item.href}
+              $active={isItemActive(item.href, router.pathname)}
+            >
               {item.label}
             </NavLink>
           ))}
@@ -99,6 +122,7 @@ const Navbar: React.FC = () => {
           <MobileNavLink
             key={item.label}
             href={item.href}
+            $active={isItemActive(item.href, router.pathname)}
             onClick={() => dispatch(closeMobileMenu())}
           >
             {item.label}
