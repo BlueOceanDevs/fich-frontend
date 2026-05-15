@@ -61,12 +61,26 @@ function formatYAxis(value: number): string {
   return `$${Math.round(value)}`;
 }
 
-// Tooltip value: full dollars with thousands separators.
-function formatTooltipValue(value: number): string {
-  return `$${value.toLocaleString(undefined, {
+// Tooltip value: full dollars with thousands separators, plus the
+// period change vs the chart's starting baseline. The chart's first
+// point is always either $1000 (shorter periods, normalised) or
+// $1000 (Inception, seed baseline), so the baseline is well-known —
+// passed in as `baseline` to keep the math explicit.
+//
+// Format example: "$1,250.42 (+25.04%)" — full dollar value with
+// a coloured-by-sign change percentage in parens so the visitor
+// can read "how much have I grown vs my starting investment" at a
+// glance.
+function formatTooltipValue(value: number, baseline: number): string {
+  const dollars = `$${value.toLocaleString(undefined, {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   })}`;
+  if (baseline <= 0 || !Number.isFinite(baseline)) return dollars;
+  const changePct = (value / baseline - 1) * 100;
+  const sign = changePct > 0 ? "+" : changePct < 0 ? "−" : "";
+  const changeStr = `${sign}${Math.abs(changePct).toFixed(2)}%`;
+  return `${dollars} (${changeStr})`;
 }
 
 const PerformanceChart: React.FC<Props> = ({ data }) => {
@@ -84,6 +98,19 @@ const PerformanceChart: React.FC<Props> = ({ data }) => {
   if (!data || data.length === 0) {
     return null;
   }
+
+  // Per-series baselines at the chart's start point. Strategy /
+  // BTC / ETH each have their own anchor — the service re-anchors
+  // every series to $1000 for shorter periods, but for Inception
+  // they're the raw starting values. Look up dynamically rather
+  // than hard-coding $1000 so the tooltip math stays correct under
+  // both modes.
+  const first = data[0];
+  const baselines = {
+    Strategy: first.strategyValueUsd,
+    BTC: first.btcValueUsd,
+    ETH: first.ethValueUsd,
+  } as const;
 
   return (
     <ChartCard>
@@ -129,12 +156,19 @@ const PerformanceChart: React.FC<Props> = ({ data }) => {
             labelFormatter={(label) => formatTooltipLabel(String(label))}
             // recharts' formatter signature accepts ValueType | undefined;
             // coerce defensively. `name` is whatever `name=` we passed
-            // on the matching Area, mapped 1:1 to the legend.
+            // on the matching Area, mapped 1:1 to the legend. Each
+            // series uses its own baseline (first chart point) so the
+            // tooltip's change% reflects "growth from your starting
+            // investment", not "growth from $1000 universally".
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            formatter={(value: any, name: any) => [
-              formatTooltipValue(Number(value)),
-              String(name),
-            ]}
+            formatter={(value: any, name: any) => {
+              const seriesName = String(name) as keyof typeof baselines;
+              const baseline = baselines[seriesName] ?? 0;
+              return [
+                formatTooltipValue(Number(value), baseline),
+                seriesName,
+              ];
+            }}
           />
 
           {/* Strategy renders LAST so its line sits on top of BTC/ETH.

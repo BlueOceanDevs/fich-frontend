@@ -151,7 +151,7 @@ export default function PerformancePage() {
               {/* ─────────────────────────────────────
                   2. 6-stat row (period-aware)
                   ───────────────────────────────────── */}
-              <SixStatsCard stats={page.stats} />
+              <SixStatsCard stats={page.stats} period={period} />
 
               {/* ─────────────────────────────────────
                   3. Disclosure header (static)
