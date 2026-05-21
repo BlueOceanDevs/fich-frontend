@@ -8,6 +8,17 @@ import { userApi } from "@/api/user";
  * - Everything complete → /dashboard
  */
 export async function getPostLoginRoute(): Promise<string> {
+  // ── WAITLIST MODE ────────────────────────────────────────────────
+  // Plan picker + Binance connect are hidden from the user area for
+  // the email-collection phase. Every authenticated user goes
+  // straight to /dashboard — legacy users (already connected
+  // exchange + active plan) get their read-only dashboard; new
+  // users see empty-state dashboards. The redirect branches below
+  // are kept intact so reverting this function restores the full
+  // funnel in one paste.
+  return "/dashboard";
+
+  /*
   try {
     const { data } = await userApi.getOnboardingStatus();
 
@@ -23,4 +34,5 @@ export async function getPostLoginRoute(): Promise<string> {
   }
 
   return "/setup";
+  */
 }

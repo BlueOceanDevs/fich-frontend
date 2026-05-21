@@ -1,3 +1,22 @@
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+
+// ─────────────────────────────────────────────
+// WAITLIST MODE — the setup-progress page is hidden during the
+// email-collection phase. Hitting this URL redirects to /thank-you.
+// Original page body preserved verbatim in the block comment below.
+// ─────────────────────────────────────────────
+
+export default function StartTradingPage() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/thank-you");
+  }, [router]);
+  return null;
+}
+
+/* ── Original page body — restore when plans launch ──────────────
+
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -37,20 +56,12 @@ import {
   PaymentNote,
 } from "@/components/Setup/styles";
 
-// ─────────────────────────────────────────────
-// Steps config
-// ─────────────────────────────────────────────
-
 const STEPS = [
   { label: "Choose Strategy", number: 1 },
   { label: "Connect Exchange", number: 2 },
   { label: "Choose Plan", number: 3 },
   { label: "Start Trading", number: 4 },
 ];
-
-// ─────────────────────────────────────────────
-// Page component
-// ─────────────────────────────────────────────
 
 export default function StartTradingPage() {
   const router = useRouter();
@@ -62,14 +73,12 @@ export default function StartTradingPage() {
   );
   const [loading, setLoading] = useState(true);
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace("/login?redirect=/setup");
     }
   }, [isAuthenticated, router]);
 
-  // Fetch onboarding status
   useEffect(() => {
     if (!isAuthenticated) return;
 
@@ -113,16 +122,13 @@ export default function StartTradingPage() {
 
   const handleContinue = () => {
     if (!exchangeConnected) {
-      // Go back to setup to connect exchange
       router.push("/setup");
       return;
     }
     if (!hasPlan) {
-      // Go to choose plan
       router.push(`/setup/choose-plan${strategy ? `?strategy=${strategy}` : ""}`);
       return;
     }
-    // All done — go to profile/dashboard
     router.push("/profile");
   };
 
@@ -146,7 +152,6 @@ export default function StartTradingPage() {
               Complete these steps to start automated trading
             </PageSubtitle>
 
-            {/* ── Steps indicator ── */}
             <StepsBar>
               {STEPS.map((step, i) => (
                 <React.Fragment key={step.number}>
@@ -173,9 +178,7 @@ export default function StartTradingPage() {
               ))}
             </StepsBar>
 
-            {/* ── Summary card ── */}
             <SummaryCard>
-              {/* Strategy */}
               <SummaryRow>
                 <SummaryIcon $color="#F7931A">
                   <FaBolt />
@@ -197,7 +200,6 @@ export default function StartTradingPage() {
                 )}
               </SummaryRow>
 
-              {/* Exchange */}
               <SummaryRow>
                 <SummaryIcon $color="#627EEA">
                   <FaLink />
@@ -221,7 +223,6 @@ export default function StartTradingPage() {
                 )}
               </SummaryRow>
 
-              {/* Plan */}
               <SummaryRow>
                 <SummaryIcon $color="#00D897">
                   <FaChartLine />
@@ -244,7 +245,6 @@ export default function StartTradingPage() {
               </SummaryRow>
             </SummaryCard>
 
-            {/* ── Continue button ── */}
             <div style={{ maxWidth: 640, margin: "32px auto 0" }}>
               <PaymentButton onClick={handleContinue}>
                 Continue
@@ -257,7 +257,6 @@ export default function StartTradingPage() {
               </PaymentNote>
             </div>
 
-            {/* ── Footer trust badges ── */}
             <SummaryFooter>
               <SummaryFooterItem>
                 <FaShieldAlt size={11} /> Non-custodial
@@ -273,3 +272,5 @@ export default function StartTradingPage() {
     </>
   );
 }
+
+──────────────────────────────────────────────────────────────── */

@@ -1,3 +1,27 @@
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+
+// ─────────────────────────────────────────────
+// WAITLIST MODE — payments are disabled during the email-collection
+// phase, so the payment-gateway return page has no reason to render.
+// Direct hits redirect to /. Original page body preserved verbatim
+// in the block comment below. Heads-up for restoration: the original
+// uses inline `styled.div` blocks — when bringing it back, extract
+// PageSection / Card / SuccessIcon / ErrorIcon / Title / Desc /
+// StatusText / ActionLink / SecondaryLink / ButtonGroup into a
+// sibling `success.styles.ts` per the styles-separation rule.
+// ─────────────────────────────────────────────
+
+export default function PaymentSuccessPage() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/");
+  }, [router]);
+  return null;
+}
+
+/* ── Original page body — restore when plans launch ──────────────
+
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -203,7 +227,6 @@ export default function PaymentSuccessPage() {
       <Layout>
         <PageSection>
           <Card>
-            {/* ── Error State ── */}
             {isError && (
               <>
                 <ErrorIcon>✕</ErrorIcon>
@@ -221,7 +244,6 @@ export default function PaymentSuccessPage() {
               </>
             )}
 
-            {/* ── Success State ── */}
             {isFinished && (
               <>
                 <SuccessIcon>✓</SuccessIcon>
@@ -234,7 +256,6 @@ export default function PaymentSuccessPage() {
               </>
             )}
 
-            {/* ── Pending / Polling State ── */}
             {!isFinished && !isError && (
               <>
                 <SuccessIcon>⏳</SuccessIcon>
@@ -249,7 +270,7 @@ export default function PaymentSuccessPage() {
                 {!polling && (
                   <ButtonGroup>
                     <Desc style={{ fontSize: 13, marginBottom: 0 }}>
-                      Don&apos;t worry — your subscription will activate automatically once the payment confirms.
+                      Don't worry — your subscription will activate automatically once the payment confirms.
                     </Desc>
                     <Link href="/dashboard/account" passHref legacyBehavior>
                       <SecondaryLink>Check order status on your account</SecondaryLink>
@@ -267,3 +288,5 @@ export default function PaymentSuccessPage() {
     </>
   );
 }
+
+──────────────────────────────────────────────────────────────── */

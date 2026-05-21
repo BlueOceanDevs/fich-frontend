@@ -1,3 +1,23 @@
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+
+// ─────────────────────────────────────────────
+// WAITLIST MODE — the dedicated plans page is hidden during the
+// email-collection phase. Hitting this URL directly now redirects
+// to the homepage. The original page (Layout + <Pricing />) is
+// preserved below the export so reverting is a one-paste change.
+// ─────────────────────────────────────────────
+
+export default function PlansPage() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/");
+  }, [router]);
+  return null;
+}
+
+/*
+// Original page — restore when plans launch:
 import Head from "next/head";
 import Layout from "@/components/Layout";
 import Pricing from "@/components/Pricing";
@@ -20,3 +40,4 @@ export default function PlansPage() {
     </>
   );
 }
+*/

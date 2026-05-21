@@ -86,7 +86,7 @@ const Pricing: React.FC = () => {
 
   const handleFreePlan = async () => {
     if (!isAuthenticated) {
-      router.push("/login?redirect=/plans");
+      router.push("/signup?redirect=/plans");
       return;
     }
     if (!requireEmailConfirmed()) return;
@@ -105,7 +105,7 @@ const Pricing: React.FC = () => {
 
   const handleStartTrial = async (planId: number, tier: string) => {
     if (!isAuthenticated) {
-      router.push("/login?redirect=/plans");
+      router.push("/signup?redirect=/plans");
       return;
     }
     if (!requireEmailConfirmed()) return;
@@ -125,7 +125,7 @@ const Pricing: React.FC = () => {
 
   const handleSubscribe = async (planId: number, tier: string) => {
     if (!isAuthenticated) {
-      router.push("/login?redirect=/plans");
+      router.push("/signup?redirect=/plans");
       return;
     }
     if (!requireEmailConfirmed()) return;
@@ -294,7 +294,7 @@ const Pricing: React.FC = () => {
                     <PlanCTA
                       $popular={group.popular}
                       onClick={() =>
-                        router.push(isAuthenticated ? "/plans" : "/login?redirect=/plans")
+                        router.push(isAuthenticated ? "/plans" : "/signup?redirect=/plans")
                       }
                     >
                       Get started

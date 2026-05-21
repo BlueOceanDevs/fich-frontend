@@ -34,10 +34,14 @@ import {
 // pages (FAQ landed its full version after the homepage preview was
 // trimmed to 4 questions); Pricing remains an anchor into the
 // homepage's pricing section. Contact Us points to /contact.
-const NAV_ITEMS = [
+// `external: true` items are off-app URLs (e.g. Research lives on a
+// subdomain) — they render with target="_blank" + rel="noopener".
+const NAV_ITEMS: { label: string; href: string; external?: boolean }[] = [
   { label: "Home", href: "/" },
   { label: "Performance", href: "/performance" },
-  { label: "Pricing", href: "/#pricing" },
+  { label: "Research", href: "https://research.fich.ai/", external: true },
+  // WAITLIST MODE — Pricing nav item hidden. Restore when plans launch.
+  // { label: "Pricing", href: "/#pricing" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact Us", href: "/contact" },
 ];
@@ -77,6 +81,9 @@ const Navbar: React.FC = () => {
               key={item.label}
               href={item.href}
               $active={isItemActive(item.href, router.pathname)}
+              {...(item.external
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
             >
               {item.label}
             </NavLink>
@@ -124,6 +131,9 @@ const Navbar: React.FC = () => {
             href={item.href}
             $active={isItemActive(item.href, router.pathname)}
             onClick={() => dispatch(closeMobileMenu())}
+            {...(item.external
+              ? { target: "_blank", rel: "noopener noreferrer" }
+              : {})}
           >
             {item.label}
           </MobileNavLink>

@@ -24,8 +24,13 @@ export default function AccountPage() {
       <DashboardLayout title="Account">
         <CardsGrid>
           <AccountCard />
-          <SubscriptionCard />
-          <ExchangeCard onStatusChange={() => {}} />
+          {/* WAITLIST MODE — subscription + exchange cards hidden,
+              matching /profile. Both components already return null
+              while we're in waitlist mode; this comment-out is for
+              symmetry so the page intent reads at a glance. Restore
+              both lines when plans/Binance launch. */}
+          {/* <SubscriptionCard /> */}
+          {/* <ExchangeCard onStatusChange={() => {}} /> */}
         </CardsGrid>
         <div style={{ marginTop: 24 }}>
           <OrdersTab />

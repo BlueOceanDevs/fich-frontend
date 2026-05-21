@@ -16,6 +16,13 @@ import {
 } from "./styles";
 
 const SubscriptionCard: React.FC = () => {
+  // ── WAITLIST MODE ────────────────────────────────────────────────
+  // Plan / subscription UI is hidden during the email-collection
+  // phase (no purchases, nothing to manage). Original body preserved
+  // below as a block comment.
+  return null;
+
+  /*
   const { subscription } = useAppSelector((s) => s.subscription);
 
   const isFreeForever =
@@ -94,6 +101,7 @@ const SubscriptionCard: React.FC = () => {
       )}
     </Card>
   );
+  */
 };
 
 export default SubscriptionCard;

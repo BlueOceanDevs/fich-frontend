@@ -104,7 +104,10 @@ export default function LoginPage() {
       </Head>
       <AuthLayout
         title="Welcome back"
-        subtitle="Sign in to your account to continue trading"
+        // WAITLIST MODE — softened from "Sign in to your account to
+        // continue trading" while trading is gated behind a coming-
+        // soon waitlist. Restore the original line when launching.
+        subtitle="Sign in to your account"
       >
         {form.globalError && <Alert $variant="error">{form.globalError}</Alert>}
 

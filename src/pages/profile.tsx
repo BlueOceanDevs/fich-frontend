@@ -48,8 +48,11 @@ export default function ProfilePage() {
             <ProfileHeader>
               <ProfileTitle>Profile</ProfileTitle>
               <ProfileSubtitle>
-                Manage your account settings, subscription, and exchange
-                connection.
+                {/* WAITLIST MODE — subscription + exchange copy
+                    removed while those cards are hidden. Original:
+                    "Manage your account settings, subscription, and
+                    exchange connection." */}
+                Manage your account settings.
               </ProfileSubtitle>
             </ProfileHeader>
 
@@ -61,12 +64,17 @@ export default function ProfilePage() {
                 blocker (without it, the backend refuses subscription
                 creation), so it reads top-down as a checklist. */}
             <EmailConfirmationBanner />
-            <SetupIncompleteBanner />
+            {/* WAITLIST MODE — SetupIncompleteBanner hidden (banner
+                component itself also returns null; this is belt-and-
+                braces so the mount is explicit too). */}
+            {/* <SetupIncompleteBanner /> */}
 
             <CardsGrid>
               <AccountCard />
-              <SubscriptionCard />
-              <ExchangeCard onStatusChange={() => {}} />
+              {/* WAITLIST MODE — subscription + exchange cards hidden.
+                  Restore both lines when plans/Binance launch. */}
+              {/* <SubscriptionCard /> */}
+              {/* <ExchangeCard onStatusChange={() => {}} /> */}
             </CardsGrid>
           </ProfileContainer>
         </ProfileSection>

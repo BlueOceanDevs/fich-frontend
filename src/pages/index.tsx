@@ -26,7 +26,10 @@ export default function Home() {
         <Hero />
         <WhyChoose />
         <HowItWorks />
-        <Pricing />
+        {/* WAITLIST MODE — Pricing section hidden. Purchases are
+            disabled during the email-collection phase; uncomment to
+            re-enable when plans launch. */}
+        {/* <Pricing /> */}
         <FAQ />
       </Layout>
     </>

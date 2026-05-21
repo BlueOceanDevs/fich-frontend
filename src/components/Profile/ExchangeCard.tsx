@@ -33,7 +33,15 @@ interface ExchangeCardProps {
   onStatusChange?: () => void;
 }
 
-const ExchangeCard: React.FC<ExchangeCardProps> = ({ onStatusChange }) => {
+const ExchangeCard: React.FC<ExchangeCardProps> = ({ onStatusChange: _onStatusChange }) => {
+  // ── WAITLIST MODE ────────────────────────────────────────────────
+  // Binance connect UI is hidden during the email-collection phase.
+  // The whole card returns null. State + fetch + JSX preserved below
+  // as a block comment; revert by deleting the early return and
+  // uncommenting the original body.
+  return null;
+
+  /*
   const [exchange, setExchange] = useState<ExchangeConnectionDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [disconnecting, setDisconnecting] = useState(false);
@@ -197,6 +205,7 @@ const ExchangeCard: React.FC<ExchangeCardProps> = ({ onStatusChange }) => {
       )}
     </>
   );
+  */
 };
 
 export default ExchangeCard;

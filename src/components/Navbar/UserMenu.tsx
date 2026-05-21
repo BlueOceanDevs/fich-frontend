@@ -70,12 +70,18 @@ const UserMenu: React.FC = () => {
     if (user && !hasFetchedSub.current) {
       hasFetchedSub.current = true;
       dispatch(fetchSubscription());
+      // WAITLIST MODE — the exchange-status row this fed is hidden,
+      // so skip the wasted HTTP call. `exchange` state stays null,
+      // which the (already-commented) row would handle correctly
+      // when uncommented later.
+      /*
       exchangeApi
         .getStatus()
         .then(({ data }) => {
           if (data.isSuccess && data.data) setExchange(data.data);
         })
         .catch(() => {});
+      */
     }
   }, [user, dispatch]);
 
@@ -129,12 +135,19 @@ const UserMenu: React.FC = () => {
             <DropdownHeader>
               {displayName && <strong>{displayName}</strong>}
               <DropdownEmail>{user?.email}</DropdownEmail>
+              {/* WAITLIST MODE — plan badge hidden. For waitlist
+                  users it never rendered (no active subscription);
+                  for legacy paying users it would render a
+                  "Pro Plan" tag with no UI behind it now that
+                  Manage/Upgrade is gone. Restore when plans launch. */}
+              {/*
               {subscription?.isActive && (
                 <PlanBadge>
                   {subscription.planTier} Plan
                   {subscription.isTrial && " (Trial)"}
                 </PlanBadge>
               )}
+              */}
             </DropdownHeader>
 
             {/* Status indicators */}
@@ -154,6 +167,11 @@ const UserMenu: React.FC = () => {
                 <StatusLabel>Email confirmed</StatusLabel>
               </StatusRow>
             )}
+            {/* WAITLIST MODE — exchange-status row hidden. The row
+                would only say "Exchange not connected" for every
+                waitlist user, which leaks a feature they can't use.
+                Restore when Binance connect launches. */}
+            {/*
             <StatusRow>
               <StatusDot $ok={exchange?.status === "Active"}>
                 {exchange?.status === "Active" ? (
@@ -168,6 +186,7 @@ const UserMenu: React.FC = () => {
                   : "Exchange not connected"}
               </StatusLabel>
             </StatusRow>
+            */}
 
             <DropdownDivider />
 
@@ -195,6 +214,9 @@ const UserMenu: React.FC = () => {
               </DropdownItem>
             </Link>
 
+            {/* WAITLIST MODE — Manage/Upgrade Plan dropdown item
+                hidden. Restore when plans launch. */}
+            {/*
             <Link href="/plans" passHref legacyBehavior>
               <DropdownItem
                 as="a"
@@ -208,6 +230,7 @@ const UserMenu: React.FC = () => {
             </Link>
 
             <DropdownDivider />
+            */}
 
             <DropdownItem onClick={handleLogout} $danger>
               <DropdownItemIcon>

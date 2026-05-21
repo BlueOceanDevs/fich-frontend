@@ -68,8 +68,12 @@ const Hero: React.FC = () => {
           that beats the market.
         </HeroTitle>
         <HeroSubtitle>
-          Your Binance account. Our Quantitative Strategy. Years of
-          backtesting and proven results.
+          {/* WAITLIST MODE — softened from the original Binance-first
+              pitch while connect-exchange UI is hidden. Original:
+              "Your Binance account. Our Quantitative Strategy. Years
+              of backtesting and proven results." */}
+          A quantitative crypto strategy backed by years of backtesting.
+          Join the waitlist as we get ready to launch.
         </HeroSubtitle>
         <HeroButton href="/signup">
           Get started now &rarr;

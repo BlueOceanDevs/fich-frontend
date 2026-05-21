@@ -68,6 +68,19 @@ export default function OnboardingGuard({
     let cancelled = false;
 
     async function check() {
+      // ── WAITLIST MODE ──────────────────────────────────────────
+      // The plan picker + Binance connect screens are hidden, so
+      // there's nowhere meaningful to redirect a user with
+      // incomplete onboarding. Pass everyone through to their
+      // requested route. Original gate kept below; revert the
+      // comment to restore.
+      if (!cancelled) {
+        setChecked(true);
+        checkingRef.current = false;
+      }
+      return;
+
+      /*
       try {
         const { data } = await userApi.getOnboardingStatus();
         if (cancelled) return;
@@ -91,6 +104,7 @@ export default function OnboardingGuard({
         setChecked(true);
         checkingRef.current = false;
       }
+      */
     }
 
     check();

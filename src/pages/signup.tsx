@@ -29,6 +29,11 @@ import {
 
 export default function SignupPage() {
   const router = useRouter();
+  // Honor an explicit `?redirect=...` (e.g. pricing's "Get started" sends
+  // anonymous visitors to /signup?redirect=/plans). Mirrors login.tsx —
+  // without this the query is silently dropped and the user lands on the
+  // default post-signup destination instead of the intended target.
+  const explicitRedirect = router.query.redirect as string | undefined;
   const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -87,8 +92,14 @@ export default function SignupPage() {
       });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
-      const dest = await getPostLoginRoute();
-      router.push(dest);
+      // ── WAITLIST MODE ────────────────────────────────────────────
+      // During the email-collection / waitlist phase we send every
+      // new signup to the "thank you" page instead of funneling them
+      // into /setup → strategy picker → Binance connect → plan.
+      // Pre-pivot redirect kept below; revert this block to restore.
+      // const dest = explicitRedirect || (await getPostLoginRoute());
+      // router.push(dest);
+      router.push("/thank-you");
     } catch (err: any) {
       form.setGlobalError(
         err.response?.data?.errors?.[0] ||
@@ -107,8 +118,11 @@ export default function SignupPage() {
       await authApi.googleLogin({ idToken: credential, context: "User" });
       dispatch(setAuthenticated());
       dispatch(fetchUser());
-      const dest = await getPostLoginRoute();
-      router.push(dest);
+      // ── WAITLIST MODE ────────────────────────────────────────────
+      // Same as the email-signup branch: post-signup → /thank-you.
+      // const dest = explicitRedirect || (await getPostLoginRoute());
+      // router.push(dest);
+      router.push("/thank-you");
     } catch (err: any) {
       form.setGlobalError(
         err.response?.data?.errors?.[0] ||
@@ -126,7 +140,11 @@ export default function SignupPage() {
       </Head>
       <AuthLayout
         title="Create your account"
-        subtitle="Start trading crypto in minutes"
+        // WAITLIST MODE — softened from "Start trading crypto in
+        // minutes" since signup currently lands on /thank-you and
+        // trading is gated behind a coming-soon waitlist. Restore
+        // the original line when launching.
+        subtitle="Join the waitlist — we'll be in touch when we launch."
       >
         {form.globalError && <Alert $variant="error">{form.globalError}</Alert>}
 

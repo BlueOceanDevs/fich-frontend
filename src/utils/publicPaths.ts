@@ -38,6 +38,11 @@ export const PUBLIC_PATHS: readonly string[] = [
   "/forgot-password",
   "/reset-password",
   "/confirm-email",
+  // Post-signup landing during waitlist mode (collects emails only;
+  // the user is technically authenticated by the time signup pushes
+  // them here, but listing it keeps the unauth-then-refresh case
+  // working too).
+  "/thank-you",
 
   // Email-flow landings (token-authenticated, not session-authenticated)
   "/unsubscribe",

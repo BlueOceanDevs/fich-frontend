@@ -30,11 +30,16 @@ const STEPS = [
     description: "Weekly email with portfolio positions.",
     color: "#00D897",
   },
+  // WAITLIST MODE — step 3 softened while Binance connect is hidden.
+  // Original:
+  //   title: "Connect your Binance account"
+  //   description: "Connect your exchange API keys and follow our
+  //                 investment strategy on autopilot."
   {
     icon: <FaExchangeAlt size={20} />,
-    title: "Connect your Binance account",
+    title: "Connect your exchange (coming soon)",
     description:
-      "Connect your exchange API keys and follow our investment strategy on autopilot.",
+      "Once we launch you'll connect your exchange and follow the strategy on autopilot. Join the newsletter to be first.",
     color: "#9945FF",
   },
 ];

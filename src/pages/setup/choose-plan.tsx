@@ -1,3 +1,26 @@
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+
+// ─────────────────────────────────────────────
+// WAITLIST MODE — the plan picker is hidden during the email-
+// collection phase. Hitting this URL redirects to /thank-you.
+// Original page body preserved verbatim in the block comment
+// below. When this comes back, extract the inline styled-component
+// imports it uses (from "@/components/Setup/styles") and any local
+// inline styles into a sibling `choose-plan.styles.ts` to satisfy
+// the styles-separation rule.
+// ─────────────────────────────────────────────
+
+export default function ChoosePlanPage() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/thank-you");
+  }, [router]);
+  return null;
+}
+
+/* ── Original page body — restore when plans launch ──────────────
+
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -56,20 +79,12 @@ import {
   FormAlert,
 } from "@/components/Setup/styles";
 
-// ─────────────────────────────────────────────
-// Steps config (same as setup.tsx)
-// ─────────────────────────────────────────────
-
 const STEPS = [
   { label: "Choose Strategy", number: 1 },
   { label: "Connect Exchange", number: 2 },
   { label: "Choose Plan", number: 3 },
   { label: "Start Trading", number: 4 },
 ];
-
-// ─────────────────────────────────────────────
-// Page component
-// ─────────────────────────────────────────────
 
 export default function ChoosePlanPage() {
   const router = useRouter();
@@ -89,21 +104,18 @@ export default function ChoosePlanPage() {
   const [error, setError] = useState<string | null>(null);
   const [usedTrialTiers, setUsedTrialTiers] = useState<string[]>([]);
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace("/login?redirect=/setup");
     }
   }, [isAuthenticated, router]);
 
-  // Fetch plans and subscription
   useEffect(() => {
     if (!isAuthenticated) return;
     dispatch(fetchPlans());
     dispatch(fetchSubscription());
   }, [dispatch, isAuthenticated]);
 
-  // Fetch used trial tiers
   useEffect(() => {
     if (!isAuthenticated) return;
     subscriptionsApi
@@ -116,7 +128,6 @@ export default function ChoosePlanPage() {
       .catch(() => {});
   }, [isAuthenticated]);
 
-  // Auto-select current plan or popular tier
   useEffect(() => {
     if (selectedTier) return;
     if (subscription?.isActive) {
@@ -130,8 +141,6 @@ export default function ChoosePlanPage() {
   if (!isAuthenticated) return null;
 
   const currentStep = 3;
-
-  // ── Price helpers ──
 
   const getPrice = (group: (typeof tierGroups)[0]): number => {
     if (usedFallback) {
@@ -180,8 +189,6 @@ export default function ChoosePlanPage() {
 
   const selectedGroup = tierGroups.find((g) => g.tier === selectedTier);
 
-  // ── Handlers ──
-
   const requireEmailConfirmed = (): boolean => {
     if (user && !user.isEmailConfirmed) {
       setError("Please confirm your email address before choosing a plan. Check your inbox or resend from your profile.");
@@ -196,7 +203,6 @@ export default function ChoosePlanPage() {
     const plan = getActivePlan(selectedGroup);
     const isFree = selectedGroup.tier === "Free";
 
-    // If this is already the user's plan, skip to next step
     if (isCurrentPlan(selectedGroup.tier)) {
       router.push(nextStep);
       return;
@@ -221,7 +227,6 @@ export default function ChoosePlanPage() {
 
     if (!plan) return;
 
-    // Paid plan — create order and redirect to NowPayments
     setActionLoading("pay");
     try {
       const { data } = await ordersApi.createOrder({ planId: plan.id });
@@ -261,7 +266,6 @@ export default function ChoosePlanPage() {
   };
 
   const handlePayLater = () => {
-    // Activate free plan as a fallback
     handleFreeFallback();
   };
 
@@ -298,7 +302,6 @@ export default function ChoosePlanPage() {
       <Layout>
         <SetupSection>
           <SetupContainer>
-            {/* ── Back button ── */}
             <div style={{ marginBottom: 24 }}>
               <BackButton onClick={() => router.back()}>
                 <FaChevronLeft size={12} style={{ marginRight: 6 }} />
@@ -311,7 +314,6 @@ export default function ChoosePlanPage() {
               Takes 1 minute. Cancel anytime.
             </PageSubtitle>
 
-            {/* ── Steps indicator ── */}
             <StepsBar>
               {STEPS.map((step, i) => (
                 <React.Fragment key={step.number}>
@@ -338,7 +340,6 @@ export default function ChoosePlanPage() {
               ))}
             </StepsBar>
 
-            {/* ── Trust badges ── */}
             <TrustBadges>
               <TrustBadge>
                 <FaLock size={12} /> Secure checkout
@@ -354,7 +355,6 @@ export default function ChoosePlanPage() {
               </TrustBadge>
             </TrustBadges>
 
-            {/* ── Billing toggle ── */}
             <PlanToggleRow>
               <PlanToggleButton
                 $active={billingCycle === "monthly"}
@@ -371,17 +371,14 @@ export default function ChoosePlanPage() {
               </PlanToggleButton>
             </PlanToggleRow>
 
-            {/* ── Email confirmation banner ── */}
             <EmailConfirmationBanner />
 
-            {/* ── Error ── */}
             {error && (
               <div style={{ maxWidth: 600, margin: "0 auto 24px" }}>
                 <FormAlert $variant="error">{error}</FormAlert>
               </div>
             )}
 
-            {/* ── Plan cards ── */}
             <PlansRow>
               {tierGroups.map((group) => {
                 const isFree = group.tier === "Free";
@@ -445,12 +442,10 @@ export default function ChoosePlanPage() {
               })}
             </PlansRow>
 
-            {/* ── Help link ── */}
             <HelpLink onClick={() => router.push("/plans")}>
               <FaQuestionCircle size={13} /> Need help choosing?
             </HelpLink>
 
-            {/* ── Continue to payment ── */}
             <PaymentButton
               $disabled={!selectedTier || isLoading}
               disabled={!selectedTier || isLoading}
@@ -470,12 +465,11 @@ export default function ChoosePlanPage() {
             </PaymentButton>
 
             <PaymentNote>
-              Next: after payment you&apos;ll confirm your exchange connection and
+              Next: after payment you'll confirm your exchange connection and
               start trading
             </PaymentNote>
             <PaymentNote>Cancel anytime &bull; No long-term commitment</PaymentNote>
 
-            {/* ── Trial link ── */}
             {selectedHasTrial && (
               <PayLaterLink
                 disabled={actionLoading === "trial"}
@@ -487,7 +481,6 @@ export default function ChoosePlanPage() {
               </PayLaterLink>
             )}
 
-            {/* ── Pay later ── */}
             {selectedTier !== "Free" && (
               <PayLaterLink
                 disabled={actionLoading === "later"}
@@ -499,14 +492,13 @@ export default function ChoosePlanPage() {
               </PayLaterLink>
             )}
 
-            {/* ── Bottom trust note ── */}
             <div style={{ marginTop: 48, textAlign: "center" }}>
               <PaymentNote style={{ color: "inherit", opacity: 0.4, fontSize: 12 }}>
                 <FaShieldAlt
                   size={11}
                   style={{ marginRight: 6, verticalAlign: "middle" }}
                 />
-                Your funds stay on your exchange. Fich only trades — it can&apos;t
+                Your funds stay on your exchange. Fich only trades — it can't
                 withdraw
               </PaymentNote>
             </div>
@@ -516,3 +508,5 @@ export default function ChoosePlanPage() {
     </>
   );
 }
+
+──────────────────────────────────────────────────────────────── */

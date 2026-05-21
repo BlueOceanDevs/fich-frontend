@@ -1,3 +1,25 @@
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+
+// ─────────────────────────────────────────────
+// WAITLIST MODE — payments are disabled during the email-collection
+// phase. Direct hits redirect to /. Original page body preserved
+// verbatim in the block comment below. When restoring, extract the
+// inline `styled.section`/`div`/`h1`/`p`/`a` blocks (PageSection /
+// Card / Icon / Title / Desc / ActionLink) into a sibling
+// `cancel.styles.ts` per the styles-separation rule.
+// ─────────────────────────────────────────────
+
+export default function PaymentCancelPage() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/");
+  }, [router]);
+  return null;
+}
+
+/* ── Original page body — restore when plans launch ──────────────
+
 import React from "react";
 import Head from "next/head";
 import Link from "next/link";
@@ -93,3 +115,5 @@ export default function PaymentCancelPage() {
     </>
   );
 }
+
+──────────────────────────────────────────────────────────────── */

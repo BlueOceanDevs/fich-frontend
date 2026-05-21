@@ -29,6 +29,13 @@ import {
  * unconditionally.
  */
 const SetupIncompleteBanner: React.FC = () => {
+  // ── WAITLIST MODE ────────────────────────────────────────────────
+  // The "Continue Setup" funnel (exchange / plan picker) is hidden
+  // during the email-collection phase, so this banner has nowhere
+  // useful to point. Renders null. Original body preserved below.
+  return null;
+
+  /*
   const { isAuthenticated } = useAppSelector((s) => s.auth);
   const [onboarding, setOnboarding] = useState<OnboardingStatusDto | null>(null);
 
@@ -76,6 +83,7 @@ const SetupIncompleteBanner: React.FC = () => {
       </Link>
     </Banner>
   );
+  */
 };
 
 export default SetupIncompleteBanner;

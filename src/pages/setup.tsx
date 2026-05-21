@@ -1,3 +1,29 @@
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+
+// ─────────────────────────────────────────────
+// WAITLIST MODE — the strategy picker + Binance-connect flow is
+// hidden during the email-collection phase. Hitting this URL
+// directly now redirects to /thank-you. The original page body is
+// preserved verbatim in the block comment below — to restore, swap
+// the redirect stub for the original code (and re-add the imports
+// in the comment to the top of the file). If/when this page comes
+// back, extract the inline `<style>`-equivalent styled-components
+// it uses from "@/components/Setup/styles" into a sibling
+// `setup.styles.ts` file in /pages — Next.js page directory
+// convention plus the project's styles-separation rule.
+// ─────────────────────────────────────────────
+
+export default function SetupPage() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/thank-you");
+  }, [router]);
+  return null;
+}
+
+/* ── Original page body — restore when plans launch ──────────────
+
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -157,7 +183,6 @@ export default function SetupPage() {
               Set up in 2 minutes. You can switch strategies anytime.
             </PageSubtitle>
 
-            {/* ── Steps indicator ── */}
             <StepsBar>
               {STEPS.map((step, i) => (
                 <React.Fragment key={step.number}>
@@ -184,7 +209,6 @@ export default function SetupPage() {
               ))}
             </StepsBar>
 
-            {/* ── Strategy cards ── */}
             <StrategyList>
               {strategiesLoading ? (
                 <div style={{ textAlign: "center", padding: "2rem 0", color: "rgba(255,255,255,0.5)" }}>
@@ -268,7 +292,6 @@ export default function SetupPage() {
               )}
             </StrategyList>
 
-            {/* ── Continue button ── */}
             <BottomActions>
               <NextHint>
                 {selectedStrategyId
@@ -286,7 +309,6 @@ export default function SetupPage() {
         </SetupSection>
       </Layout>
 
-      {/* ── Connect Exchange Modal ── */}
       {showExchangeModal && selectedStrategyId && (
         <ConnectExchangeModal
           strategy={strategies.find((s) => s.id === selectedStrategyId)?.slug ?? ""}
@@ -297,3 +319,5 @@ export default function SetupPage() {
     </>
   );
 }
+
+──────────────────────────────────────────────────────────────── */

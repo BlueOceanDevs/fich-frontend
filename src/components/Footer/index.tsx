@@ -40,7 +40,9 @@ const Footer: React.FC = () => {
                 first, then scroll to the anchor. */}
             <FooterLink href="/#why-fich">Why Fich?</FooterLink>
             <FooterLink href="/#how-it-works">How it works</FooterLink>
-            <FooterLink href="/#pricing">Pricing</FooterLink>
+            {/* WAITLIST MODE — Pricing footer link hidden. Restore
+                when plans launch. */}
+            {/* <FooterLink href="/#pricing">Pricing</FooterLink> */}
             {/* FAQ has its own dedicated page now, not a homepage
                 anchor — match the navbar. */}
             <FooterLink href="/faq">FAQ</FooterLink>
