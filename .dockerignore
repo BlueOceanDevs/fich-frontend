@@ -1,0 +1,47 @@
+# ──────────────────────────────────────────────────────────────
+# Files NOT shipped in the Docker build context.
+#
+# Bigger benefit than the size win: keeps secrets out. `.env.local`
+# carries the dev API URL / Google client ID; we never want it baked
+# into a production image. The deploy workflow passes prod values
+# via --build-arg explicitly.
+# ──────────────────────────────────────────────────────────────
+
+# Build outputs
+node_modules
+.next
+out
+build
+dist
+
+# Local env (secrets!) — prod values come from CI build-args
+.env
+.env.local
+.env.*.local
+.env.development
+.env.development.local
+
+# VCS / editor
+.git
+.gitignore
+.gitattributes
+.vscode
+.idea
+*.swp
+
+# Vercel artifacts (legacy; we're moving off Vercel)
+.vercel
+
+# Docs / CI metadata not needed at runtime
+*.md
+.github
+.dockerignore
+Dockerfile
+
+# Test / coverage artifacts
+coverage
+.nyc_output
+
+# OS junk
+.DS_Store
+Thumbs.db
