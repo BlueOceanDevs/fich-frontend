@@ -87,10 +87,17 @@ jobs:
     steps:
       - name: SSH → run deploy script on VPS
         uses: appleboy/ssh-action@v1
+        env:
+          # Forwarded to the SSH session so the VPS-side script can
+          # `docker login ghcr.io` with the same short-lived token the
+          # build job used. No long-lived PAT lives on the VPS.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
         with:
           host:     ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key:      ${{ secrets.VPS_SSH_KEY }}
+          envs: GITHUB_TOKEN,GITHUB_ACTOR
           # Tag was computed by docker/metadata-action — sha-<short>
           # is the unique, traceable form (no race with `latest`).
           script: |
