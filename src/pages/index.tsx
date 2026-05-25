@@ -16,7 +16,7 @@ export default function Home() {
           content="Fich Crypto Trading Platform - discover the best crypto trading platform with instant transactions, optimized fees, and a premium interface built by professionals. Trade cryptocurrency securely while funds remain in your exchange account"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        {/* Favicon is set in _document.tsx for the whole app. */}
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet"

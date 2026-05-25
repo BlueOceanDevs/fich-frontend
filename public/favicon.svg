@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!--
+    Fich favicon — lowercase "f" letterform, matching the navbar/footer
+    wordmark ("fich" in Inter ExtraBold, primary green on the dark
+    surface). Drawn as a vector path (not text) because the browser
+    shell renders the favicon without loading the page's Google Fonts,
+    so an SVG <text> tag would fall back to OS fonts and the "f" would
+    look different on every machine. The path locks the glyph shape.
+
+    Geometry (28×44 figure inside the 64×64 viewBox, centered):
+      • Stem      — x 24–34, y 12–56  (8 wide × 44 tall)
+      • Top hook  — x 24–46, y 12–20  (extends stem right at top)
+      • Crossbar  — x 18–42, y 28–36  (extends both sides of stem)
+  -->
+  <rect width="64" height="64" rx="14" fill="#0a0f1c"/>
+  <path
+    d="M24 12 H46 V20 H34 V28 H42 V36 H34 V56 H24 V36 H18 V28 H24 Z"
+    fill="#00D897"/>
+</svg>

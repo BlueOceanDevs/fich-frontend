@@ -11,10 +11,8 @@ import {
   FooterColumnTitle,
   FooterLink,
   FooterBottom,
-  FooterCopyright,
   SocialLinks,
   SocialLink,
-  CreatorRow,
 } from "./styles";
 
 const Footer: React.FC = () => {
@@ -58,11 +56,6 @@ const Footer: React.FC = () => {
         </FooterGrid>
 
         <FooterBottom>
-          <CreatorRow>
-            Created by &nbsp;
-            <span style={{ fontWeight: 600 }}>Arthur A. Fournier</span>
-          </CreatorRow>
-          <FooterCopyright>Made in Europe</FooterCopyright>
           <SocialLinks>
             <SocialLink href="#" aria-label="Twitter">
               <FaTwitter size={16} />
