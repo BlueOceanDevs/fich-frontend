@@ -36,9 +36,16 @@ import {
 // homepage's pricing section. Contact Us points to /contact.
 // `external: true` items are off-app URLs (e.g. Research lives on a
 // subdomain) — they render with target="_blank" + rel="noopener".
+//
+// Note: the "Crypto Performance" label expands on the previous plain
+// "Performance" — the page shows Fich's historical crypto-trading
+// track record, and the more specific label both helps SEO and
+// distinguishes the public marketing surface from the logged-in
+// dashboard's "Performance" tab (which shows the *user's own* trading
+// stats, not Fich's aggregate).
 const NAV_ITEMS: { label: string; href: string; external?: boolean }[] = [
   { label: "Home", href: "/" },
-  { label: "Performance", href: "/performance" },
+  { label: "Crypto Performance", href: "/performance" },
   { label: "Research", href: "https://research.fich.ai/", external: true },
   // WAITLIST MODE — Pricing nav item hidden. Restore when plans launch.
   // { label: "Pricing", href: "/#pricing" },
