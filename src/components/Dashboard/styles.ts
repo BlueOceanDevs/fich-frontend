@@ -106,6 +106,20 @@ export const SummaryPnl = styled.span<{ $positive: boolean }>`
     $positive ? theme.colors.success : theme.colors.danger};
 `;
 
+// Sibling to SummaryPnl, used for the "Collateral drift" subline on
+// multi-asset wallets. Smaller + muted because it's secondary context
+// to the headline "Fich Trading P&L" number — the user should glance at
+// it once to understand why their Total Portfolio Value moved, not
+// treat it as a primary metric. Same green/red sign convention as
+// SummaryPnl but at lower contrast to keep the visual hierarchy clear.
+export const SummarySubline = styled.span<{ $positive: boolean }>`
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ $positive, theme }) =>
+    $positive ? theme.colors.success : theme.colors.danger};
+  opacity: 0.75;
+`;
+
 export const SummaryRight = styled.div`
   display: flex;
   flex-direction: column;

@@ -430,8 +430,25 @@ export interface PagedResult<T> {
 export interface PortfolioDto {
   totalValueUsd: number;
   totalInvestedUsd: number;
+  /**
+   * Fich's lifetime trading P&L — realized + unrealized + funding − commission,
+   * all in BNFCR/USDT quote-asset terms. Excludes market drift on non-stable
+   * collateral (that shows in `collateralDriftUsd`).
+   */
   pnlUsd: number;
+  /** `pnlUsd / netDepositsUsd × 100`. The Return % the user sees. */
   pnlPercent: number;
+  /** Contributed-capital baseline — `OpeningEquityUsd + Σpost-activation Transfers`. The denominator behind `pnlPercent`. */
+  netDepositsUsd: number;
+  /**
+   * `totalValueUsd − netDepositsUsd − pnlUsd`. The "everything else" that
+   * moved the wallet — primarily mark-to-market changes on non-stablecoin
+   * collateral the user deposited. Rounds to 0 for single-stablecoin wallets;
+   * the UI hides the line in that case. For multi-asset wallets it explains
+   * why "Total Portfolio Value dropped" while "Trading P&L is positive" can
+   * both be true.
+   */
+  collateralDriftUsd: number;
   /** Available cash balance. Label with `cashAssetName` — not hardcoded "USDT". */
   usdtBalance: number;
   /** Actual quote asset: "USDT" for normal accounts, "BNFCR" for EU Credits-mode. */
